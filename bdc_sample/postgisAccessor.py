@@ -18,8 +18,8 @@ class PostgisAccessor(object):
 
     def store_classes(self, classes):
         self._driver.insert_many("""
-            INSERT INTO bdc.luc_class ( class_name, description, luc_classification_system_id )
-                 VALUES (%(class_name)s, %(description)s, %(luc_classification_system_id)s )
+            INSERT INTO bdc.luc_class ( class_name, description, luc_classification_system_id, user_id )
+                 VALUES (%(class_name)s, %(description)s, %(luc_classification_system_id)s, %(user_id)s )
         """, classes)
 
     def store_observations(self, data_sets):
@@ -32,7 +32,7 @@ class PostgisAccessor(object):
         :return:
         """
         self._driver.insert_many('''
-            INSERT INTO bdc.observation ( start_date, end_date, location, class_id )
+            INSERT INTO bdc.observation ( start_date, end_date, location, class_id, user_id )
                  VALUES (%(start_date)s,
                          %(end_date)s,
                          ST_Transform(
@@ -42,7 +42,8 @@ class PostgisAccessor(object):
                              ),
                              4326
                          ),
-                         %(class_id)s)
+                         %(class_id)s,
+                         %(user_id)s)
         ''', data_sets)
 
     def load(self):

@@ -1,5 +1,5 @@
-from postgisAccessor import PostgisAccessor
-from embrapa import Embrapa
+from bdc_sample.postgisAccessor import PostgisAccessor
+from bdc_sample.drivers.embrapa import Embrapa
 
 
 if __name__ == '__main__':

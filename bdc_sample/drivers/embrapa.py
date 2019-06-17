@@ -9,9 +9,7 @@ def is_shapefile(f):
 
 
 class Embrapa(object):
-    """
-
-    """
+    """Driver for Embrapa Sample for data loading to `sampledb`"""
     def __init__(self, directory, storager):
         """
         Create Embrapa Samples data handlers
@@ -54,7 +52,8 @@ class Embrapa(object):
             sample_class = {
                 "class_name": class_name,
                 "description": class_name,
-                "luc_classification_system_id": 1  # TODO Change to dynamic value
+                "luc_classification_system_id": 1,  # TODO Change to dynamic value
+                "user_id": 1  # TODO Change to dynamic value
             }
 
             samples_to_save.append(sample_class)
@@ -90,12 +89,14 @@ class Embrapa(object):
                     "lat": properties["LAT"],
                     "long": properties["LON"],
                     "srid": int(layer.GetSpatialRef().GetAuthorityCode(None)),
-                    "class_id": self._storager.samples_map_id[properties["CLASS_INPE"]]
+                    "class_id": self._storager.samples_map_id[properties["CLASS_INPE"]],
+                    "user_id": 1  # TODO Change to dynamic value
                 }
 
                 self._data_sets.append(data_set)
 
     def load_data_sets(self):
+        """Load data sets in memory using database format"""
         files = self.get_files()
 
         for f in files:
@@ -104,4 +105,5 @@ class Embrapa(object):
         return self
 
     def store(self):
+        """Stores Loaded data sets into database"""
         self._storager.store_observations(self._data_sets)
