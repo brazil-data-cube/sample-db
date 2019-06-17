@@ -1,6 +1,5 @@
 from datetime import datetime
 from osgeo import ogr
-from postgis import PostgisStorager
 import os
 import json
 
@@ -10,32 +9,35 @@ def is_shapefile(f):
 
 
 class Embrapa(object):
-    def __init__(self, directory):
+    """
+
+    """
+    def __init__(self, directory, storager):
+        """
+        Create Embrapa Samples data handlers
+        :param directory: string Directory files containing Embrapa Samples
+        :param storager: PostgisAccessor
+        """
         self._directory = directory
-        self._datasets = []
+        self._data_sets = []
         self._sample_classes = []
-        self._postgis = PostgisStorager()
-        self._postgis.connect()
+        self._storager = storager
+        self._storager.open()
 
     def get_files(self):
         files = os.listdir(self._directory)
 
         return [f for f in files if is_shapefile(f)]
 
-    def _load_classes_from_db(self):
-        self._sample_classes = self._postgis.execute('SELECT * FROM bdc.luc_class')
-        self._samples_map_id = {}
-
-        for sample in self._sample_classes:
-            self._samples_map_id[sample["class_name"]] = sample["id"]
-
     def load_classes(self, ogr_file):
         """Load Samples Classes in memory
         :param ogr_file
         """
-        layer_name = ogr_file.GetName()[:-4].split('/')[-1]
 
-        self._load_classes_from_db()
+        # Retrieves Layer Name from Data set filename
+        layer_name = ogr_file.GetName()[:-4].split('/')[-1]
+        # Load Storager classes in memory
+        self._storager.load()
 
         unique_classes = ogr_file.ExecuteSQL('SELECT DISTINCT CLASS_INPE FROM {}'.format(layer_name))
 
@@ -46,7 +48,7 @@ class Embrapa(object):
             class_name = feature.GetField(0)
 
             # When class already registered, skips
-            if class_name in self._samples_map_id.keys():
+            if class_name in self._storager.samples_map_id.keys():
                 continue
 
             sample_class = {
@@ -58,13 +60,10 @@ class Embrapa(object):
             samples_to_save.append(sample_class)
 
         if samples_to_save:
-            self._postgis.insert_many("""
-                INSERT INTO bdc.luc_class ( class_name, description, luc_classification_system_id )
-                     VALUES (%(class_name)s, %(description)s, %(luc_classification_system_id)s )
-            """, samples_to_save)
+            self._storager.store_classes(samples_to_save)
 
             # TODO: Remove it and make object key id manually
-            self._load_classes_from_db()
+            self._storager.load()
 
     def load(self, filename):
         absolute_filename = os.path.join(self._directory, filename)
@@ -85,18 +84,18 @@ class Embrapa(object):
                 start_date = '{}-01-01'.format(period[0])
                 end_date = '{}-12-31'.format(period[1])
 
-                dataset = {
+                data_set = {
                     "start_date": datetime.strptime(start_date, '%Y-%m-%d'),
                     "end_date": datetime.strptime(end_date, '%Y-%m-%d'),
                     "lat": properties["LAT"],
                     "long": properties["LON"],
                     "srid": int(layer.GetSpatialRef().GetAuthorityCode(None)),
-                    "class_id": self._samples_map_id[properties["CLASS_INPE"]]
+                    "class_id": self._storager.samples_map_id[properties["CLASS_INPE"]]
                 }
 
-                self._datasets.append(dataset)
+                self._data_sets.append(data_set)
 
-    def load_datasets(self):
+    def load_data_sets(self):
         files = self.get_files()
 
         for f in files:
@@ -105,22 +104,4 @@ class Embrapa(object):
         return self
 
     def store(self):
-        self._postgis.insert_many('''
-            INSERT INTO bdc.observation ( start_date, end_date, location, class_id )
-                 VALUES (%(start_date)s,
-                         %(end_date)s,
-                         ST_Transform(
-                             ST_SetSRID(
-                                ST_MakePoint(%(long)s, %(lat)s),
-                                 %(srid)s
-                             ),
-                             4326
-                         ),
-                         %(class_id)s )
-        ''', self._datasets)
-
-
-embrapa = Embrapa('/data/samples/Embrapa/Pontos_Coletados_Embrapa')
-
-embrapa.load_datasets()
-embrapa.store()
+        self._storager.store_observations(self._data_sets)
