@@ -98,13 +98,4 @@ CREATE TRIGGER update_observation BEFORE UPDATE
 INSERT INTO bdc.luc_classification_system (authority_name, system_name, description)
      VALUES ( 'Brazil Data Cubes', 'BDC', 'Brazilian Earth Observation Data Cube' );
 
-CREATE VIEW sample_observation AS
-  SELECT obs.start_date, obs.end_date, obs.location,
-         luclass.class_name, luclass.description,
-         lucsystem.authority_name
-    FROM bdc.luc_classification_system as lucsystem,
-         bdc.luc_class as luclass,
-         bdc.observation as obs
-   WHERE obs.class_id = luclass.id
-     AND luclass.luc_classification_system_id = lucsystem.id;
 END;
