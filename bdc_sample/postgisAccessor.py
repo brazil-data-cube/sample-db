@@ -1,4 +1,4 @@
-from postgis import Postgis
+from .postgis import Postgis
 
 
 class PostgisAccessor(object):
@@ -8,15 +8,22 @@ class PostgisAccessor(object):
         self.samples_map_id = {}
 
     def __del__(self):
+        """Close PostgreSQL connection before object destruction"""
         self.close()
 
     def open(self):
+        """Create PostgreSQL datasource connection"""
         self._driver.connect()
 
     def close(self):
+        """Disconnect PostgreSQL datasource connection"""
         self._driver.disconnect()
 
     def store_classes(self, classes):
+        """
+        Utility method to insert multiple sample classes on database
+        :param classes: list List of classes objects to save
+        """
         self._driver.insert_many("""
             INSERT INTO bdc.luc_class ( class_name, description, luc_classification_system_id, user_id )
                  VALUES (%(class_name)s, %(description)s, %(luc_classification_system_id)s, %(user_id)s )
@@ -36,17 +43,15 @@ class PostgisAccessor(object):
                  VALUES (%(start_date)s,
                          %(end_date)s,
                          ST_Transform(
-                             ST_SetSRID(
-                                ST_MakePoint(%(long)s, %(lat)s),
-                                 %(srid)s
-                             ),
-                             4326
+                            ST_SetSRID(ST_MakePoint(%(long)s, %(lat)s), %(srid)s),
+                            4326
                          ),
                          %(class_id)s,
                          %(user_id)s)
         ''', data_sets)
 
     def load(self):
+        """Load sample classes in memory"""
         self._sample_classes = self._driver.execute('SELECT * FROM bdc.luc_class')
         self.samples_map_id = {}
 
