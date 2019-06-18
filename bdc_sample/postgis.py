@@ -4,11 +4,8 @@ import psycopg2.extras
 
 class Postgis(object):
     def __init__(self, host='localhost', port=5432, username='postgres', password='', database='amostras'):
-        self._host = host
-        self._port = port
-        self._username = username
-        self._password = password
-        self._database = database
+        self._uri = "dbname='{}' user='{}' password='{}' host='{}' port={}".format(
+            database, username, password, host, port)
         self._pg = None
         self._cursor = None
 
@@ -27,8 +24,7 @@ class Postgis(object):
         Connect to the PostgreSQL database. It may throw ConnectionError
         :return:
         """
-        self._pg = psycopg2.connect("dbname='{4}' user='{2}' password='{3}' host='{0}' port={1}".format(
-            self._host, self._port, self._username, self._password, self._database))
+        self._pg = psycopg2.connect(self._uri)
 
     def cursor(self, **kwargs):
         # TODO: Should create multiple cursor connections?

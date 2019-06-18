@@ -79,7 +79,7 @@ class InSitu(object):
         """Load data sets in memory using database format"""
 
         # Read data sets (.rda) from R to CSV
-        self.generate_data_sets()
+        InSitu.generate_data_sets(self._directory)
 
         files = self.get_files()
 
@@ -89,7 +89,8 @@ class InSitu(object):
 
         return self
     
-    def generate_data_sets(self):
+    @classmethod
+    def generate_data_sets(self, directory):
         """
         Generates sample from inSitu package in R. It will generate `.csv` files
         inside the provided in this object creation.
@@ -101,15 +102,24 @@ class InSitu(object):
         install.packages("devtools")
         devtools::install_github("e-sensing/inSitu")
         install.packages("dplyr")
-        library("inSitu")
-
-        list_datasets()
-        load("")
-        ...
         ```
 
-        After that, 
+        After that, execute R functions to load `.rda` files and export to CSV
         """
+        import subprocess
+        from pathlib import Path
+
+        scripts_directory = Path(__file__).parent.parent.parent / 'share/bdc_sample/scripts/'
+
+        export_to_csv_script = scripts_directory / 'export-inSitu-samples-csv.R'
+        install_dependencies_script = scripts_directory / 'install-inSitu.R'
+
+        # Install dependencies
+        subprocess.call('R --silent -f {}'.format(install_dependencies_script), shell=True)
+
+        rcommands = 'R --silent -f {} --args {}'.format(export_to_csv_script, directory)
+        # Execute script to generate Sample CSV data
+        subprocess.call(rcommands, shell=True)
     
     def store(self):
         self._storager.store_observations(self._data_sets)

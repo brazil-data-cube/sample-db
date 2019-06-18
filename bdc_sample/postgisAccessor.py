@@ -1,4 +1,4 @@
-from .postgis import Postgis
+from postgis import Postgis
 
 
 class PostgisAccessor(object):
