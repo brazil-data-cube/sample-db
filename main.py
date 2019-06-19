@@ -1,6 +1,7 @@
 from bdc_sample.postgisAccessor import PostgisAccessor
 from bdc_sample.drivers.embrapa import Embrapa
 from bdc_sample.drivers.inSitu import InSitu
+from bdc_sample.drivers.dpi import Dpi
 
 
 if __name__ == '__main__':
@@ -17,3 +18,9 @@ if __name__ == '__main__':
     driver.load_data_sets()
 
     driver.store()
+
+    dpi = Dpi('/data/Ieda/', storager=storager)
+
+    dpi.load_data_sets()
+
+    dpi.store()

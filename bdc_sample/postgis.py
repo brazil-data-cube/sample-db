@@ -19,12 +19,16 @@ class Postgis(object):
         if self._pg:
             self._pg.close()
 
+        self._cursor = None
+        self._pg = None
+
     def connect(self):
         """
         Connect to the PostgreSQL database. It may throw ConnectionError
         :return:
         """
-        self._pg = psycopg2.connect(self._uri)
+        if not self._pg:
+            self._pg = psycopg2.connect(self._uri)
 
     def cursor(self, **kwargs):
         # TODO: Should create multiple cursor connections?

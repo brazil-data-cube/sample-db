@@ -34,6 +34,6 @@ class Dpi(ShapeToTableDriver):
             "lat": geom.GetY(),
             "long": geom.GetX(),
             "srid": srid,
-            "class_id": self.storager.samples_map_id[feature.GetFieldAsString["ext_na"]],
+            "class_id": self.storager.samples_map_id[feature.GetFieldAsString("ext_na")],
             "user_id": 1  # TODO Change to dynamic value
         }

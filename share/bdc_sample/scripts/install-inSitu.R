@@ -4,8 +4,19 @@
 # - devtools
 # - e-sensing/inSitu
 # - dplyr
-# 
+#
 
-install.packages("devtools", repos="http://cran.r-project.org")
+# Function to check whether package is installed
+is.installed <- function(mypkg){
+    is.element(mypkg, installed.packages()[,1])
+}
+
+if (!is.installed("devtools")) {
+    install.packages("devtools", repos="http://cran.r-project.org")
+}
+
 devtools::install_github("e-sensing/inSitu")
-install.packages("dplyr", repos="http://cran.r-project.org")
+
+if (!is.installed("dplyr")) {
+    install.packages("dplyr", repos="http://cran.r-project.org")
+}
