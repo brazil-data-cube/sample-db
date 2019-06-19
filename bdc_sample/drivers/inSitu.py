@@ -34,20 +34,13 @@ class InSitu(Driver):
 
         self.load_classes(csv)
 
-        for row in csv.iterrows():
-            values = row[1]
+        csv['srid'] = 4326
+        csv['class_id'] = csv['label'].apply(lambda row: self.storager.samples_map_id[row])
+        csv['user_id'] = 1
+        csv['lat'] = csv['latitude']
+        csv['long'] = csv['longitude']
 
-            data_set = {
-                "start_date": datetime.strptime(values['start_date'], '%Y-%m-%d'),
-                "end_date": datetime.strptime(values['end_date'], '%Y-%m-%d'),
-                "lat": values['latitude'],
-                "long": values['longitude'],
-                "srid": 4326,  # TODO: We are assuming
-                "class_id": self.storager.samples_map_id[values["label"]],
-                "user_id": 1  # TODO Change to dynamic value
-            }
-
-            self._data_sets.append(data_set)
+        self._data_sets.extend(csv.T.to_dict().values())
 
     def load_classes(self, csv):
         self.storager.load()
@@ -90,7 +83,7 @@ class InSitu(Driver):
         return super().load_data_sets()
 
     @classmethod
-    def generate_data_sets(self, directory):
+    def generate_data_sets(cls, directory):
         """
         Generates sample from inSitu package in R. It will generate `.csv` files
         inside the provided in this object creation.
@@ -113,6 +106,9 @@ class InSitu(Driver):
 
         export_to_csv_script = scripts_directory / 'export-inSitu-samples-csv.R'
         install_dependencies_script = scripts_directory / 'install-inSitu.R'
+
+        if not os.path.exists(directory):
+            os.mkdir(directory)
 
         # Install dependencies
         subprocess.call('R --silent -f {}'.format(install_dependencies_script), shell=True)

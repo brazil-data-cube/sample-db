@@ -90,6 +90,25 @@ CREATE TABLE bdc.observation
               MATCH FULL ON DELETE NO ACTION
 );
 
+CREATE TABLE bdc.sample_set
+(
+  id          SERIAL PRIMARY KEY,
+  name        VARCHAR NOT NULL,
+  description TEXT,
+  created_at  TIMESTAMP WITHOUT TIME ZONE DEFAULT now(),
+  updated_at  TIMESTAMP WITHOUT TIME ZONE DEFAULT now(),
+  user_id     INTEGER NOT NULL,
+  luc_classification_system_id INTEGER NOT NULL,
+  FOREIGN KEY (user_id)
+              REFERENCES bdc.users(id)
+              MATCH FULL ON DELETE NO ACTION,
+  FOREIGN KEY (luc_classification_system_id)
+              REFERENCES bdc.luc_classification_system(id)
+              MATCH FULL ON DELETE NO ACTION
+);
+
+CREATE INDEX bdc_observation_location_idx ON bdc.observation USING GIST(location);
+
 CREATE OR REPLACE FUNCTION bdc.set_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -109,6 +128,11 @@ CREATE TRIGGER update_luc_class BEFORE UPDATE
 CREATE TRIGGER update_observation BEFORE UPDATE
     ON bdc.observation FOR EACH ROW EXECUTE PROCEDURE
     bdc.set_updated_at();
+
+CREATE TRIGGER update_sample_set BEFORE UPDATE
+    ON bdc.sample_set FOR EACH ROW EXECUTE PROCEDURE
+    bdc.set_updated_at();
+
 
 INSERT INTO bdc.users ( full_name, email, password ) VALUES ( 'Admin', 'admin@admin.com', crypt('admin', gen_salt('bf')) );
 
