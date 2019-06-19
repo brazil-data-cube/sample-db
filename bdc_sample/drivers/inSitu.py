@@ -1,14 +1,15 @@
+from bdc_sample.core.driver import Driver
 from datetime import datetime
 import os
 import pandas as pd
 
 
-class InSitu(object):
+class InSitu(Driver):
     """
     Driver for InSitu Sample for data loading to `sampledb`
 
     This class is an abstraction of repository https://github.com/e-sensing/inSitu.git
-    
+
     **Make sure** you have `R` in PATH. You can download `R` in https://cran.r-project.org/
     """
     def __init__(self, directory, storager):
@@ -17,18 +18,19 @@ class InSitu(object):
         :param directory: string Directory where converted files will be stored
         :param storager: PostgisAccessor
         """
-        self._directory = directory
-        self._data_sets = []
-        self._storager = storager
-        self._storager.open()
+        super().__init__(storager)
+
+        self.directory = directory
+        storager.open()
 
     def get_files(self):
-        files = os.listdir(self._directory)
+        files = os.listdir(self.directory)
 
         return [f for f in files if f.endswith(".csv")]
 
-    def load(self, file_path):
-        csv = pd.read_csv(file_path)
+    def load(self, file_name):
+        absolute_file_path = os.path.join(self.directory, file_name)
+        csv = pd.read_csv(absolute_file_path)
 
         self.load_classes(csv)
 
@@ -40,26 +42,26 @@ class InSitu(object):
                 "end_date": datetime.strptime(values['end_date'], '%Y-%m-%d'),
                 "lat": values['latitude'],
                 "long": values['longitude'],
-                "srid": 4326,  # TODO: We are assuming 
-                "class_id": self._storager.samples_map_id[values["label"]],
+                "srid": 4326,  # TODO: We are assuming
+                "class_id": self.storager.samples_map_id[values["label"]],
                 "user_id": 1  # TODO Change to dynamic value
             }
 
             self._data_sets.append(data_set)
 
     def load_classes(self, csv):
-        self._storager.load()
+        self.storager.load()
 
         unique_classes = csv['label'].unique()
 
         samples_to_save = []
 
-        stored_keys = self._storager.samples_map_id.keys()
+        stored_keys = self.storager.samples_map_id.keys()
 
         for class_name in unique_classes:
             if class_name in stored_keys:
                 continue
-            
+
             sample_class = {
                 "class_name": class_name,
                 "description": class_name,
@@ -70,25 +72,23 @@ class InSitu(object):
             samples_to_save.append(sample_class)
 
         if samples_to_save:
-            self._storager.store_classes(samples_to_save)
+            self.storager.store_classes(samples_to_save)
 
             # TODO: Remove it and make object key id manually
-            self._storager.load()
+            self.storager.load()
 
     def load_data_sets(self):
-        """Load data sets in memory using database format"""
+        """
+        Load data sets in memory using database format.
+        Calls `R` script to generate CSV sample data set. After that,
+        process the `CSV` files to the storager handler
+        """
 
         # Read data sets (.rda) from R to CSV
-        InSitu.generate_data_sets(self._directory)
+        InSitu.generate_data_sets(self.directory)
 
-        files = self.get_files()
+        return super().load_data_sets()
 
-        for f in files:
-            absolute_filename = os.path.join(self._directory, f)
-            self.load(absolute_filename)
-
-        return self
-    
     @classmethod
     def generate_data_sets(self, directory):
         """
@@ -120,6 +120,3 @@ class InSitu(object):
         rcommands = 'R --silent -f {} --args {}'.format(export_to_csv_script, directory)
         # Execute script to generate Sample CSV data
         subprocess.call(rcommands, shell=True)
-    
-    def store(self):
-        self._storager.store_observations(self._data_sets)

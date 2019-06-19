@@ -9,7 +9,7 @@ class Dpi(ShapeToTableDriver):
     """Driver for data loading to `sampledb`"""
     def __init__(self, directory, storager):
         """
-        Create InSitu Samples data handlers
+        Create Dpi Samples data handlers
         :param directory: string Directory where converted files will be stored
         :param storager: PostgisAccessor
         """

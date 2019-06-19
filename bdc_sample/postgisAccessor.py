@@ -1,4 +1,4 @@
-from postgis import Postgis
+from bdc_sample.postgis import Postgis
 
 
 class PostgisAccessor(object):
