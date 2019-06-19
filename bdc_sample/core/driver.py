@@ -1,11 +1,12 @@
 from abc import abstractmethod, ABCMeta
+from osgeo import ogr
 import os
 
 class Driver(metaclass=ABCMeta):
     def __init__(self, storager):
         self.storager = storager
         self._data_sets = []
-    
+
     @abstractmethod
     def load(self, file):
         """Opens the file and load data"""
@@ -13,7 +14,7 @@ class Driver(metaclass=ABCMeta):
     @abstractmethod
     def load_classes(self, file):
         """Load sample classes in memory"""
-    
+
     @abstractmethod
     def get_files(self):
         """Retrieves list of files to load"""
@@ -26,7 +27,7 @@ class Driver(metaclass=ABCMeta):
             self.load(f)
 
         return self
-    
+
     def store(self):
         self.storager.store_observations(self._data_sets)
 
@@ -40,15 +41,29 @@ class ShapeToTableDriver(Driver):
     @abstractmethod
     def get_unique_classes(self, ogr_file, layer_name):
         """Retrieves distinct sample classes from shapefile datasource"""
-    
+
     def get_files(self):
         files = os.listdir(self.directory)
 
         return [f for f in files if f.endswith('.shp')]
 
     # def build_data_set(lat, long, start_date, end_date, class_id, user_id=1, srid=4326):
-        
-    
+    @abstractmethod
+    def build_data_set(self, feature, **kwargs):
+        """Build data set sample observation"""
+
+    def load(self, filename):
+        absolute_filename = os.path.join(self.directory, filename)
+        gdal_file = ogr.Open(absolute_filename)
+
+        self.load_classes(gdal_file)
+
+        for layer_id in range(gdal_file.GetLayerCount()):
+            layer = gdal_file.GetLayer(layer_id)
+
+            for feature in layer:
+                self._data_sets.append(self.build_data_set(feature, **{"layer": layer}))
+
     def load_classes(self, file):
         # Retrieves Layer Name from Data set filename
         layer_name = file.GetName()[:-4].split('/')[-1]
