@@ -6,7 +6,7 @@ from bdc_sample.drivers.fototeca import Fototeca
 
 
 if __name__ == '__main__':
-    storager = PostgisAccessor(host='terrama2_pg', username='postgres', password='postgres', database='amostras')
+    storager = PostgisAccessor(host='localhost', username='postgres', password='postgres', database='amostras')
 
     # TODO: Retrieve from database. Enable to create new one
     # User Identifier
