@@ -7,13 +7,13 @@ import json
 
 class Embrapa(ShapeToTableDriver):
     """Driver for Embrapa Sample for data loading to `sampledb`"""
-    def __init__(self, directory, storager):
+    def __init__(self, directory, storager, user, system):
         """
         Create Embrapa Samples data handlers
         :param directory: string Directory files containing Embrapa Samples
         :param storager: PostgisAccessor
         """
-        super().__init__(directory, storager)
+        super().__init__(directory, storager, user, system)
         self._directory = directory
         self.storager.open()
 
@@ -36,5 +36,5 @@ class Embrapa(ShapeToTableDriver):
             "long": properties["LON"],
             "srid": int(layer.GetSpatialRef().GetAuthorityCode(None)),
             "class_id": self.storager.samples_map_id[properties["CLASS_INPE"]],
-            "user_id": 1  # TODO Change to dynamic value
+            "user_id": self.user  # TODO Change to dynamic value
         }

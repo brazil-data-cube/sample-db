@@ -1,10 +1,8 @@
-from bdc_sample.core.driver import Driver
+from bdc_sample.core.driver import CSVDriver
 from datetime import datetime
 import os
-import pandas as pd
 
-
-class InSitu(Driver):
+class InSitu(CSVDriver):
     """
     Driver for InSitu Sample for data loading to `sampledb`
 
@@ -12,63 +10,26 @@ class InSitu(Driver):
 
     **Make sure** you have `R` in PATH. You can download `R` in https://cran.r-project.org/
     """
-    def __init__(self, directory, storager):
+    def __init__(self, directory, storager, user, system):
         """
         Create InSitu Samples data handlers
         :param directory: string Directory where converted files will be stored
         :param storager: PostgisAccessor
         """
-        super().__init__(storager)
+        super().__init__(directory, storager, user, system)
 
-        self.directory = directory
         storager.open()
 
-    def get_files(self):
-        files = os.listdir(self.directory)
+    def get_unique_classes(self, csv):
+        return csv['label'].unique()
 
-        return [f for f in files if f.endswith(".csv")]
-
-    def load(self, file_name):
-        absolute_file_path = os.path.join(self.directory, file_name)
-        csv = pd.read_csv(absolute_file_path)
-
-        self.load_classes(csv)
-
+    def build_data_set(self, csv):
         csv['srid'] = 4326
         csv['class_id'] = csv['label'].apply(lambda row: self.storager.samples_map_id[row])
         csv['user_id'] = 1
         csv['lat'] = csv['latitude']
         csv['long'] = csv['longitude']
-
-        self._data_sets.extend(csv.T.to_dict().values())
-
-    def load_classes(self, csv):
-        self.storager.load()
-
-        unique_classes = csv['label'].unique()
-
-        samples_to_save = []
-
-        stored_keys = self.storager.samples_map_id.keys()
-
-        for class_name in unique_classes:
-            if class_name in stored_keys:
-                continue
-
-            sample_class = {
-                "class_name": class_name,
-                "description": class_name,
-                "luc_classification_system_id": 1,  # TODO Change to dynamic value
-                "user_id": 1  # TODO Change to dynamic value
-            }
-
-            samples_to_save.append(sample_class)
-
-        if samples_to_save:
-            self.storager.store_classes(samples_to_save)
-
-            # TODO: Remove it and make object key id manually
-            self.storager.load()
+        return csv
 
     def load_data_sets(self):
         """

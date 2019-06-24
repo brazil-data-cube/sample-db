@@ -7,13 +7,13 @@ import os
 
 class Dpi(ShapeToTableDriver):
     """Driver for data loading to `sampledb`"""
-    def __init__(self, directory, storager):
+    def __init__(self, directory, storager, user, system):
         """
         Create Dpi Samples data handlers
         :param directory: string Directory where converted files will be stored
         :param storager: PostgisAccessor
         """
-        super().__init__(directory, storager)
+        super().__init__(directory, storager, user, system)
         self._directory = directory
         self.storager.open()
 

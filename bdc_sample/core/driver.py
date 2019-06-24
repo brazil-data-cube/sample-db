@@ -1,10 +1,14 @@
 from abc import abstractmethod, ABCMeta
 from osgeo import ogr
 import os
+import pandas as pd
+
 
 class Driver(metaclass=ABCMeta):
-    def __init__(self, storager):
+    def __init__(self, storager, user=1, system=1):
         self.storager = storager
+        self.user = user
+        self.system = system
         self._data_sets = []
 
     @abstractmethod
@@ -32,9 +36,67 @@ class Driver(metaclass=ABCMeta):
         self.storager.store_observations(self._data_sets)
 
 
+class CSVDriver(Driver):
+    def __init__(self, directory, storager, user, system):
+        super().__init__(storager, user, system)
+
+        self.directory = directory
+
+    def get_files(self):
+        files = os.listdir(self.directory)
+
+        return [f for f in files if f.endswith(".csv")]
+
+    @abstractmethod
+    def build_data_set(self, csv):
+        """Build data set sample observation"""
+
+    @abstractmethod
+    def get_unique_classes(self, csv):
+        """Retrieves distinct sample classes from CSV datasource"""
+
+    def load(self, file_name):
+        absolute_file_path = os.path.join(self.directory, file_name)
+        csv = pd.read_csv(absolute_file_path)
+
+        self.load_classes(csv)
+
+        self.build_data_set(csv)
+
+        self._data_sets.extend(csv.T.to_dict().values())
+
+    def load_classes(self, csv):
+        self.storager.load()
+
+        unique_classes = self.get_unique_classes(csv)
+
+        samples_to_save = []
+
+        stored_keys = self.storager.samples_map_id.keys()
+
+        for class_name in unique_classes:
+            if class_name in stored_keys:
+                continue
+
+            sample_class = {
+                "class_name": class_name,
+                "description": class_name,
+                "luc_classification_system_id": 1,  # TODO Change to dynamic value
+                "user_id": self.user
+            }
+
+            samples_to_save.append(sample_class)
+
+        if samples_to_save:
+            self.storager.store_classes(samples_to_save)
+
+            # TODO: Remove it and make object key id manually
+            self.storager.load()
+
+
 class ShapeToTableDriver(Driver):
-    def __init__(self, directory, storager):
-        super().__init__(storager)
+    def __init__(self, directory, storager, user, system):
+        super().__init__(storager, user, system)
 
         self.directory = directory
 
@@ -47,7 +109,6 @@ class ShapeToTableDriver(Driver):
 
         return [f for f in files if f.endswith('.shp')]
 
-    # def build_data_set(lat, long, start_date, end_date, class_id, user_id=1, srid=4326):
     @abstractmethod
     def build_data_set(self, feature, **kwargs):
         """Build data set sample observation"""

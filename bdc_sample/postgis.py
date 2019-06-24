@@ -36,7 +36,7 @@ class Postgis(object):
             self._cursor = self._pg.cursor(**kwargs)
         return self._cursor
 
-    def execute(self, sql, cursor=None):
+    def execute(self, sql, cursor=None, **values):
         """
         Executes SQL on current database session and retrieve the affected result.
         When `cursor` is `None`, creates a new one with `psycopg2.extras.DictCursor` as factory handling.
@@ -48,7 +48,7 @@ class Postgis(object):
         if cursor is None:
             cursor = self.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-        cursor.execute(sql)
+        cursor.execute(sql, values)
         self._pg.commit()
 
         return cursor.fetchall()
