@@ -1,4 +1,4 @@
-from bdc_sample.postgisAccessor import PostgisAccessor
+from bdc_sample.core.postgis_accessor import PostgisAccessor
 from bdc_sample.drivers.embrapa import Embrapa
 
 
