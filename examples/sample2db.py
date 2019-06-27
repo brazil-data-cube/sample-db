@@ -8,7 +8,6 @@ from bdc_sample.drivers.dpi import Dpi
 from bdc_sample.drivers.fototeca import Fototeca
 
 
-
 if __name__ == '__main__':
     # Initialize SQLAlchemy Models
     db.init_model('postgresql://postgres:postgres@localhost:5432/sampledb')
