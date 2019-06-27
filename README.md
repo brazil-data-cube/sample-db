@@ -23,4 +23,16 @@ pip install -r requirements.txt
 
 ## Running
 
-TODO
+We have prepared [`migration`](./migrations) config using [`alembic`](https://alembic.sqlalchemy.org/en/latest/).
+Create database `sampledb` with the following command:
+
+```psql
+CREATE DATABASE sampledb TEMPLATE template1;
+```
+
+After that, edit database credentials `sqlalchemy.url` in `alembic.ini`. Once configured, run migration command to prepare model tables:
+
+```python
+alembic upgrade head
+```
+
