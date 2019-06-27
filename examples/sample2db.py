@@ -11,7 +11,7 @@ from bdc_sample.drivers.fototeca import Fototeca
 
 if __name__ == '__main__':
     # Initialize SQLAlchemy Models
-    db.init_model('postgresql://postgres:postgres@localhost:5432/teste')
+    db.init_model('postgresql://postgres:postgres@localhost:5432/sampledb')
     # db.Model.metadata.create_all()
 
     users = db.session.query(User).filter(User.email == "admin@admin.com")
@@ -34,9 +34,9 @@ if __name__ == '__main__':
     storager = PostgisAccessor()
 
     drivers = [
-#        Embrapa('/data/Embrapa/Pontos_Coletados_Embrapa', storager, user, luc_system),
-#        InSitu('/data/inSitu', storager, user, luc_system),
-#        Dpi('/data/Ieda/', storager, user, luc_system),
+        Embrapa('/data/Embrapa/Pontos_Coletados_Embrapa', storager, user, luc_system),
+        InSitu('/data/inSitu', storager, user, luc_system),
+        Dpi('/data/Ieda/', storager, user, luc_system),
         Fototeca('/data/Rodrigo/Rodrigo-BareSoil', storager, user, luc_system)
     ]
 
