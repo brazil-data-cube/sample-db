@@ -1,54 +1,37 @@
-from bdc_sample.core.postgis import Postgis
-
+from bdc_sample.models import db, LucClass, Observation
 
 class PostgisAccessor(object):
-    def __init__(self, host='localhost', port=5432, username='postgres', password='', database='amostras'):
-        self._driver = Postgis(host, port, username, password, database)
-        self._sample_classes = []
+    def __init__(self):
+        self.sample_classes = []
         self.samples_map_id = {}
 
-    def __del__(self):
-        self.close()
-
-    def open(self):
-        self._driver.connect()
-
-    def close(self):
-        self._driver.disconnect()
-
     def store_classes(self, classes):
-        self._driver.insert_many("""
-            INSERT INTO bdc.luc_class ( class_name, description, luc_classification_system_id, user_id )
-                 VALUES (%(class_name)s, %(description)s, %(luc_classification_system_id)s, %(user_id)s )
-        """, classes)
+        """
+        Utility method to insert multiple sample classes on database
+        :param classes: list List of classes objects to save
+        """
+        # for sample_class in classes:
+        #     klass = LucClass(**sample_class)
+        #     klass.save(commit=False)
+        db.session.bulk_insert_mappings(LucClass, classes)
+        # Commit transaction once
+        db.session.commit()
 
     def store_observations(self, data_sets):
         """
         Stores sample observation into database.
-        **Note** that you must provide `lat/long` and `srid` attributes to build a location.
 
-        TODO: Allow to handle both `lat/long` and `geom` field in data set
         :param data_sets: List of data sets observation to insert in database
         :return:
         """
-        self._driver.insert_many('''
-            INSERT INTO bdc.observation ( start_date, end_date, location, class_id, user_id )
-                 VALUES (%(start_date)s,
-                         %(end_date)s,
-                         ST_Transform(
-                             ST_SetSRID(
-                                ST_MakePoint(%(long)s, %(lat)s),
-                                 %(srid)s
-                             ),
-                             4326
-                         ),
-                         %(class_id)s,
-                         %(user_id)s)
-        ''', data_sets)
+        db.session.bulk_insert_mappings(Observation, data_sets, True)
+        # Commit transaction once
+        db.session.commit()
 
     def load(self):
-        self._sample_classes = self._driver.execute('SELECT * FROM bdc.luc_class')
+        """Load sample classes in memory"""
+        self.sample_classes = db.session.query(LucClass).all()
         self.samples_map_id = {}
 
-        for sample in self._sample_classes:
-            self.samples_map_id[sample["class_name"]] = sample["id"]
+        for sample in self.sample_classes:
+            self.samples_map_id[sample.class_name] = sample.id

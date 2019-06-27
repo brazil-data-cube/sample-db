@@ -9,7 +9,7 @@ setup(
     author='Admin',
     author_email='admin@admin.com',
     url='https://www.python.org/sigs/distutils-sig/',
-    packages=['bdc_sample', 'bdc_sample.models'],
+    packages=['bdc_sample', 'bdc_sample.core', 'bdc_sample.drivers', 'bdc_sample.models'],
     package_data={'': ['*.md']}
     # data_files=[('README.md'), ['README.md']]
 )
