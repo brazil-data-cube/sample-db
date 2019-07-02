@@ -24,7 +24,11 @@ class PostgisAccessor(object):
         :param data_sets: List of data sets observation to insert in database
         :return:
         """
-        db.session.bulk_insert_mappings(Observation, data_sets, True)
+        # db.session.bulk_insert_mappings(Observation, data_sets)
+        db.engine.execute(
+            Observation.__table__.insert(),
+            data_sets
+        )
         # Commit transaction once
         db.session.commit()
 

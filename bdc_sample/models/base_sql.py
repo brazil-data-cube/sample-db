@@ -12,8 +12,8 @@ class DatabaseWrapper(object):
         self.Model = declarative_base(metadata=MetaData(schema="bdc"))
 
     def init_model(self, uri):
-        engine = create_engine(uri)
-        self.DBSession.configure(bind=engine)
+        self.engine = create_engine(uri)
+        self.DBSession.configure(bind=self.engine)
         self.session = self.DBSession()
 
 
