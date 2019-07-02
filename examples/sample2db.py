@@ -1,3 +1,9 @@
+import os
+import sys
+
+sys.path.append(os.path.abspath('.'))
+sys.path.append(os.path.abspath('../'))
+
 # Models
 from bdc_sample.models import db, LucClassificationSystem, User
 # Drivers
@@ -36,7 +42,13 @@ if __name__ == '__main__':
         Embrapa('/data/Embrapa/Pontos_Coletados_Embrapa', storager, user, luc_system),
         InSitu('/data/inSitu', storager, user, luc_system),
         Dpi('/data/Ieda/', storager, user, luc_system),
-        Fototeca('/data/Rodrigo/Rodrigo-BareSoil', storager, user, luc_system)
+        Fototeca('/data/Rodrigo/Rodrigo-BareSoil', storager, user, luc_system),
+        Fototeca('/data/Rodrigo/Rodrigo-Cerrado-Campestre-Toposerra-Arboreo', storager, user, luc_system),
+        Fototeca('/data/Rodrigo/ClearCut', storager, user, luc_system),
+        Fototeca('/data/Rodrigo/Eucalyptus', storager, user, luc_system),
+        Fototeca('/data/Rodrigo/ForestDegradation', storager, user, luc_system),
+        Fototeca('/data/Rodrigo/ForestFireScar', storager, user, luc_system),
+        Fototeca('/data/Rodrigo/ForestFireScar', storager, user, luc_system),
     ]
 
     for driver in drivers:
