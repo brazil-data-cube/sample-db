@@ -6,14 +6,6 @@ from geoalchemy2 import shape
 
 class Embrapa(ShapeToTableDriver):
     """Driver for Embrapa Sample for data loading to `sampledb`"""
-    def __init__(self, directory, storager, user, system):
-        """
-        Create Embrapa Samples data handlers
-        :param directory: string Directory files containing Embrapa Samples
-        :param storager: PostgisAccessor
-        """
-        super().__init__(directory, storager, user, system)
-        self._directory = directory
 
     def get_unique_classes(self, ogr_file, layer_name):
         return ogr_file.ExecuteSQL('SELECT DISTINCT CLASS_INPE FROM {}'.format(layer_name))
