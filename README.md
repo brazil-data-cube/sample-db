@@ -116,7 +116,7 @@ docker run --interactive \
            --tty \
            --rm \
            --name sampledb_migration \
-           --volume $(pwd)/alembic.ini:/devel/alembic.ini
+           --volume $(pwd)/alembic.ini:/devel/alembic.ini \
            bdc/sampledb alembic upgrade head
 ```
 
