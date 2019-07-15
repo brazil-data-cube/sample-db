@@ -1,6 +1,10 @@
+import os
+import sys
+sys.path.append(os.path.abspath('.'))
+sys.path.append(os.path.abspath('../'))
 
 from logging.config import fileConfig
-from sqlalchemy import engine_from_config
+from sqlalchemy import create_engine, engine_from_config
 from sqlalchemy import pool
 from alembic import context
 from bdc_sample import models
@@ -37,7 +41,9 @@ def run_migrations_offline():
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
+    url = os.environ.get('SQLALCHEMY_URI',
+                         config.get_main_option("sqlalchemy.url"))
+
     context.configure(
         url=url, target_metadata=target_metadata, literal_binds=True
     )
@@ -53,11 +59,16 @@ def run_migrations_online():
     and associate a connection with the context.
 
     """
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+    uri = os.environ.get('SQLALCHEMY_URI', None)
+
+    if uri:
+        connectable = create_engine(uri)
+    else:
+        connectable = engine_from_config(
+            config.get_section(config.config_ini_section),
+            prefix="sqlalchemy.",
+            poolclass=pool.NullPool,
+        )
 
     with connectable.connect() as connection:
         context.configure(

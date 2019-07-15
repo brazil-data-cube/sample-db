@@ -1,6 +1,6 @@
-from bdc_sample.core.driver import CSVDriver
 from geopandas import GeoDataFrame
 from shapely.geometry import Point
+from bdc_sample.core.driver import CSVDriver
 
 
 class Fototeca(CSVDriver):

@@ -1,1 +1,2 @@
-include share/*
+graft bdc_sample
+global-exclude *.py[cod] __pycache__ *.so

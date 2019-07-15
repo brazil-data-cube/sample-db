@@ -1,26 +1,14 @@
-FROM ubuntu:18.04
+FROM brazildatacube/geo:0.1
 
 RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y \
-        sudo \
-        libssl-dev \
-        software-properties-common \
-        r-base \
-        python3-pip python3-dev && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y r-base && \
     rm -rf /var/lib/apt/lists/*
-
-RUN add-apt-repository -y ppa:ubuntugis/ppa && \
-    apt-get update && \
-    apt-get install -y \
-        libgdal-dev gdal-bin && \
-    rm -rf /var/lib/apt/lists/*
-
-RUN pip3 install GDAL==2.4
 
 COPY . /devel
 
 WORKDIR /devel
 
-RUN gdalinfo --version && \
-    pip3 install -r requirements.txt && \
+RUN pip3 install -r requirements.txt && \
     python3 setup.py install
+
+RUN R --silent -f bdc_sample/drivers/r-scripts/install-inSitu.R

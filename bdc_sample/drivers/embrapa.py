@@ -1,7 +1,7 @@
-from bdc_sample.core.driver import ShapeToTableDriver
 from datetime import datetime
 from shapely import geometry
 from geoalchemy2 import shape
+from bdc_sample.core.driver import ShapeToTableDriver
 
 
 class Embrapa(ShapeToTableDriver):
