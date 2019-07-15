@@ -36,7 +36,7 @@ CREATE DATABASE sampledb TEMPLATE template1;
 After that, run migration command to prepare model tables:
 
 ```python
-alembic upgrade head
+PYTHONPATH=$(pwd) alembic upgrade head
 ```
 
 Edit the file [`sample2db.py`](./examples/sample2db.py) with directory where sample is stored.
@@ -47,7 +47,7 @@ For example:
 # Models
 from bdc_sample.models import db, LucClassificationSystem, User
 # Drivers
-from bdc_sample.core.postgis_acessor import PostgisAccessor
+from bdc_sample.core.postgis_accessor import PostgisAccessor
 from bdc_sample.drivers.embrapa import Embrapa
 from bdc_sample.drivers.inSitu import InSitu
 from bdc_sample.drivers.dpi import Dpi
@@ -106,7 +106,7 @@ You can use Docker environment to execute the script `sample2db.py`
 Build docker image with the following command:
 
 ```bash
-docker build --tag bdc/sampledb -f docker/Dockerfile .
+docker build --tag brazildatacube/sampledb:1.0 -f docker/Dockerfile .
 ```
 
 To create migration, make sure the database connection parameters is correct in `alembic.ini`. Run the following command to create migrations:
@@ -116,8 +116,8 @@ docker run --interactive \
            --tty \
            --rm \
            --name sampledb_migration \
-           --volume $(pwd)/alembic.ini:/devel/alembic.ini \
-           bdc/sampledb alembic upgrade head
+           --env SQLALCHEMY_URI=postgresql://postgres:postgres@150.163.2.83:5433/sampledb \
+           brazildatacube/sampledb:1.0 alembic upgrade head
 ```
 
 After that, create container and execute the `sample2db.py` (**Make sure** that database connection parameters is correct. You can edit manually and mount as file in container):
@@ -127,7 +127,7 @@ docker run --interactive \
            --tty \
            --rm \
            --name sampledb \
-           --volume /path/to/the/sample_data:/data \
-           --volume $(pwd)/examples/sample2db.py:/devel/examples/sample2db.py \
-           bdc/sample python examples/sample2db.py
+           --volume /data:/data \
+           --env SQLALCHEMY_URI=postgresql://postgres:postgres@150.163.2.83:5433/sampledb \
+           brazildatacube/sampledb:1.0 python3 examples/sample2db.py
 ```
