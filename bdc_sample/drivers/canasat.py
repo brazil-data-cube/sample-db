@@ -1,21 +1,8 @@
 """
 Samples Canasat
-2005 - GRIDCODE, Classe, ID
-2006 - SPRAREA, SPRPERIMET, SPRCLASSE, ID
-2007 - SPRAREA, SPRPERIMET, SPRCLASSE, ID
-2008 - SPRAREA, SPRPERIMET, SPRCLASSE, ID
-2009 - SPRCLASSE, Classe, ID
-2010 - Classe, ID
-2011 - ID, GRIDCODE, Classes
-2012 - Classes, ID
-2013 - ID, GRIDCODE, Class_map
-2014 - ID, GRIDCODE, Classes, Class_map
-2015 -  OBJECTID, Id, gridcode, Classes
 """
 
 from datetime import datetime
-from os.path import join as join_path
-from osgeo import ogr
 from shapely.geometry import Point
 from bdc_sample.core.driver import ShapeToTableDriver
 from bdc_sample.core.utils import reproject
