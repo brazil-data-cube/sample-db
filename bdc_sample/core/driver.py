@@ -63,6 +63,9 @@ class CSVDriver(Driver):
 
     @staticmethod
     def list_csv_files(directory):
+        if os.path.isfile(directory):
+            return [directory]
+
         files = os.listdir(directory)
 
         return [os.path.join(directory, f) for f in files if f.endswith(".csv")]
@@ -131,15 +134,16 @@ class ShapeToTableDriver(Driver):
 
         files = os.listdir(self.directory)
 
-        return [f for f in files if f.endswith('.shp')]
+        return [
+            os.path.join(self.directory, f) for f in files if f.endswith('.shp')
+        ]
 
     @abstractmethod
     def build_data_set(self, feature, **kwargs):
         """Build data set sample observation"""
 
     def load(self, file):
-        absolute_filename = os.path.join(self.directory, file)
-        gdal_file = ogr.Open(absolute_filename)
+        gdal_file = ogr.Open(file)
 
         self.load_classes(gdal_file)
 

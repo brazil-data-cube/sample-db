@@ -8,11 +8,28 @@ sys.path.append(os.path.abspath('../'))
 
 from bdc_sample.core.postgis_accessor import PostgisAccessor
 from bdc_sample.models import db, LucClassificationSystem, User
-from bdc_sample.drivers import Canasat, Dpi, Embrapa, Fototeca, InSitu, Lapig
+from bdc_sample.drivers import Canasat, Cerrado, Dpi, Embrapa
+from bdc_sample.drivers import Fototeca, InSitu, Lapig, VMaus
 
 
 storager = PostgisAccessor()
 class_systems = [
+    {
+        'authority_name': 'claudio',
+        'system_name': 'Claudio',
+        'description': 'Claudio\'s sample of Mission Points of Cerrado',
+        'sample': [
+            Cerrado('/data/Claudio/Pontos_Missoes_Cerrado', storager)
+        ]
+    },
+    {
+        'authority_name': 'vmaus',
+        'system_name': 'vmaus',
+        'description': 'Victor Maus\'s sample',
+        'sample': [
+            VMaus('/data/Victor_Maus-Forest/samples_Victor.csv', storager)
+        ]
+    },
     {
         'authority_name': 'Canasat',
         'system_name': 'Canasat',
