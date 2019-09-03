@@ -3,6 +3,7 @@ This file contains Brazil Data Cube drivers
 to list the sample and store in database
 """
 
+import io
 import os
 from abc import abstractmethod, ABCMeta
 from osgeo import ogr
@@ -63,7 +64,10 @@ class CSVDriver(Driver):
 
     @staticmethod
     def list_csv_files(directory):
-        if os.path.isfile(directory):
+        import tempfile
+        if isinstance(directory, io.IOBase) or \
+           isinstance(directory, tempfile.SpooledTemporaryFile) or \
+           os.path.isfile(directory):
             return [directory]
 
         files = os.listdir(directory)

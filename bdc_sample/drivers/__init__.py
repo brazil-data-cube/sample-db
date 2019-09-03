@@ -8,9 +8,27 @@ from bdc_sample.drivers.fototeca import Fototeca
 from bdc_sample.drivers.inSitu import InSitu
 from bdc_sample.drivers.lapig import Lapig
 from bdc_sample.drivers.vmaus import VMaus
+from bdc_sample.drivers.csv import CSV
 
+
+class DriverFactory:
+    drivers = {
+        'text/csv': CSV
+    }
+
+    def add(self, driver_name, driver):
+        self.drivers[driver_name] = driver
+
+    def get(self, driver_name):
+        assert driver_name in self.drivers
+
+        return self.drivers[driver_name]
+
+
+factory = DriverFactory()
 
 __all__ = [
+    'factory',
     'Canasat',
     'Cerrado',
     'Dpi',

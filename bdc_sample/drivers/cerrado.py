@@ -17,7 +17,7 @@ class Cerrado(ShapeToTableDriver):
     def load(self, file):
         file_name = path.splitext(path.basename(file))[0]
 
-        matched = re.search('.*?(\d+)$', file_name)
+        matched = re.search(r'.*?(\d+)$', file_name)
 
         if matched.group(1):
             year = int(matched.group(1))
