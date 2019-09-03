@@ -8,10 +8,85 @@ sys.path.append(os.path.abspath('../'))
 
 from bdc_sample.core.postgis_accessor import PostgisAccessor
 from bdc_sample.models import db, LucClassificationSystem, User
-from bdc_sample.drivers.embrapa import Embrapa
-from bdc_sample.drivers.inSitu import InSitu
-from bdc_sample.drivers.dpi import Dpi
-from bdc_sample.drivers.fototeca import Fototeca
+from bdc_sample.drivers import Canasat, Cerrado, Dpi, Embrapa
+from bdc_sample.drivers import Fototeca, InSitu, Lapig, VMaus
+
+
+storager = PostgisAccessor()
+class_systems = [
+    {
+        'authority_name': 'claudio',
+        'system_name': 'Claudio',
+        'description': 'Claudio\'s sample of Mission Points of Cerrado',
+        'sample': [
+            Cerrado('/data/Claudio/Pontos_Missoes_Cerrado', storager)
+        ]
+    },
+    {
+        'authority_name': 'vmaus',
+        'system_name': 'vmaus',
+        'description': 'Victor Maus\'s sample',
+        'sample': [
+            VMaus('/data/Victor_Maus-Forest/samples_Victor.csv', storager)
+        ]
+    },
+    {
+        'authority_name': 'Canasat',
+        'system_name': 'Canasat',
+        'description': 'Canasat\'s Pasture sample',
+        'sample': [
+            Canasat('/data/Canasat', storager)
+        ]
+    },
+    {
+        'authority_name': 'lapig',
+        'system_name': 'Lapig',
+        'description': 'Lapig\'s Pasture sample',
+        'sample': [
+            Lapig('/data/Lapig-Pastagem', storager)
+        ]
+    },
+    {
+        'authority_name': 'Ieda',
+        'system_name': 'Ieda',
+        'description': 'Ieda\'s sample',
+        'sample': [
+            Dpi('/data/Ieda/', storager),
+        ]
+    },
+    {
+        'authority_name': 'Embrapa',
+        'system_name': 'Embrapa',
+        'description': 'Embrapa\'s sample',
+        'sample': [
+            Embrapa('/data/Embrapa/Pontos_Coletados_Embrapa', storager),
+        ]
+    },
+    {
+        'authority_name': 'Rodrigo',
+        'system_name': 'Rodrigo',
+        'description': 'Fototeca\'s sample',
+        'sample': [
+            Fototeca('/data/Rodrigo/BareSoil', storager),
+            Fototeca('/data/Rodrigo/Cerrado-Campestre-Toposerra-Arboreo',
+                     storager),
+            Fototeca('/data/Rodrigo/ClearCut', storager),
+            Fototeca('/data/Rodrigo/Eucalyptus', storager),
+            Fototeca('/data/Rodrigo/ForestDegradation', storager),
+            Fototeca('/data/Rodrigo/ForestFireScar', storager),
+            Fototeca('/data/Rodrigo/OilPalm', storager),
+            Fototeca('/data/Rodrigo/UrbanAreas', storager),
+        ]
+    },
+    {
+        'authority_name': 'insitu',
+        'system_name': 'InSitu',
+        'description': 'InSitu\'s sample in R',
+        'sample': [
+            InSitu('/data/inSitu', storager)
+        ]
+    }
+]
 
 
 if __name__ == '__main__':
@@ -20,48 +95,32 @@ if __name__ == '__main__':
         'SQLALCHEMY_URI',
         'postgresql://localhost:5432/sampledb')
     db.init_model(uri)
-    users = db.session.query(User).filter(User.email == "admin@admin.com")
 
-    if users.count() == 0:
-        user = User(full_name="Admin", email="admin@admin.com")
-        user.password = "admin"
+    user = db.session.query(User).filter(User.email == 'admin@admin.com').first()
+
+    if user is None:
+        user = User(full_name='Admin', email='admin@admin.com')
+        user.password = 'admin'
         user.save()
-    else:
-        user = users[0]
 
-    luc_systems = db.session.query(LucClassificationSystem).filter(
-        LucClassificationSystem.system_name == "BDC")
+    for class_system in class_systems:
+        luc_system = db.session.query(LucClassificationSystem).filter(
+            LucClassificationSystem.system_name == class_system['system_name']).first()
 
-    if luc_systems.count() == 0:
-        luc_system = LucClassificationSystem(
-            authority_name="Brazil Data Cube",
-            system_name="BDC",
-            description="",
-            user_id=user.id)
-        luc_system.save()
-    else:
-        luc_system = luc_systems[0]
+        if luc_system is None:
+            luc_system = LucClassificationSystem(user_id=user.id)
+            luc_system.authority_name = class_system['authority_name']
+            luc_system.description = class_system['description']
+            luc_system.system_name = class_system['system_name']
+            luc_system.save()
 
-    storager = PostgisAccessor()
+        for driver in class_system['sample']:
+            try:
+                driver.user = user
+                driver.system = luc_system
 
-    drivers = [
-        Embrapa('/data/Embrapa/Pontos_Coletados_Embrapa',
-                storager, user, luc_system),
-        InSitu('/data/inSitu', storager, user, luc_system),
-        Dpi('/data/Ieda/', storager, user, luc_system),
-        Fototeca('/data/Rodrigo/Rodrigo-BareSoil', storager, user, luc_system),
-        Fototeca('/data/Rodrigo/Rodrigo-Cerrado-Campestre-Toposerra-Arboreo',
-                 storager, user, luc_system),
-        Fototeca('/data/Rodrigo/ClearCut', storager, user, luc_system),
-        Fototeca('/data/Rodrigo/Eucalyptus', storager, user, luc_system),
-        Fototeca('/data/Rodrigo/ForestDegradation', storager, user, luc_system),
-        Fototeca('/data/Rodrigo/ForestFireScar', storager, user, luc_system),
-    ]
-
-    for driver in drivers:
-        try:
-            driver.load_data_sets()
-            driver.store()
-            print("Done {}".format(driver.__class__.__name__))
-        except BaseException as err:
-            print(err)
+                driver.load_data_sets()
+                driver.store()
+                print('Done {}'.format(driver.__class__.__name__))
+            except BaseException as err:
+                print(err)

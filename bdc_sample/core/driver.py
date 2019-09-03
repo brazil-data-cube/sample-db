@@ -1,11 +1,24 @@
+"""
+This file contains Brazil Data Cube drivers
+to list the sample and store in database
+"""
+
+import os
 from abc import abstractmethod, ABCMeta
 from osgeo import ogr
-import os
 import pandas as pd
 
 
 class Driver(metaclass=ABCMeta):
-    def __init__(self, storager, user=1, system=1):
+    """Generic interface for data reader"""
+    def __init__(self, storager, user=None, system=None):
+        """
+        Args:
+            storager (Storager) - Storager Strategy. See @postgis_acessor
+            user (bdc_sample.models.User) - The user instance sample owner
+            system (bdc_sample.models.LucClassificationSystem)
+                The land use coverage classification system
+        """
         self.storager = storager
         self.user = user
         self.system = system
@@ -34,19 +47,31 @@ class Driver(metaclass=ABCMeta):
         return self
 
     def store(self):
+        """
+        Store the observations into database using
+        Storager strategy
+        """
         self.storager.store_observations(self._data_sets)
 
 
 class CSVDriver(Driver):
-    def __init__(self, directory, storager, user, system):
+    """Base class for handling CSV files"""
+    def __init__(self, directory, storager, user=None, system=None):
         super().__init__(storager, user, system)
 
         self.directory = directory
 
-    def get_files(self):
-        files = os.listdir(self.directory)
+    @staticmethod
+    def list_csv_files(directory):
+        if os.path.isfile(directory):
+            return [directory]
 
-        return [f for f in files if f.endswith(".csv")]
+        files = os.listdir(directory)
+
+        return [os.path.join(directory, f) for f in files if f.endswith(".csv")]
+
+    def get_files(self):
+        return CSVDriver.list_csv_files(self.directory)
 
     @abstractmethod
     def build_data_set(self, csv):
@@ -56,9 +81,8 @@ class CSVDriver(Driver):
     def get_unique_classes(self, csv):
         """Retrieves distinct sample classes from CSV datasource"""
 
-    def load(self, file_name):
-        absolute_file_path = os.path.join(self.directory, file_name)
-        csv = pd.read_csv(absolute_file_path)
+    def load(self, file):
+        csv = pd.read_csv(file)
 
         self.load_classes(csv)
 
@@ -66,10 +90,10 @@ class CSVDriver(Driver):
 
         self._data_sets.extend(res.T.to_dict().values())
 
-    def load_classes(self, csv):
+    def load_classes(self, file):
         self.storager.load()
 
-        unique_classes = self.get_unique_classes(csv)
+        unique_classes = self.get_unique_classes(file)
 
         samples_to_save = []
 
@@ -90,13 +114,12 @@ class CSVDriver(Driver):
 
         if samples_to_save:
             self.storager.store_classes(samples_to_save)
-
-            # TODO: Remove it and make object key id manually
             self.storager.load()
 
 
 class ShapeToTableDriver(Driver):
-    def __init__(self, directory, storager, user, system):
+    """Base class for Shapefiles Reader"""
+    def __init__(self, directory, storager, user=None, system=None):
         super().__init__(storager, user, system)
 
         self.directory = directory
@@ -106,17 +129,21 @@ class ShapeToTableDriver(Driver):
         """Retrieves distinct sample classes from shapefile datasource"""
 
     def get_files(self):
+        if os.path.isfile(self.directory) and self.directory.endswith('.shp'):
+            return [self.directory]
+
         files = os.listdir(self.directory)
 
-        return [f for f in files if f.endswith('.shp')]
+        return [
+            os.path.join(self.directory, f) for f in files if f.endswith('.shp')
+        ]
 
     @abstractmethod
     def build_data_set(self, feature, **kwargs):
         """Build data set sample observation"""
 
-    def load(self, filename):
-        absolute_filename = os.path.join(self.directory, filename)
-        gdal_file = ogr.Open(absolute_filename)
+    def load(self, file):
+        gdal_file = ogr.Open(file)
 
         self.load_classes(gdal_file)
 
@@ -124,7 +151,8 @@ class ShapeToTableDriver(Driver):
             layer = gdal_file.GetLayer(layer_id)
 
             for feature in layer:
-                self._data_sets.append(self.build_data_set(feature, **{"layer": layer}))
+                dataset = self.build_data_set(feature, **{"layer": layer})
+                self._data_sets.append(dataset)
 
     def load_classes(self, file):
         # Retrieves Layer Name from Data set filename
@@ -155,6 +183,4 @@ class ShapeToTableDriver(Driver):
 
         if samples_to_save:
             self.storager.store_classes(samples_to_save)
-
-            # TODO: Remove it and make object key id manually
             self.storager.load()

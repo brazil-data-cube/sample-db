@@ -8,28 +8,24 @@ class PostgisAccessor(object):
     def store_classes(self, classes):
         """
         Utility method to insert multiple sample classes on database
-        :param classes: list List of classes objects to save
+
+        Args:
+            classes (dict[]): list List of classes objects to save
         """
-        # for sample_class in classes:
-        #     klass = LucClass(**sample_class)
-        #     klass.save(commit=False)
         db.session.bulk_insert_mappings(LucClass, classes)
-        # Commit transaction once
         db.session.commit()
 
     def store_observations(self, data_sets):
         """
         Stores sample observation into database.
 
-        :param data_sets: List of data sets observation to insert in database
-        :return:
+        Args:
+            data_sets (dict[]): List of data sets observation to store
         """
-        # db.session.bulk_insert_mappings(Observation, data_sets)
         db.engine.execute(
             Observation.__table__.insert(),
             data_sets
         )
-        # Commit transaction once
         db.session.commit()
 
     def load(self):

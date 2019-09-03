@@ -31,12 +31,14 @@ Create database `sampledb` with the following command:
 
 ```psql
 CREATE DATABASE sampledb TEMPLATE template1;
+\c sampledb
+CREATE EXTENSION postgis
 ```
 
 After that, run migration command to prepare model tables:
 
 ```python
-PYTHONPATH=$(pwd) alembic upgrade head
+alembic upgrade head
 ```
 
 Edit the file [`sample2db.py`](./examples/sample2db.py) with directory where sample is stored.
@@ -106,28 +108,34 @@ You can use Docker environment to execute the script `sample2db.py`
 Build docker image with the following command:
 
 ```bash
-docker build --tag brazildatacube/sampledb:1.0 -f docker/Dockerfile .
+docker-compose build
+```
+
+Create PostgreSQL with PostGIS docker container with command:
+
+```bash
+docker-compose up -d db
+docker-compose exec db \
+                    psql -U postgres -c "CREATE DATABASE sampledb TEMPLATE template1"
+docker-compose exec db \
+                    psql -U postgres -d sampledb -c "CREATE EXTENSION postgis"
 ```
 
 To create migration, make sure the database connection parameters is correct in `alembic.ini`. Run the following command to create migrations:
 
 ```bash
-docker run --interactive \
-           --tty \
-           --rm \
-           --name sampledb_migration \
-           --env SQLALCHEMY_URI=postgresql://postgres:postgres@150.163.2.83:5433/sampledb \
-           brazildatacube/sampledb:1.0 alembic upgrade head
+docker-compose run --rm \
+                   -e SQLALCHEMY_URI=postgresql://postgres:postgres@bdc_pg/sampledb \
+                   sampledb \
+                   alembic upgrade head
 ```
 
 After that, create container and execute the `sample2db.py` (**Make sure** that database connection parameters is correct. You can edit manually and mount as file in container):
 
 ```bash
-docker run --interactive \
-           --tty \
-           --rm \
-           --name sampledb \
-           --volume /data:/data \
-           --env SQLALCHEMY_URI=postgresql://postgres:postgres@150.163.2.83:5433/sampledb \
-           brazildatacube/sampledb:1.0 python3 examples/sample2db.py
+docker-compose run --rm \
+                   -e SQLALCHEMY_URI=postgresql://postgres:postgres@bdc_pg/sampledb \
+                   --volume /data:/data \
+                   sampledb \
+                   python3 examples/sample2db.py
 ```
