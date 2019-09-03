@@ -31,12 +31,14 @@ Create database `sampledb` with the following command:
 
 ```psql
 CREATE DATABASE sampledb TEMPLATE template1;
+\c sampledb
+CREATE EXTENSION postgis
 ```
 
 After that, run migration command to prepare model tables:
 
 ```python
-PYTHONPATH=$(pwd) alembic upgrade head
+alembic upgrade head
 ```
 
 Edit the file [`sample2db.py`](./examples/sample2db.py) with directory where sample is stored.
@@ -115,6 +117,8 @@ Create PostgreSQL with PostGIS docker container with command:
 docker-compose up -d db
 docker-compose exec db \
                     psql -U postgres -c "CREATE DATABASE sampledb TEMPLATE template1"
+docker-compose exec db \
+                    psql -U postgres -d sampledb -c "CREATE EXTENSION postgis"
 ```
 
 To create migration, make sure the database connection parameters is correct in `alembic.ini`. Run the following command to create migrations:

@@ -55,4 +55,6 @@ class BaseModel(db.Model, DBO):
     __abstract__ = True
 
     created_at = Column(DateTime, default=datetime.utcnow())
-    updated_at = Column(DateTime, default=datetime.utcnow())
+    updated_at = Column(DateTime,
+                        default=datetime.utcnow(),
+                        onupdate=datetime.utcnow())
