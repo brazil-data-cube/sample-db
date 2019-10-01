@@ -1,19 +1,21 @@
 """List of Brazil Data Cube drivers"""
 
-from bdc_sample.drivers.canasat import Canasat
-from bdc_sample.drivers.cerrado import Cerrado
-from bdc_sample.drivers.dpi import Dpi
-from bdc_sample.drivers.embrapa import Embrapa
-from bdc_sample.drivers.fototeca import Fototeca
-from bdc_sample.drivers.inSitu import InSitu
-from bdc_sample.drivers.lapig import Lapig
-from bdc_sample.drivers.vmaus import VMaus
-from bdc_sample.drivers.csv import CSV
+from bdc_sample.core.driver import CSV
+from bdc_sample.drivers.shapefile import Shapefile
+# from bdc_sample.drivers.canasat import Canasat
+# from bdc_sample.drivers.cerrado import Cerrado
+# from bdc_sample.drivers.dpi import Dpi
+# from bdc_sample.drivers.embrapa import Embrapa
+# from bdc_sample.drivers.fototeca import Fototeca
+# from bdc_sample.drivers.inSitu import InSitu
+# from bdc_sample.drivers.lapig import Lapig
+# from bdc_sample.drivers.vmaus import VMaus
 
 
 class DriverFactory:
     drivers = {
-        'text/csv': CSV
+        'text/csv': CSV,
+        'application/zip': Shapefile
     }
 
     def add(self, driver_name, driver):

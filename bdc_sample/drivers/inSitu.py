@@ -1,10 +1,10 @@
 import os
 import geopandas
 from shapely import geometry
-from bdc_sample.core.driver import CSVDriver
+from bdc_sample.core.driver import CSV
 
 
-class InSitu(CSVDriver):
+class InSitu(CSV):
     """
     Driver for InSitu Sample for data loading to `sampledb`
 
@@ -15,21 +15,10 @@ class InSitu(CSVDriver):
     in https://cran.r-project.org/
     """
 
-    def get_unique_classes(self, csv):
-        return csv['label'].unique()
+    def __init__(self, directory, storager, **kwargs):
+        mappings = {"class_name": "label"}
 
-    def build_data_set(self, csv):
-        geom_column = [geometry.Point(xy) for xy in zip(
-            csv['longitude'], csv['latitude'])]
-        geocsv = geopandas.GeoDataFrame(csv, crs=4326, geometry=geom_column)
-
-        geocsv['location'] = geocsv['geometry'].apply(
-            lambda point: ';'.join(['SRID=4326', point.wkt]))
-        geocsv['class_id'] = csv['label'].apply(
-            lambda row: self.storager.samples_map_id[row])
-        geocsv['user_id'] = self.user.id
-
-        return geocsv
+        super(mappings, directory, storager, **kwargs)
 
     def load_data_sets(self):
         """

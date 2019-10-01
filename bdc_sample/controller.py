@@ -24,7 +24,7 @@ class SampleResource(APIResource):
         files_key = next(request.files.keys())
 
         for file_storage in request.files.getlist(files_key):
-            driver: Driver = factory.get(file_storage.content_type)(directory=file_storage.stream, mappings=mappings, storager=accessor, user=user, system=system)
+            driver: Driver = factory.get(file_storage.content_type)(directory=file_storage, mappings=mappings, storager=accessor, user=user, system=system)
 
             driver.load_data_sets()
 

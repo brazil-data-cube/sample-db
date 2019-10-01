@@ -6,8 +6,11 @@ to list the sample and store in database
 import io
 import os
 from abc import abstractmethod, ABCMeta
+from copy import deepcopy
 from osgeo import ogr
 import pandas as pd
+from geopandas import GeoDataFrame
+from shapely.geometry import Point
 
 
 class Driver(metaclass=ABCMeta):
@@ -55,35 +58,76 @@ class Driver(metaclass=ABCMeta):
         self.storager.store_observations(self._data_sets)
 
 
-class CSVDriver(Driver):
+class CSV(Driver):
     """Base class for handling CSV files"""
-    def __init__(self, directory, storager, user=None, system=None):
-        super().__init__(storager, user, system)
+    def __init__(self, mappings, directory, storager, user=None, system=None, **kwargs):
+        copy_mappings = deepcopy(mappings)
 
+        CSV._validate_mappings(mappings)
+
+        super(CSV, self).__init__(storager, user, **kwargs)
+
+        self.mappings = copy_mappings
         self.directory = directory
 
     @staticmethod
-    def list_csv_files(directory):
-        import tempfile
-        if isinstance(directory, io.IOBase) or \
-           isinstance(directory, tempfile.SpooledTemporaryFile) or \
-           os.path.isfile(directory):
-            return [directory]
+    def _validate_mappings(mappings):
+        assert mappings
+        assert 'class_name' in mappings
 
-        files = os.listdir(directory)
+        if not mappings.get('geom'):
+            if not mappings.get('latitude') and not mappings.get('longitude'):
+                mappings['latitude'] = 'latitude'
+                mappings['longitude'] = 'longitude'
 
-        return [os.path.join(directory, f) for f in files if f.endswith(".csv")]
+        if not mappings.get('start_date'):
+            mappings['start_date'] = 'start_date'
+        if not mappings.get('end_date'):
+            mappings['end_date'] = 'end_date'
 
     def get_files(self):
-        return CSVDriver.list_csv_files(self.directory)
+        import tempfile
+        if isinstance(self.directory, io.IOBase) or \
+           isinstance(self.directory, tempfile.SpooledTemporaryFile) or \
+           os.path.isfile(self.directory):
+            return [self.directory]
 
-    @abstractmethod
+        files = os.listdir(self.directory)
+
+        return [os.path.join(self.directory, f) for f in files if f.endswith(".csv")]
+
     def build_data_set(self, csv):
-        """Build data set sample observation"""
+        """Build data set sample observation
 
-    @abstractmethod
+        Args:
+            csv(pd.DataFrame) - Open CSV file
+
+        Returns:
+            GeoDataFrame CSV with geospatial location
+        """
+
+        geom_column = [Point(xy) for xy in zip(csv['longitude'], csv['latitude'])]
+        geocsv = GeoDataFrame(csv, crs=self.mappings.get('srid', 4326), geometry=geom_column)
+
+        geocsv['location'] = geocsv['geometry'].apply(lambda point: ';'.join(['SRID=4326', point.wkt]))
+        geocsv['class_id'] = geocsv[self.mappings['class_name']].apply(lambda row: self.storager.samples_map_id[row])
+        geocsv['user_id'] = self.user.id
+        geocsv['start_date'] = geocsv[self.mappings['start_date']]
+        geocsv['end_date'] = geocsv[self.mappings['end_date']]
+
+        del geocsv['geometry']
+        del geocsv['latitude']
+        del geocsv['longitude']
+
+        # Delete id column to avoid DuplicateError on database
+        if 'id' in geocsv.columns:
+            del geocsv['id']
+
+        return geocsv
+
     def get_unique_classes(self, csv):
         """Retrieves distinct sample classes from CSV datasource"""
+        return csv[self.mappings['class_name']]
 
     def load(self, file):
         csv = pd.read_csv(file)
