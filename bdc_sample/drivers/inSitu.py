@@ -1,6 +1,4 @@
 import os
-import geopandas
-from shapely import geometry
 from bdc_sample.core.driver import CSV
 
 
@@ -15,10 +13,10 @@ class InSitu(CSV):
     in https://cran.r-project.org/
     """
 
-    def __init__(self, directory, storager, **kwargs):
+    def __init__(self, entries, storager, **kwargs):
         mappings = {"class_name": "label"}
 
-        super(mappings, directory, storager, **kwargs)
+        super(InSitu, self).__init__(entries, mappings, storager, **kwargs)
 
     def load_data_sets(self):
         """
@@ -28,12 +26,12 @@ class InSitu(CSV):
         """
 
         # Read data sets (.rda) from R to CSV
-        InSitu.generate_data_sets(self.directory)
+        InSitu.generate_data_sets(self.entries)
 
         return super().load_data_sets()
 
     @classmethod
-    def generate_data_sets(cls, directory):
+    def generate_data_sets(cls, entries):
         """
         Generates sample from inSitu package in R. It will generate `.csv` files
         inside the provided in this object creation.
@@ -58,14 +56,14 @@ class InSitu(CSV):
         export_csv_script = scripts_dir / 'export-inSitu-samples-csv.R'
         install_dependencies_script = scripts_dir / 'install-inSitu.R'
 
-        if not os.path.exists(directory):
-            os.mkdir(directory)
+        if not os.path.exists(entries):
+            os.mkdir(entries)
 
         # Install dependencies
         subprocess.call('R --silent -f {}'.format(
             install_dependencies_script), shell=True)
 
         rcommands = 'R --silent -f {} --args {}'.format(
-            export_csv_script, directory)
+            export_csv_script, entries)
         # Execute script to generate Sample CSV data
         subprocess.call(rcommands, shell=True)

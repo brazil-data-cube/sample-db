@@ -1,7 +1,7 @@
 """List of Brazil Data Cube drivers"""
 
 from bdc_sample.core.driver import CSV
-from bdc_sample.drivers.shapefile import Shapefile
+from bdc_sample.core.driver import Shapefile
 # from bdc_sample.drivers.canasat import Canasat
 # from bdc_sample.drivers.cerrado import Cerrado
 # from bdc_sample.drivers.dpi import Dpi
@@ -31,12 +31,12 @@ factory = DriverFactory()
 
 __all__ = [
     'factory',
-    'Canasat',
-    'Cerrado',
-    'Dpi',
-    'Embrapa',
-    'Fototeca',
-    'InSitu',
-    'Lapig',
-    'VMaus'
+    # 'Canasat',
+    # 'Cerrado',
+    # 'Dpi',
+    # 'Embrapa',
+    # 'Fototeca',
+    # 'InSitu',
+    # 'Lapig',
+    # 'VMaus'
 ]

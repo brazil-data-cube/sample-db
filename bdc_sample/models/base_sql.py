@@ -58,3 +58,38 @@ class BaseModel(db.Model, DBO):
     updated_at = Column(DateTime,
                         default=datetime.utcnow(),
                         onupdate=datetime.utcnow())
+
+    @classmethod
+    def _filter(cls, **properties):
+        """Filter abstraction"""
+        return db.session.query(cls).filter_by(**properties)
+
+    @classmethod
+    def filter(cls, **properties):
+        """
+        Filter data set rows following the provided restrictions
+
+        Provides a wrapper of SQLAlchemy session query.
+
+        Args:
+            **properties (dict) - List of properties to filter of.
+
+        Returns:
+            list of BaseModel item Retrieves the filtered rows
+        """
+        return cls._filter(**properties).all()
+
+    @classmethod
+    def get(cls, **restrictions):
+        """
+        Get one data set from database.
+        Throws exception **NoResultFound** when the filter
+        does not match any result.
+
+        Args:
+            **properties (dict) - List of properties to filter of.
+
+        Returns:
+            BaseModel Retrieves the base model instance
+        """
+        return cls._filter(**restrictions).one()

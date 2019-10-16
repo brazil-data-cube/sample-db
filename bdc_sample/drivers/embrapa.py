@@ -1,14 +1,16 @@
 from datetime import datetime
 from shapely import geometry
 from geoalchemy2 import shape
-from bdc_sample.core.driver import ShapeToTableDriver
+from bdc_sample.core.driver import Shapefile
 
 
-class Embrapa(ShapeToTableDriver):
+class Embrapa(Shapefile):
     """Driver for Embrapa Sample for data loading to `sampledb`"""
 
-    def get_unique_classes(self, ogr_file, layer_name):
-        return ogr_file.ExecuteSQL('SELECT DISTINCT CLASS_INPE FROM {}'.format(layer_name))
+    def __init__(self, entries, **kwargs):
+        mappings = dict(class_name="CLASS_INPE")
+
+        super(Embrapa, self).__init__(entries, mappings, **kwargs)
 
     def build_data_set(self, feature, **kwargs):
         period = feature.GetField('PERIODO').split('-')

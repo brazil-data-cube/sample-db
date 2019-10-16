@@ -7,10 +7,16 @@ import io
 import os
 from abc import abstractmethod, ABCMeta
 from copy import deepcopy
+from tempfile import SpooledTemporaryFile, TemporaryDirectory
 from osgeo import ogr
 import pandas as pd
+from geoalchemy2 import shape
 from geopandas import GeoDataFrame
 from shapely.geometry import Point
+from shapely.wkt import loads as geom_from_wkt
+from werkzeug import FileStorage
+from bdc_sample.core.postgis_accessor import PostgisAccessor
+from bdc_sample.core.utils import validate_mappings, unzip
 
 
 class Driver(metaclass=ABCMeta):
@@ -23,6 +29,10 @@ class Driver(metaclass=ABCMeta):
             system (bdc_sample.models.LucClassificationSystem)
                 The land use coverage classification system
         """
+
+        if storager is None:
+            storager = PostgisAccessor()
+
         self.storager = storager
         self.user = user
         self.system = system
@@ -39,6 +49,14 @@ class Driver(metaclass=ABCMeta):
     @abstractmethod
     def get_files(self):
         """Retrieves list of files to load"""
+
+    def get_data_sets(self):
+        """Retrieves the loaded data sets
+
+        Returns:
+            list of dict - Loaded data sets
+        """
+        return self._data_sets
 
     def load_data_sets(self):
         """Load data sets in memory using database format"""
@@ -59,42 +77,60 @@ class Driver(metaclass=ABCMeta):
 
 
 class CSV(Driver):
-    """Base class for handling CSV files"""
-    def __init__(self, mappings, directory, storager, user=None, system=None, **kwargs):
+    """Defines a Base class for handle CSV data files
+
+    Basically, a CSV is built with a mappings config.
+    The config describes how to read the dataset in order to
+    create a Brazil Data Cube sample. The `mappings`
+    must include at least the required fields to fill
+    a sample, such latitude, longitude and class_name fields.
+
+    Example:
+        >>> from bdc_sample.drivers.csv import CSV
+        >>> from bdc_sample.models import User, LucClassificationSystem, db
+        ...
+        ...
+        >>> # In CSV, the fields are composed by:bdc_sample/drivers/csv.py
+        >>> # id, lat, long,
+        >>> mappings = dict(latitude='lat', longitude='lon', class_name='label')
+        >>> user = db.query(User).query().first()
+        >>> system = db.query(LucClassificationSystem).query().first()
+        >>> sample = CSV(mappings=mappings,
+        ...              entries='/path/to/CSV',
+        ...              user=user, system=system)
+        >>> sample.load_data_sets()
+        >>> sample.store()
+    """
+
+    def __init__(self, entries, mappings, storager=None, **kwargs):
+        """
+        Args:
+            entries (string|io.IOBase) - The file entries
+            mappings (dict) - CSV Mappings to Sample
+            storager (PostgisAccessor) -
+        """
+
         copy_mappings = deepcopy(mappings)
 
-        CSV._validate_mappings(mappings)
+        validate_mappings(copy_mappings)
 
-        super(CSV, self).__init__(storager, user, **kwargs)
+        super(CSV, self).__init__(storager, **kwargs)
 
         self.mappings = copy_mappings
-        self.directory = directory
-
-    @staticmethod
-    def _validate_mappings(mappings):
-        assert mappings
-        assert 'class_name' in mappings
-
-        if not mappings.get('geom'):
-            if not mappings.get('latitude') and not mappings.get('longitude'):
-                mappings['latitude'] = 'latitude'
-                mappings['longitude'] = 'longitude'
-
-        if not mappings.get('start_date'):
-            mappings['start_date'] = 'start_date'
-        if not mappings.get('end_date'):
-            mappings['end_date'] = 'end_date'
+        self.entries = entries
 
     def get_files(self):
-        import tempfile
-        if isinstance(self.directory, io.IOBase) or \
-           isinstance(self.directory, tempfile.SpooledTemporaryFile) or \
-           os.path.isfile(self.directory):
-            return [self.directory]
+        if isinstance(self.entries, io.IOBase) or \
+           isinstance(self.entries, SpooledTemporaryFile) or \
+           isinstance(self.entries, FileStorage) or \
+           os.path.isfile(self.entries):
+            return [self.entries]
 
-        files = os.listdir(self.directory)
+        files = os.listdir(self.entries)
 
-        return [os.path.join(self.directory, f) for f in files if f.endswith(".csv")]
+        return [
+            os.path.join(self.entries, f) for f in files if f.endswith(".csv")
+        ]
 
     def build_data_set(self, csv):
         """Build data set sample observation
@@ -106,11 +142,21 @@ class CSV(Driver):
             GeoDataFrame CSV with geospatial location
         """
 
-        geom_column = [Point(xy) for xy in zip(csv['longitude'], csv['latitude'])]
-        geocsv = GeoDataFrame(csv, crs=self.mappings.get('srid', 4326), geometry=geom_column)
+        geom_column = [
+            Point(xy) for xy in zip(csv['longitude'], csv['latitude'])
+        ]
+        geocsv = GeoDataFrame(csv,
+                              crs=self.mappings.get('srid', 4326),
+                              geometry=geom_column)
 
-        geocsv['location'] = geocsv['geometry'].apply(lambda point: ';'.join(['SRID=4326', point.wkt]))
-        geocsv['class_id'] = geocsv[self.mappings['class_name']].apply(lambda row: self.storager.samples_map_id[row])
+        geocsv['location'] = geocsv['geometry'].apply(
+            lambda point: ';'.join(['SRID=4326', point.wkt])
+        )
+
+        geocsv['class_id'] = geocsv[self.mappings['class_name']].apply(
+            lambda row: self.storager.samples_map_id[row]
+        )
+
         geocsv['user_id'] = self.user.id
         geocsv['start_date'] = geocsv[self.mappings['start_date']]
         geocsv['end_date'] = geocsv[self.mappings['end_date']]
@@ -165,30 +211,66 @@ class CSV(Driver):
             self.storager.load()
 
 
-class ShapeToTableDriver(Driver):
+class Shapefile(Driver):
     """Base class for Shapefiles Reader"""
-    def __init__(self, directory, storager, user=None, system=None):
-        super().__init__(storager, user, system)
+    def __init__(self, entries, mappings, storager=None, **kwargs):
+        copy_mappings = deepcopy(mappings)
 
-        self.directory = directory
+        validate_mappings(copy_mappings)
 
-    @abstractmethod
+        super(Shapefile, self).__init__(storager, **kwargs)
+
+        self.mappings = copy_mappings
+        self.entries = entries
+        self.temporary_folder = TemporaryDirectory()
+
     def get_unique_classes(self, ogr_file, layer_name):
         """Retrieves distinct sample classes from shapefile datasource"""
 
-    def get_files(self):
-        if os.path.isfile(self.directory) and self.directory.endswith('.shp'):
-            return [self.directory]
+        return ogr_file.ExecuteSQL(
+            'SELECT DISTINCT {} FROM {}'.format(self.mappings['class_name'],
+                                                layer_name)
+        )
 
-        files = os.listdir(self.directory)
+    def get_files(self):
+        if isinstance(self.entries, FileStorage) or \
+            self.entries.endswith('.zip'):
+
+            unzip(self.entries, self.temporary_folder.name)
+
+            self.entries = self.temporary_folder.name
+
+        if isinstance(self.entries, io.IOBase) or \
+           isinstance(self.entries, SpooledTemporaryFile) or \
+           isinstance(self.entries, FileStorage) or \
+           (os.path.isfile(self.entries) and self.entries.endswith('.shp')):
+            return [self.entries]
+
+        files = os.listdir(self.entries)
 
         return [
-            os.path.join(self.directory, f) for f in files if f.endswith('.shp')
+            os.path.join(self.entries, f) for f in files if f.endswith('.shp')
         ]
 
-    @abstractmethod
     def build_data_set(self, feature, **kwargs):
         """Build data set sample observation"""
+        geometry = feature.GetGeometryRef()
+
+        shapely_point = geom_from_wkt(
+            geometry.ExportToWkt()).representative_point()
+
+        ewkt = shape.from_shape(shapely_point, srid=4326)
+
+        start_date = feature.GetField(self.mappings.get('start_date'))
+        end_date = feature.GetField(self.mappings.get('end_date'))
+
+        return {
+            "start_date": start_date,
+            "end_date": end_date,
+            "location": ewkt,
+            "class_id": self.storager.samples_map_id[feature.GetField(self.mappings['class_name'])],
+            "user_id": self.user.id
+        }
 
     def load(self, file):
         gdal_file = ogr.Open(file)
