@@ -23,23 +23,33 @@ def validate_mappings(mappings):
     - start_date: Start date field. Default is "start_date"
     - end_date: End date field. Default is "end_date"
     """
+
+    def set_default_value_for(key, object_reference):
+        obj = dict()
+
+        value = object_reference.get(key)
+        if isinstance(value, str):
+            obj.update(dict(key=object_reference[key]))
+        elif not value:
+            obj.setdefault('key', key)
+        else:
+            obj.update(object_reference[key])
+
+        object_reference[key] = obj
+
     if not mappings:
         raise TypeError('Invalid mappings')
 
     if not mappings.get('class_name'):
         mappings['class_name'] = 'label'
-        # raise KeyError('Invalid mappings: Key "class_name" is required.')
 
     if not mappings.get('geom'):
         if not mappings.get('latitude') and not mappings.get('longitude'):
             mappings['latitude'] = 'latitude'
             mappings['longitude'] = 'longitude'
 
-    if not mappings.get('start_date'):
-        mappings['start_date'] = 'start_date'
-    if not mappings.get('end_date'):
-        mappings['end_date'] = 'end_date'
-
+    set_default_value_for('start_date', mappings)
+    set_default_value_for('end_date', mappings)
 
 def reproject(geom, source_srid, target_srid):
     """

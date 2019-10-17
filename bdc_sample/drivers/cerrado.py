@@ -1,49 +1,39 @@
-import re
+"""
+Samples Cerrado
+"""
+
+from re import search as regex_search
 from datetime import datetime
 from os import path
-from osgeo import ogr
-from shapely.wkt import loads
-from geoalchemy2 import shape
-from bdc_sample.core.driver import ShapeToTableDriver
+from bdc_sample.core.driver import Shapefile
 
 
-class Cerrado(ShapeToTableDriver):
+class Cerrado(Shapefile):
     """Driver for Cerrado Sample for data loading to `sampledb`"""
 
-    start_date = None
-    end_date = None
-    class_name = 'CLASSE PRI'
+    def __init__(self, entries, **kwargs):
+        mappings = dict(class_name='CLASSE PRI')
+
+        super(Cerrado, self).__init__(entries, mappings, **kwargs)
 
     def load(self, file):
         file_name = path.splitext(path.basename(file))[0]
 
-        matched = re.search(r'.*?(\d+)$', file_name)
+        matched = regex_search(r'.*?(\d+)$', file_name)
 
         if matched.group(1):
             year = int(matched.group(1))
 
-            self.start_date = datetime(year=year, month=1, day=1)
-            self.end_date = datetime(year=year, month=12, day=31)
+            self.mappings['start_date'].setdefault(
+                'value',
+                datetime(year=year, month=1, day=1))
+
+            self.mappings['end_date'].setdefault(
+                'value',
+                datetime(year=year, month=12, day=31))
         else:
-            self.start_date = self.end_date = datetime.utcnow()
+            now = datetime.utcnow()
+            self.mappings['start_date'].setdefault('value', now)
+            self.mappings['end_date'].setdefault('value', now)
 
         return super(Cerrado, self).load(file)
-
-    def get_unique_classes(self, ogr_file, layer_name):
-        return ogr_file.ExecuteSQL(
-            'SELECT DISTINCT "{}" FROM {}'.format(self.class_name, layer_name))
-
-    def build_data_set(self, feature, **kwargs):
-        multipoint = feature.GetGeometryRef()
-        point = multipoint.GetGeometryRef(0)
-
-        shapely_point = loads(point.ExportToWkt()).representative_point()
-        ewkt = shape.from_shape(shapely_point, srid=4326)
-
-        return {
-            "start_date": self.start_date,
-            "end_date": self.end_date,
-            "location": ewkt,
-            "class_id": self.storager.samples_map_id[feature.GetField(self.class_name)],
-            "user_id": self.user.id
-        }

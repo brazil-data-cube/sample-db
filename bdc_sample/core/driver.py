@@ -157,9 +157,15 @@ class CSV(Driver):
             lambda row: self.storager.samples_map_id[row]
         )
 
+        start_date = self.mappings['start_date'].get('value') or \
+            geocsv[self.mappings['start_date']['key']]
+
+        end_date = self.mappings['end_date'].get('value') or \
+            geocsv[self.mappings['end_date']['key']]
+
         geocsv['user_id'] = self.user.id
-        geocsv['start_date'] = geocsv[self.mappings['start_date']]
-        geocsv['end_date'] = geocsv[self.mappings['end_date']]
+        geocsv['start_date'] = start_date
+        geocsv['end_date'] = end_date
 
         del geocsv['geometry']
         del geocsv['latitude']
@@ -223,14 +229,37 @@ class Shapefile(Driver):
         self.mappings = copy_mappings
         self.entries = entries
         self.temporary_folder = TemporaryDirectory()
+        self.class_name = None
+        self.start_date = None
+        self.end_date = None
 
     def get_unique_classes(self, ogr_file, layer_name):
         """Retrieves distinct sample classes from shapefile datasource"""
 
-        return ogr_file.ExecuteSQL(
-            'SELECT DISTINCT {} FROM {}'.format(self.mappings['class_name'],
-                                                layer_name)
-        )
+        classes = self.mappings.get('class_name')
+
+        if isinstance(classes, str):
+            classes = [self.mappings['class_name']]
+
+        layer = ogr_file.GetLayer(layer_name)
+
+        if layer.GetFeatureCount() == 0:
+            return []
+
+        f = layer.GetFeature(0)
+
+        fields = [
+            f.GetFieldDefnRef(i).GetName() for i in range(f.GetFieldCount())
+        ]
+
+        for possibly_class in classes:
+            if possibly_class in fields:
+                self.class_name = possibly_class
+
+                return ogr_file.ExecuteSQL(
+                    'SELECT DISTINCT "{}" FROM {}'.format(
+                        possibly_class, layer_name))
+        return []
 
     def get_files(self):
         if isinstance(self.entries, FileStorage) or \
@@ -261,8 +290,11 @@ class Shapefile(Driver):
 
         ewkt = shape.from_shape(shapely_point, srid=4326)
 
-        start_date = feature.GetField(self.mappings.get('start_date'))
-        end_date = feature.GetField(self.mappings.get('end_date'))
+        start_date = self.mappings['start_date'].get('value') or \
+            feature.GetField(self.mappings['start_date']['key'])
+
+        end_date = self.mappings['end_date'].get('value') or \
+            feature.GetField(self.mappings['end_date']['key'])
 
         return {
             "start_date": start_date,

@@ -19,11 +19,12 @@ class Embrapa(Shapefile):
 
         point = geometry.Point(feature.GetField('LON'), feature.GetField('LAT'))
         ewkt = shape.from_shape(point, srid=4326)
+        class_id = self.storager.samples_map_id[feature.GetField('CLASS_INPE')]
 
         return {
             "start_date": datetime.strptime(start_date, '%Y-%m-%d'),
             "end_date": datetime.strptime(end_date, '%Y-%m-%d'),
             "location": ewkt,
-            "class_id": self.storager.samples_map_id[feature.GetField('CLASS_INPE')],
+            "class_id": class_id,
             "user_id": self.user.id
         }

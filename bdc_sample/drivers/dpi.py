@@ -1,15 +1,16 @@
 from datetime import datetime
 from shapely.geometry import Point
-from bdc_sample.core.driver import ShapeToTableDriver
+from bdc_sample.core.driver import Shapefile
 from bdc_sample.core.utils import reproject
 
 
-class Dpi(ShapeToTableDriver):
+class Dpi(Shapefile):
     """Driver for data loading to `sampledb`"""
 
-    def get_unique_classes(self, ogr_file, layer_name):
-        return ogr_file.ExecuteSQL(
-            'SELECT DISTINCT ext_na FROM {}'.format(layer_name))
+    def __init__(self, entries, **kwargs):
+        mappings = dict(class_name="ext_na")
+
+        super(Dpi, self).__init__(entries, mappings, **kwargs)
 
     def build_data_set(self, feature, **kwargs):
         layer = kwargs.get('layer')
