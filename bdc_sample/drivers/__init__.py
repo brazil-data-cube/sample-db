@@ -15,7 +15,9 @@ from bdc_sample.core.driver import Shapefile
 class DriverFactory:
     drivers = {
         'text/csv': CSV,
-        'application/zip': Shapefile
+        'application/vnd.ms-excel': CSV,
+        'application/zip': Shapefile,
+        'application/x-zip-compressed': Shapefile
     }
 
     def add(self, driver_name, driver):

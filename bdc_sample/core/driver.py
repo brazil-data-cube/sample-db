@@ -7,6 +7,7 @@ import io
 import os
 from abc import abstractmethod, ABCMeta
 from copy import deepcopy
+from pathlib import Path
 from tempfile import SpooledTemporaryFile, TemporaryDirectory
 from osgeo import ogr
 import pandas as pd
@@ -285,10 +286,10 @@ class Shapefile(Driver):
         """Build data set sample observation"""
         geometry = feature.GetGeometryRef()
 
-        shapely_point = geom_from_wkt(
-            geometry.ExportToWkt()).representative_point()
+        geom_shapely = geom_from_wkt(
+            geometry.ExportToWkt()) #.representative_point()
 
-        ewkt = shape.from_shape(shapely_point, srid=4326)
+        ewkt = shape.from_shape(geom_shapely, srid=4326)
 
         start_date = self.mappings['start_date'].get('value') or \
             feature.GetField(self.mappings['start_date']['key'])
@@ -318,7 +319,7 @@ class Shapefile(Driver):
 
     def load_classes(self, file):
         # Retrieves Layer Name from Data set filename
-        layer_name = file.GetName()[:-4].split('/')[-1]
+        layer_name = Path(file.GetName()).stem
         # Load Storager classes in memory
         self.storager.load()
 
