@@ -2,9 +2,12 @@
 This file contains code utilities of Brazil Data Cubes sampledb
 """
 
+from io import IOBase
 import os
+from tempfile import SpooledTemporaryFile
 from zipfile import ZipFile
 from osgeo import osr
+from werkzeug.datastructures import FileStorage
 
 
 def validate_mappings(mappings):
@@ -94,3 +97,11 @@ def unzip(stream, destination):
 
     with ZipFile(stream) as zip_object:
         zip_object.extractall(destination)
+
+
+def is_stream(entry):
+    """Returns if the provided entry is readable as stream-like"""
+
+    return isinstance(entry, IOBase) or \
+           isinstance(entry, SpooledTemporaryFile) or \
+           isinstance(entry, FileStorage)

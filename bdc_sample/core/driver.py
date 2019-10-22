@@ -17,7 +17,7 @@ from shapely.geometry import Point
 from shapely.wkt import loads as geom_from_wkt
 from werkzeug import FileStorage
 from bdc_sample.core.postgis_accessor import PostgisAccessor
-from bdc_sample.core.utils import validate_mappings, unzip
+from bdc_sample.core.utils import validate_mappings, unzip, is_stream
 
 
 class Driver(metaclass=ABCMeta):
@@ -121,9 +121,7 @@ class CSV(Driver):
         self.entries = entries
 
     def get_files(self):
-        if isinstance(self.entries, io.IOBase) or \
-           isinstance(self.entries, SpooledTemporaryFile) or \
-           isinstance(self.entries, FileStorage) or \
+        if is_stream(self.entries) or \
            os.path.isfile(self.entries):
             return [self.entries]
 
@@ -270,9 +268,7 @@ class Shapefile(Driver):
 
             self.entries = self.temporary_folder.name
 
-        if isinstance(self.entries, io.IOBase) or \
-           isinstance(self.entries, SpooledTemporaryFile) or \
-           isinstance(self.entries, FileStorage) or \
+        if is_stream(self.entries) or \
            (os.path.isfile(self.entries) and self.entries.endswith('.shp')):
             return [self.entries]
 
