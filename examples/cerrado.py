@@ -2,9 +2,11 @@
 Samples Cerrado
 """
 
+from os import path
 from re import search as regex_search
 from datetime import datetime
-from os import path
+from geoalchemy2 import shape
+from shapely.wkt import loads as geom_from_wkt
 from bdc_sample.core.driver import Shapefile
 
 
@@ -37,3 +39,25 @@ class Cerrado(Shapefile):
             self.mappings['end_date'].setdefault('value', now)
 
         return super(Cerrado, self).load(file)
+
+    def build_data_set(self, feature, **kwargs):
+        multipoint = feature.GetGeometryRef()
+        point = multipoint.GetGeometryRef(0)
+
+        shapely_point = geom_from_wkt(
+            point.ExportToWkt()).representative_point()
+        ewkt = shape.from_shape(shapely_point, srid=4326)
+
+        start_date = self.mappings['start_date'].get('value') or \
+            feature.GetField(self.mappings['start_date']['key'])
+
+        end_date = self.mappings['end_date'].get('value') or \
+            feature.GetField(self.mappings['end_date']['key'])
+
+        return {
+            "start_date": start_date,
+            "end_date": end_date,
+            "location": ewkt,
+            "class_id": self.storager.samples_map_id[feature.GetField(self.class_name)],
+            "user_id": self.user.id
+        }

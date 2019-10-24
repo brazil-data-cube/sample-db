@@ -1,7 +1,4 @@
-from datetime import datetime
-from shapely.geometry import Point
 from bdc_sample.core.driver import Shapefile
-from bdc_sample.core.utils import reproject
 
 
 class Dpi(Shapefile):

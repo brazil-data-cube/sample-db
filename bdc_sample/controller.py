@@ -17,7 +17,7 @@ from bdc_core.utils.flask import APIResource
 # Brazil Data Cube - SampleDB
 from bdc_sample.core.driver import Driver
 from bdc_sample.core.postgis_accessor import PostgisAccessor
-from bdc_sample.drivers import factory
+from bdc_sample.factory import factory
 from bdc_sample.forms import LucClassificationSystemSchema
 from bdc_sample.models import LucClassificationSystem, User
 

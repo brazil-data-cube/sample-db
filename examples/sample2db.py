@@ -8,8 +8,14 @@ sys.path.append(os.path.abspath('../'))
 
 from bdc_sample.core.postgis_accessor import PostgisAccessor
 from bdc_sample.models import db, LucClassificationSystem, User
-from bdc_sample.drivers import Canasat, Cerrado, Dpi, Embrapa
-from bdc_sample.drivers import Fototeca, InSitu, Lapig, VMaus
+from examples.canasat import Canasat
+from examples.cerrado import Cerrado
+from examples.sample_ieda import Dpi
+from examples.embrapa import Embrapa
+from examples.fototeca import Fototeca
+from examples.inSitu import InSitu
+from examples.lapig import Lapig
+from examples.vmaus import VMaus
 
 
 storager = PostgisAccessor()
@@ -93,21 +99,21 @@ if __name__ == '__main__':
     # Initialize SQLAlchemy Models
     uri = os.environ.get(
         'SQLALCHEMY_URI',
-        'postgresql://postgres:postgres@localhost:5434/sampledb')
+        'postgresql://postgres:postgres@localhost:5434/amostras')
     db.init_model(uri)
 
-    user = db.session.query(User).filter(User.email == 'admin@admin.com').first()
-
-    if user is None:
+    try:
+        user = User.get(email='admin@admin.com')
+    except BaseException:
         user = User(full_name='Admin', email='admin@admin.com')
         user.password = 'admin'
         user.save()
 
     for class_system in class_systems:
-        luc_system = db.session.query(LucClassificationSystem).filter(
-            LucClassificationSystem.system_name == class_system['system_name']).first()
-
-        if luc_system is None:
+        try:
+            luc_system = LucClassificationSystem.get(
+                system_name=class_system['system_name'])
+        except BaseException:
             luc_system = LucClassificationSystem(user_id=user.id)
             luc_system.authority_name = class_system['authority_name']
             luc_system.description = class_system['description']
