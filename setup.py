@@ -31,10 +31,9 @@ setup(
     url='https://github.com/brazil-data-cube/sampledb.git',
     packages=find_packages(),
     install_requires=[
-        'psycopg2>=2.8.3',
         'geopandas>=0.5.0',
-        'gdal>=2.3.3',
-        'SQLAlchemy>=1.3.4',
+        'gdal>=2.3.3,<3',
+        'SQLAlchemy[postgresql]>=1.3.4',
         'alembic>=1.0.10',
         'GeoAlchemy2>=0.6.3',
         'Shapely>=1.6.4',
@@ -42,7 +41,7 @@ setup(
         'Flask-Cors>=3.0.8',
         'flask-restplus>=0.13.0',
         'Flask-Script>=2.0.6',
-        'jsonschema>=3.0.1',
+        'marshmallow-sqlalchemy>=0.19.0',
         'bdc-core @ git+git://github.com/brazil-data-cube/bdc-core.git#egg=bdc-core'
     ],
     extras_require=extras_require,

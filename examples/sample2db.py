@@ -19,7 +19,7 @@ class_systems = [
         'system_name': 'Claudio',
         'description': 'Claudio\'s sample of Mission Points of Cerrado',
         'sample': [
-            Cerrado('/data/Claudio/Pontos_Missoes_Cerrado', storager)
+            Cerrado('/data/Claudio/Pontos_Missoes_Cerrado', storager=storager)
         ]
     },
     {
@@ -27,7 +27,7 @@ class_systems = [
         'system_name': 'vmaus',
         'description': 'Victor Maus\'s sample',
         'sample': [
-            VMaus('/data/Victor_Maus-Forest/samples_Victor.csv', storager)
+            VMaus('/data/Victor_Maus-Forest/samples_Victor.csv', storager=storager)
         ]
     },
     {
@@ -35,7 +35,7 @@ class_systems = [
         'system_name': 'Canasat',
         'description': 'Canasat\'s Pasture sample',
         'sample': [
-            Canasat('/data/Canasat', storager)
+            Canasat('/data/Canasat', storager=storager)
         ]
     },
     {
@@ -43,7 +43,7 @@ class_systems = [
         'system_name': 'Lapig',
         'description': 'Lapig\'s Pasture sample',
         'sample': [
-            Lapig('/data/Lapig-Pastagem', storager)
+            Lapig('/data/Lapig-Pastagem', storager=storager)
         ]
     },
     {
@@ -51,7 +51,7 @@ class_systems = [
         'system_name': 'Ieda',
         'description': 'Ieda\'s sample',
         'sample': [
-            Dpi('/data/Ieda/', storager),
+            Dpi('/data/Ieda/', storager=storager),
         ]
     },
     {
@@ -59,7 +59,7 @@ class_systems = [
         'system_name': 'Embrapa',
         'description': 'Embrapa\'s sample',
         'sample': [
-            Embrapa('/data/Embrapa/Pontos_Coletados_Embrapa', storager),
+            Embrapa('/data/Embrapa/Pontos_Coletados_Embrapa', storager=storager),
         ]
     },
     {
@@ -67,15 +67,15 @@ class_systems = [
         'system_name': 'Rodrigo',
         'description': 'Fototeca\'s sample',
         'sample': [
-            Fototeca('/data/Rodrigo/BareSoil', storager),
+            Fototeca('/data/Rodrigo/BareSoil', storager=storager),
             Fototeca('/data/Rodrigo/Cerrado-Campestre-Toposerra-Arboreo',
-                     storager),
-            Fototeca('/data/Rodrigo/ClearCut', storager),
-            Fototeca('/data/Rodrigo/Eucalyptus', storager),
-            Fototeca('/data/Rodrigo/ForestDegradation', storager),
-            Fototeca('/data/Rodrigo/ForestFireScar', storager),
-            Fototeca('/data/Rodrigo/OilPalm', storager),
-            Fototeca('/data/Rodrigo/UrbanAreas', storager),
+                     storager=storager),
+            Fototeca('/data/Rodrigo/ClearCut', storager=storager),
+            Fototeca('/data/Rodrigo/Eucalyptus', storager=storager),
+            Fototeca('/data/Rodrigo/ForestDegradation', storager=storager),
+            Fototeca('/data/Rodrigo/ForestFireScar', storager=storager),
+            Fototeca('/data/Rodrigo/OilPalm', storager=storager),
+            Fototeca('/data/Rodrigo/UrbanAreas', storager=storager),
         ]
     },
     {
@@ -83,7 +83,7 @@ class_systems = [
         'system_name': 'InSitu',
         'description': 'InSitu\'s sample in R',
         'sample': [
-            InSitu('/data/inSitu', storager)
+            InSitu('/data/inSitu', storager=storager)
         ]
     }
 ]
@@ -93,7 +93,7 @@ if __name__ == '__main__':
     # Initialize SQLAlchemy Models
     uri = os.environ.get(
         'SQLALCHEMY_URI',
-        'postgresql://localhost:5432/sampledb')
+        'postgresql://postgres:postgres@localhost:5434/sampledb')
     db.init_model(uri)
 
     user = db.session.query(User).filter(User.email == 'admin@admin.com').first()

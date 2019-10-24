@@ -5,4 +5,4 @@ from bdc_sample.models.observation import Observation
 from bdc_sample.models.user import User
 
 
-ALL = ['db', 'LucClass', 'LucClassificationSystem', 'Observation', 'User']
+__all__ = ['db', 'LucClass', 'LucClassificationSystem', 'Observation', 'User']

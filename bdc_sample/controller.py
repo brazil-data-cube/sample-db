@@ -1,3 +1,7 @@
+"""
+Defines the sampledb views
+"""
+
 # Python dependencies
 from json import loads as resource_parse_json
 
@@ -14,14 +18,34 @@ from bdc_core.utils.flask import APIResource
 from bdc_sample.core.driver import Driver
 from bdc_sample.core.postgis_accessor import PostgisAccessor
 from bdc_sample.drivers import factory
+from bdc_sample.forms import LucClassificationSystemSchema
 from bdc_sample.models import LucClassificationSystem, User
 
 
 ns = Namespace('sample', description='sample')
 
 
+@ns.route('/classification_system')
+class ClassificationSystemResource(APIResource):
+    """
+    URL Handler for Land User Cover Classification System
+    through REST API
+    """
+    def get(self):
+        """Retrieves all land user cover classificaiton system"""
+
+        systems = LucClassificationSystem.filter()
+
+        return LucClassificationSystemSchema().dump(systems, many=True)
+
+
 @ns.route('/')
 class SampleResource(APIResource):
+    """
+    URL Handler to manipulate the samples in database
+    through REST API
+    """
+
     def post(self):
         """
         Handler of Sample upload
