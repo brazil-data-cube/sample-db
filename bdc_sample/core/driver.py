@@ -3,12 +3,11 @@ This file contains Brazil Data Cube drivers
 to list the sample and store in database
 """
 
-import io
 import os
 from abc import abstractmethod, ABCMeta
 from copy import deepcopy
 from pathlib import Path
-from tempfile import SpooledTemporaryFile, TemporaryDirectory
+from tempfile import TemporaryDirectory
 from osgeo import ogr
 import pandas as pd
 from geoalchemy2 import shape
@@ -162,7 +161,7 @@ class CSV(Driver):
         end_date = self.mappings['end_date'].get('value') or \
             geocsv[self.mappings['end_date']['key']]
 
-        geocsv['user_id'] = self.user.id
+        geocsv['user_id'] = self.user
         geocsv['start_date'] = start_date
         geocsv['end_date'] = end_date
 
@@ -206,7 +205,7 @@ class CSV(Driver):
                 "class_name": class_name,
                 "description": class_name,
                 "luc_classification_system_id": self.system.id,
-                "user_id": self.user.id
+                "user_id": self.user
             }
 
             samples_to_save.append(sample_class)
@@ -286,7 +285,7 @@ class Shapefile(Driver):
         reproject(geometry, self.crs, 4326)
 
         geom_shapely = geom_from_wkt(
-            geometry.ExportToWkt()) #.representative_point()
+            geometry.ExportToWkt())
 
         ewkt = shape.from_shape(geom_shapely, srid=4326)
 
@@ -301,7 +300,7 @@ class Shapefile(Driver):
             "end_date": end_date,
             "location": ewkt,
             "class_id": self.storager.samples_map_id[feature.GetField(self.mappings['class_name'])],
-            "user_id": self.user.id
+            "user_id": self.user
         }
 
     def load(self, file):
@@ -340,7 +339,7 @@ class Shapefile(Driver):
                 "class_name": class_name,
                 "description": class_name,
                 "luc_classification_system_id": self.system.id,
-                "user_id": self.user.id
+                "user_id": self.user
             }
 
             samples_to_save.append(sample_class)

@@ -41,6 +41,7 @@ setup(
         'Flask-Cors>=3.0.8',
         'flask-restplus>=0.13.0',
         'Flask-Script>=2.0.6',
+        'flask_bcrypt>=0.7.1',
         'marshmallow-sqlalchemy>=0.19.0',
         'bdc-core @ git+git://github.com/brazil-data-cube/bdc-core.git#egg=bdc-core'
     ],

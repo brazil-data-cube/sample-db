@@ -10,4 +10,3 @@ class LucClass(BaseModel):
     description = Column(Text, nullable=False)
     luc_classification_system_id = Column(Integer, ForeignKey('luc_classification_system.id', ondelete='NO ACTION'), nullable=False)
     parent_id = Column(Integer, ForeignKey('luc_class.id', ondelete='NO ACTION'), nullable=True)
-    user_id = Column(Integer, ForeignKey('users.id', ondelete='NO ACTION'), nullable=False)

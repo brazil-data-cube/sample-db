@@ -7,7 +7,7 @@ sys.path.append(os.path.abspath('../'))
 #pylint: disable=wrong-import-position
 
 from bdc_sample.core.postgis_accessor import PostgisAccessor
-from bdc_sample.models import db, LucClassificationSystem, User
+from bdc_sample.models import db, LucClassificationSystem
 from examples.canasat import Canasat
 from examples.cerrado import Cerrado
 from examples.sample_ieda import Dpi

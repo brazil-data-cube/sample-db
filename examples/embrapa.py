@@ -26,5 +26,5 @@ class Embrapa(Shapefile):
             "end_date": datetime.strptime(end_date, '%Y-%m-%d'),
             "location": ewkt,
             "class_id": class_id,
-            "user_id": self.user.id
+            "user_id": self.user
         }

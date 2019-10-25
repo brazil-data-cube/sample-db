@@ -13,13 +13,14 @@ from werkzeug.exceptions import BadRequest, NotFound
 
 # Brazil Data Cube - Core Module
 from bdc_core.utils.flask import APIResource
+from bdc_core.decorators.auth import require_oauth_scopes
 
 # Brazil Data Cube - SampleDB
 from bdc_sample.core.driver import Driver
 from bdc_sample.core.postgis_accessor import PostgisAccessor
 from bdc_sample.factory import factory
 from bdc_sample.forms import LucClassificationSystemSchema
-from bdc_sample.models import LucClassificationSystem, User
+from bdc_sample.models import LucClassificationSystem, db
 
 
 ns = Namespace('sample', description='sample')
@@ -28,15 +29,37 @@ ns = Namespace('sample', description='sample')
 @ns.route('/classification_system')
 class ClassificationSystemResource(APIResource):
     """
-    URL Handler for Land User Cover Classification System
+    URL Handler for Land Use Cover Classification System
     through REST API
     """
+
+    @require_oauth_scopes(scope='samples:manage:get')
     def get(self):
-        """Retrieves all land user cover classificaiton system"""
+        """Retrieves all land use cover classificaiton system"""
 
         systems = LucClassificationSystem.filter()
 
         return LucClassificationSystemSchema().dump(systems, many=True)
+
+    @require_oauth_scopes(scope='samples:manage:post')
+    def post(self):
+        """Creates a land use cover classification system"""
+
+        # Retrieves body data
+        data = request.get_json()
+        # Set current user from session
+        data['user_id'] = request.user_id
+
+        # Create form attached to the Model
+        form = LucClassificationSystemSchema(session=db.session)
+
+        # Loads the form data into form (performs validation)
+        luc_classification_system = form.load(data)
+
+        # Once everything ok, just save
+        luc_classification_system.save()
+
+        return form.dump(luc_classification_system), 201
 
 
 @ns.route('/')
@@ -46,6 +69,7 @@ class SampleResource(APIResource):
     through REST API
     """
 
+    @require_oauth_scopes(scope='samples:manage:post')
     def post(self):
         """
         Handler of Sample upload
@@ -70,12 +94,6 @@ class SampleResource(APIResource):
         except NoResultFound:
             raise NotFound('Classification system "{}" not found'.format(
                 classification_system))
-
-        try:
-            user = User.get(email='admin@admin.com')
-        except NoResultFound:
-            raise NotFound('User "{}" not found'.format(
-                'admin@admin.com'))
 
         # Retrieves file upload
         file = request.files.get('file')

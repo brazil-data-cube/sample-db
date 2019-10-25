@@ -1,5 +1,10 @@
+"""
+SampleDB ase model configuration
+"""
+
+
 from datetime import datetime
-from sqlalchemy import create_engine, Column, DateTime, MetaData
+from sqlalchemy import create_engine, Column, DateTime, MetaData, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session
 
@@ -19,7 +24,19 @@ class DatabaseWrapper(object):
 
 db = DatabaseWrapper()
 
-class DBO():
+
+class BaseModel(db.Model):
+    """
+    Abstract class for ORM model.
+    Injects both `created_at` and `updated_at` fields in table
+    """
+    __abstract__ = True
+
+    user_id = Column(String(length=50), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow())
+    updated_at = Column(DateTime, default=datetime.utcnow(),
+                                  onupdate=datetime.utcnow())
+
     def save(self, commit=True):
         """
         Save and persists object in database
@@ -46,18 +63,6 @@ class DBO():
         except Exception as e:
             db.session.rollback()
             raise e
-
-class BaseModel(db.Model, DBO):
-    """
-    Abstract class for ORM model.
-    Injects both `created_at` and `updated_at` fields in table
-    """
-    __abstract__ = True
-
-    created_at = Column(DateTime, default=datetime.utcnow())
-    updated_at = Column(DateTime,
-                        default=datetime.utcnow(),
-                        onupdate=datetime.utcnow())
 
     @classmethod
     def _filter(cls, **properties):

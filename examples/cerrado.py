@@ -59,5 +59,5 @@ class Cerrado(Shapefile):
             "end_date": end_date,
             "location": ewkt,
             "class_id": self.storager.samples_map_id[feature.GetField(self.class_name)],
-            "user_id": self.user.id
+            "user_id": self.user
         }
