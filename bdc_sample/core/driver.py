@@ -17,7 +17,7 @@ from shapely.geometry import Point
 from shapely.wkt import loads as geom_from_wkt
 from werkzeug import FileStorage
 from bdc_sample.core.postgis_accessor import PostgisAccessor
-from bdc_sample.core.utils import validate_mappings, unzip, is_stream
+from bdc_sample.core.utils import validate_mappings, unzip, is_stream, reproject
 
 
 class Driver(metaclass=ABCMeta):
@@ -178,7 +178,7 @@ class CSV(Driver):
 
     def get_unique_classes(self, csv):
         """Retrieves distinct sample classes from CSV datasource"""
-        return csv[self.mappings['class_name']]
+        return csv[self.mappings['class_name']].unique()
 
     def load(self, file):
         csv = pd.read_csv(file)
@@ -231,6 +231,7 @@ class Shapefile(Driver):
         self.class_name = None
         self.start_date = None
         self.end_date = None
+        self.crs = None
 
     def get_unique_classes(self, ogr_file, layer_name):
         """Retrieves distinct sample classes from shapefile datasource"""
@@ -282,6 +283,8 @@ class Shapefile(Driver):
         """Build data set sample observation"""
         geometry = feature.GetGeometryRef()
 
+        reproject(geometry, self.crs, 4326)
+
         geom_shapely = geom_from_wkt(
             geometry.ExportToWkt()) #.representative_point()
 
@@ -308,6 +311,8 @@ class Shapefile(Driver):
 
         for layer_id in range(gdal_file.GetLayerCount()):
             layer = gdal_file.GetLayer(layer_id)
+
+            self.crs = layer.GetSpatialRef().ExportToProj4()
 
             for feature in layer:
                 dataset = self.build_data_set(feature, **{"layer": layer})

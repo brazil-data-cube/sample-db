@@ -30,7 +30,7 @@ class PostgisAccessor(object):
 
     def load(self):
         """Load sample classes in memory"""
-        self.sample_classes = db.session.query(LucClass).all()
+        self.sample_classes = LucClass.filter()
         self.samples_map_id = {}
 
         for sample in self.sample_classes:

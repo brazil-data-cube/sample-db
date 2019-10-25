@@ -33,7 +33,8 @@ class_systems = [
         'system_name': 'vmaus',
         'description': 'Victor Maus\'s sample',
         'sample': [
-            VMaus('/data/Victor_Maus-Forest/samples_Victor.csv', storager=storager)
+            VMaus('/data/Victor_Maus-Forest/samples_Victor.csv',
+                  storager=storager)
         ]
     },
     {
@@ -65,7 +66,8 @@ class_systems = [
         'system_name': 'Embrapa',
         'description': 'Embrapa\'s sample',
         'sample': [
-            Embrapa('/data/Embrapa/Pontos_Coletados_Embrapa', storager=storager),
+            Embrapa('/data/Embrapa/Pontos_Coletados_Embrapa',
+                    storager=storager),
         ]
     },
     {

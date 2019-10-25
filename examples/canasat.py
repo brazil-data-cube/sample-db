@@ -41,9 +41,23 @@ class Canasat(Shapefile):
     def point_wkt(geom):
         return Point(geom.GetX(), geom.GetY()).wkt
 
+    def get_unique_classes(self, ogr_file, layer_name):
+        layer = ogr_file.GetLayer(layer_name)
+
+        code = layer.GetSpatialRef().GetAuthorityCode(None)
+
+        if code is not None:
+            self.srid = int(code) or self.srid
+        else:
+            self.srid = layer.GetSpatialRef().ExportToProj4()
+
+        return super(Canasat, self).get_unique_classes(ogr_file, layer_name)
+
     def build_data_set(self, feature, **kwargs):
         """Build data set sample observation"""
         geometry = feature.GetGeometryRef()
+
+        reproject(geometry, self.srid, 4326)
 
         point_maker = self.handlers[geometry.GetGeometryName()]
         ewkt = ';'.join(['SRID=4326', point_maker(geometry)])
