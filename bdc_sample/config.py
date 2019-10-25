@@ -19,13 +19,9 @@ def get_settings(env):
 class Config():
     DEBUG = False
     TESTING = False
-
-    AUTH_SECRET_KEY = os.environ.get('AUTH_SECRET_KEY', 'bdc#2019key')
-    ALGORITHM = os.environ.get('ALGORITHM', 'RS256')
-    EXPIRES_IN_AUTH = int(os.environ.get('EXPIRES_IN_AUTH', '3600'))
-    EXPIRES_IN_CLIENT = int(os.environ.get('EXPIRES_IN_CLIENT', '86400'))
-
     SQLALCHEMY_URI = os.environ.get('SQLALCHEMY_URI', 'postgresql://postgres:postgres@localhost/sampledb')
+    CLIENT_SECRET_KEY = 'CHANGE_ME'
+    CLIENT_AUDIENCE = 'samples'
 
 
 class ProductionConfig(Config):

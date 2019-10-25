@@ -107,7 +107,7 @@ class SampleResource(APIResource):
         driver: Driver = driver_klass(entries=file,
                                       mappings=mappings,
                                       storager=accessor,
-                                      user=user,
+                                      user=request.user_id,
                                       system=system)
         # Load data set in memory
         driver.load_data_sets()

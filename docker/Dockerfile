@@ -1,4 +1,4 @@
-FROM brazildatacube/geo:0.1
+FROM registry.dpi.inpe.br/brazildatacube/geo:0.1
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y r-base && \
@@ -11,3 +11,5 @@ WORKDIR /devel
 RUN pip3 install --upgrade pip && \
     pip install wheel && \
     pip install -e .
+
+CMD ["python3", "manage.py", "run"]
