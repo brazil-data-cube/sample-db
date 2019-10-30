@@ -10,4 +10,3 @@ class SampleSet(BaseModel):
     name = Column(String, nullable=False)
     description = Column(Text, nullable=True)
     luc_classification_system_id = Column(Integer, ForeignKey('luc_classification_system.id', ondelete='NO ACTION'), nullable=False)
-    user_id = Column(Integer, ForeignKey('users.id', ondelete='NO ACTION'), nullable=False)

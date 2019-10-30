@@ -1,4 +1,4 @@
-FROM brazildatacube/geo:0.1
+FROM registry.dpi.inpe.br/brazildatacube/geo:0.1
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y r-base && \
@@ -8,7 +8,8 @@ COPY . /devel
 
 WORKDIR /devel
 
-RUN pip3 install -r requirements.txt && \
-    python3 setup.py install
+RUN pip3 install --upgrade pip && \
+    pip install wheel && \
+    pip install -e .
 
-RUN R --silent -f bdc_sample/drivers/r-scripts/install-inSitu.R
+CMD ["python3", "manage.py", "run"]

@@ -1,14 +1,16 @@
 from datetime import datetime
 from shapely import geometry
 from geoalchemy2 import shape
-from bdc_sample.core.driver import ShapeToTableDriver
+from bdc_sample.core.driver import Shapefile
 
 
-class Embrapa(ShapeToTableDriver):
+class Embrapa(Shapefile):
     """Driver for Embrapa Sample for data loading to `sampledb`"""
 
-    def get_unique_classes(self, ogr_file, layer_name):
-        return ogr_file.ExecuteSQL('SELECT DISTINCT CLASS_INPE FROM {}'.format(layer_name))
+    def __init__(self, entries, **kwargs):
+        mappings = dict(class_name="CLASS_INPE")
+
+        super(Embrapa, self).__init__(entries, mappings, **kwargs)
 
     def build_data_set(self, feature, **kwargs):
         period = feature.GetField('PERIODO').split('-')
@@ -17,11 +19,12 @@ class Embrapa(ShapeToTableDriver):
 
         point = geometry.Point(feature.GetField('LON'), feature.GetField('LAT'))
         ewkt = shape.from_shape(point, srid=4326)
+        class_id = self.storager.samples_map_id[feature.GetField('CLASS_INPE')]
 
         return {
             "start_date": datetime.strptime(start_date, '%Y-%m-%d'),
             "end_date": datetime.strptime(end_date, '%Y-%m-%d'),
             "location": ewkt,
-            "class_id": self.storager.samples_map_id[feature.GetField('CLASS_INPE')],
-            "user_id": self.user.id
+            "class_id": class_id,
+            "user_id": self.user
         }

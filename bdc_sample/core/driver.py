@@ -5,8 +5,18 @@ to list the sample and store in database
 
 import os
 from abc import abstractmethod, ABCMeta
+from copy import deepcopy
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from osgeo import ogr
 import pandas as pd
+from geoalchemy2 import shape
+from geopandas import GeoDataFrame
+from shapely.geometry import Point
+from shapely.wkt import loads as geom_from_wkt
+from werkzeug import FileStorage
+from bdc_sample.core.postgis_accessor import PostgisAccessor
+from bdc_sample.core.utils import validate_mappings, unzip, is_stream, reproject
 
 
 class Driver(metaclass=ABCMeta):
@@ -19,6 +29,10 @@ class Driver(metaclass=ABCMeta):
             system (bdc_sample.models.LucClassificationSystem)
                 The land use coverage classification system
         """
+
+        if storager is None:
+            storager = PostgisAccessor()
+
         self.storager = storager
         self.user = user
         self.system = system
@@ -35,6 +49,14 @@ class Driver(metaclass=ABCMeta):
     @abstractmethod
     def get_files(self):
         """Retrieves list of files to load"""
+
+    def get_data_sets(self):
+        """Retrieves the loaded data sets
+
+        Returns:
+            list of dict - Loaded data sets
+        """
+        return self._data_sets
 
     def load_data_sets(self):
         """Load data sets in memory using database format"""
@@ -54,32 +76,108 @@ class Driver(metaclass=ABCMeta):
         self.storager.store_observations(self._data_sets)
 
 
-class CSVDriver(Driver):
-    """Base class for handling CSV files"""
-    def __init__(self, directory, storager, user=None, system=None):
-        super().__init__(storager, user, system)
+class CSV(Driver):
+    """Defines a Base class for handle CSV data files
 
-        self.directory = directory
+    Basically, a CSV is built with a mappings config.
+    The config describes how to read the dataset in order to
+    create a Brazil Data Cube sample. The `mappings`
+    must include at least the required fields to fill
+    a sample, such latitude, longitude and class_name fields.
 
-    @staticmethod
-    def list_csv_files(directory):
-        if os.path.isfile(directory):
-            return [directory]
+    Example:
+        >>> from bdc_sample.drivers.csv import CSV
+        >>> from bdc_sample.models import User, LucClassificationSystem, db
+        ...
+        ...
+        >>> # In CSV, the fields are composed by:bdc_sample/drivers/csv.py
+        >>> # id, lat, long,
+        >>> mappings = dict(latitude='lat', longitude='lon', class_name='label')
+        >>> user = db.query(User).query().first()
+        >>> system = db.query(LucClassificationSystem).query().first()
+        >>> sample = CSV(mappings=mappings,
+        ...              entries='/path/to/CSV',
+        ...              user=user, system=system)
+        >>> sample.load_data_sets()
+        >>> sample.store()
+    """
 
-        files = os.listdir(directory)
+    def __init__(self, entries, mappings, storager=None, **kwargs):
+        """
+        Args:
+            entries (string|io.IOBase) - The file entries
+            mappings (dict) - CSV Mappings to Sample
+            storager (PostgisAccessor) -
+        """
 
-        return [os.path.join(directory, f) for f in files if f.endswith(".csv")]
+        copy_mappings = deepcopy(mappings)
+
+        validate_mappings(copy_mappings)
+
+        super(CSV, self).__init__(storager, **kwargs)
+
+        self.mappings = copy_mappings
+        self.entries = entries
 
     def get_files(self):
-        return CSVDriver.list_csv_files(self.directory)
+        if is_stream(self.entries) or \
+           os.path.isfile(self.entries):
+            return [self.entries]
 
-    @abstractmethod
+        files = os.listdir(self.entries)
+
+        return [
+            os.path.join(self.entries, f) for f in files if f.endswith(".csv")
+        ]
+
     def build_data_set(self, csv):
-        """Build data set sample observation"""
+        """Build data set sample observation
 
-    @abstractmethod
+        Args:
+            csv(pd.DataFrame) - Open CSV file
+
+        Returns:
+            GeoDataFrame CSV with geospatial location
+        """
+
+        geom_column = [
+            Point(xy) for xy in zip(csv['longitude'], csv['latitude'])
+        ]
+        geocsv = GeoDataFrame(csv,
+                              crs=self.mappings.get('srid', 4326),
+                              geometry=geom_column)
+
+        geocsv['location'] = geocsv['geometry'].apply(
+            lambda point: ';'.join(['SRID=4326', point.wkt])
+        )
+
+        geocsv['class_id'] = geocsv[self.mappings['class_name']].apply(
+            lambda row: self.storager.samples_map_id[row]
+        )
+
+        start_date = self.mappings['start_date'].get('value') or \
+            geocsv[self.mappings['start_date']['key']]
+
+        end_date = self.mappings['end_date'].get('value') or \
+            geocsv[self.mappings['end_date']['key']]
+
+        geocsv['user_id'] = self.user
+        geocsv['start_date'] = start_date
+        geocsv['end_date'] = end_date
+
+        del geocsv['geometry']
+        del geocsv['latitude']
+        del geocsv['longitude']
+
+        # Delete id column to avoid DuplicateError on database
+        if 'id' in geocsv.columns:
+            del geocsv['id']
+
+        return geocsv
+
     def get_unique_classes(self, csv):
         """Retrieves distinct sample classes from CSV datasource"""
+        return csv[self.mappings['class_name']].unique()
 
     def load(self, file):
         csv = pd.read_csv(file)
@@ -107,7 +205,7 @@ class CSVDriver(Driver):
                 "class_name": class_name,
                 "description": class_name,
                 "luc_classification_system_id": self.system.id,
-                "user_id": self.user.id
+                "user_id": self.user
             }
 
             samples_to_save.append(sample_class)
@@ -117,30 +215,93 @@ class CSVDriver(Driver):
             self.storager.load()
 
 
-class ShapeToTableDriver(Driver):
+class Shapefile(Driver):
     """Base class for Shapefiles Reader"""
-    def __init__(self, directory, storager, user=None, system=None):
-        super().__init__(storager, user, system)
+    def __init__(self, entries, mappings, storager=None, **kwargs):
+        copy_mappings = deepcopy(mappings)
 
-        self.directory = directory
+        validate_mappings(copy_mappings)
 
-    @abstractmethod
+        super(Shapefile, self).__init__(storager, **kwargs)
+
+        self.mappings = copy_mappings
+        self.entries = entries
+        self.temporary_folder = TemporaryDirectory()
+        self.class_name = None
+        self.start_date = None
+        self.end_date = None
+        self.crs = None
+
     def get_unique_classes(self, ogr_file, layer_name):
         """Retrieves distinct sample classes from shapefile datasource"""
 
-    def get_files(self):
-        if os.path.isfile(self.directory) and self.directory.endswith('.shp'):
-            return [self.directory]
+        classes = self.mappings.get('class_name')
 
-        files = os.listdir(self.directory)
+        if isinstance(classes, str):
+            classes = [self.mappings['class_name']]
 
-        return [
-            os.path.join(self.directory, f) for f in files if f.endswith('.shp')
+        layer = ogr_file.GetLayer(layer_name)
+
+        if layer.GetFeatureCount() == 0:
+            return []
+
+        f = layer.GetFeature(0)
+
+        fields = [
+            f.GetFieldDefnRef(i).GetName() for i in range(f.GetFieldCount())
         ]
 
-    @abstractmethod
+        for possibly_class in classes:
+            if possibly_class in fields:
+                self.class_name = possibly_class
+
+                return ogr_file.ExecuteSQL(
+                    'SELECT DISTINCT "{}" FROM {}'.format(
+                        possibly_class, layer_name))
+        return []
+
+    def get_files(self):
+        if isinstance(self.entries, FileStorage) or \
+            self.entries.endswith('.zip'):
+
+            unzip(self.entries, self.temporary_folder.name)
+
+            self.entries = self.temporary_folder.name
+
+        if is_stream(self.entries) or \
+           (os.path.isfile(self.entries) and self.entries.endswith('.shp')):
+            return [self.entries]
+
+        files = os.listdir(self.entries)
+
+        return [
+            os.path.join(self.entries, f) for f in files if f.endswith('.shp')
+        ]
+
     def build_data_set(self, feature, **kwargs):
         """Build data set sample observation"""
+        geometry = feature.GetGeometryRef()
+
+        reproject(geometry, self.crs, 4326)
+
+        geom_shapely = geom_from_wkt(
+            geometry.ExportToWkt())
+
+        ewkt = shape.from_shape(geom_shapely, srid=4326)
+
+        start_date = self.mappings['start_date'].get('value') or \
+            feature.GetField(self.mappings['start_date']['key'])
+
+        end_date = self.mappings['end_date'].get('value') or \
+            feature.GetField(self.mappings['end_date']['key'])
+
+        return {
+            "start_date": start_date,
+            "end_date": end_date,
+            "location": ewkt,
+            "class_id": self.storager.samples_map_id[feature.GetField(self.mappings['class_name'])],
+            "user_id": self.user
+        }
 
     def load(self, file):
         gdal_file = ogr.Open(file)
@@ -150,13 +311,15 @@ class ShapeToTableDriver(Driver):
         for layer_id in range(gdal_file.GetLayerCount()):
             layer = gdal_file.GetLayer(layer_id)
 
+            self.crs = layer.GetSpatialRef().ExportToProj4()
+
             for feature in layer:
                 dataset = self.build_data_set(feature, **{"layer": layer})
                 self._data_sets.append(dataset)
 
     def load_classes(self, file):
         # Retrieves Layer Name from Data set filename
-        layer_name = file.GetName()[:-4].split('/')[-1]
+        layer_name = Path(file.GetName()).stem
         # Load Storager classes in memory
         self.storager.load()
 
@@ -176,7 +339,7 @@ class ShapeToTableDriver(Driver):
                 "class_name": class_name,
                 "description": class_name,
                 "luc_classification_system_id": self.system.id,
-                "user_id": self.user.id
+                "user_id": self.user
             }
 
             samples_to_save.append(sample_class)

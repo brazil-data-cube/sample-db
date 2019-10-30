@@ -1,5 +1,5 @@
 from bdc_sample.models.base_sql import BaseModel
-from sqlalchemy import Column, ForeignKey, Integer, Text
+from sqlalchemy import Column, Integer, Text
 
 
 class LucClassificationSystem(BaseModel):
@@ -9,4 +9,3 @@ class LucClassificationSystem(BaseModel):
     authority_name = Column(Text, nullable=False)
     system_name = Column(Text, nullable=False)
     description = Column(Text, nullable=False)
-    user_id = Column(Integer, ForeignKey('users.id', ondelete='NO ACTION'), nullable=False)

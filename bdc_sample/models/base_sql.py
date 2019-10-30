@@ -1,5 +1,10 @@
+"""
+SampleDB ase model configuration
+"""
+
+
 from datetime import datetime
-from sqlalchemy import create_engine, Column, DateTime, MetaData
+from sqlalchemy import create_engine, Column, DateTime, MetaData, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session
 
@@ -19,7 +24,19 @@ class DatabaseWrapper(object):
 
 db = DatabaseWrapper()
 
-class DBO():
+
+class BaseModel(db.Model):
+    """
+    Abstract class for ORM model.
+    Injects both `created_at` and `updated_at` fields in table
+    """
+    __abstract__ = True
+
+    user_id = Column(String(length=50), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow())
+    updated_at = Column(DateTime, default=datetime.utcnow(),
+                                  onupdate=datetime.utcnow())
+
     def save(self, commit=True):
         """
         Save and persists object in database
@@ -47,14 +64,37 @@ class DBO():
             db.session.rollback()
             raise e
 
-class BaseModel(db.Model, DBO):
-    """
-    Abstract class for ORM model.
-    Injects both `created_at` and `updated_at` fields in table
-    """
-    __abstract__ = True
+    @classmethod
+    def _filter(cls, **properties):
+        """Filter abstraction"""
+        return db.session.query(cls).filter_by(**properties)
 
-    created_at = Column(DateTime, default=datetime.utcnow())
-    updated_at = Column(DateTime,
-                        default=datetime.utcnow(),
-                        onupdate=datetime.utcnow())
+    @classmethod
+    def filter(cls, **properties):
+        """
+        Filter data set rows following the provided restrictions
+
+        Provides a wrapper of SQLAlchemy session query.
+
+        Args:
+            **properties (dict) - List of properties to filter of.
+
+        Returns:
+            list of BaseModel item Retrieves the filtered rows
+        """
+        return cls._filter(**properties).all()
+
+    @classmethod
+    def get(cls, **restrictions):
+        """
+        Get one data set from database.
+        Throws exception **NoResultFound** when the filter
+        does not match any result.
+
+        Args:
+            **properties (dict) - List of properties to filter of.
+
+        Returns:
+            BaseModel Retrieves the base model instance
+        """
+        return cls._filter(**restrictions).one()

@@ -1,10 +1,8 @@
 import os
-import geopandas
-from shapely import geometry
-from bdc_sample.core.driver import CSVDriver
+from bdc_sample.core.driver import CSV
 
 
-class InSitu(CSVDriver):
+class InSitu(CSV):
     """
     Driver for InSitu Sample for data loading to `sampledb`
 
@@ -15,21 +13,10 @@ class InSitu(CSVDriver):
     in https://cran.r-project.org/
     """
 
-    def get_unique_classes(self, csv):
-        return csv['label'].unique()
+    def __init__(self, entries, storager, **kwargs):
+        mappings = {"class_name": "label"}
 
-    def build_data_set(self, csv):
-        geom_column = [geometry.Point(xy) for xy in zip(
-            csv['longitude'], csv['latitude'])]
-        geocsv = geopandas.GeoDataFrame(csv, crs=4326, geometry=geom_column)
-
-        geocsv['location'] = geocsv['geometry'].apply(
-            lambda point: ';'.join(['SRID=4326', point.wkt]))
-        geocsv['class_id'] = csv['label'].apply(
-            lambda row: self.storager.samples_map_id[row])
-        geocsv['user_id'] = self.user.id
-
-        return geocsv
+        super(InSitu, self).__init__(entries, mappings, storager, **kwargs)
 
     def load_data_sets(self):
         """
@@ -39,12 +26,12 @@ class InSitu(CSVDriver):
         """
 
         # Read data sets (.rda) from R to CSV
-        InSitu.generate_data_sets(self.directory)
+        InSitu.generate_data_sets(self.entries)
 
         return super().load_data_sets()
 
     @classmethod
-    def generate_data_sets(cls, directory):
+    def generate_data_sets(cls, entries):
         """
         Generates sample from inSitu package in R. It will generate `.csv` files
         inside the provided in this object creation.
@@ -69,14 +56,14 @@ class InSitu(CSVDriver):
         export_csv_script = scripts_dir / 'export-inSitu-samples-csv.R'
         install_dependencies_script = scripts_dir / 'install-inSitu.R'
 
-        if not os.path.exists(directory):
-            os.mkdir(directory)
+        if not os.path.exists(entries):
+            os.mkdir(entries)
 
         # Install dependencies
         subprocess.call('R --silent -f {}'.format(
             install_dependencies_script), shell=True)
 
         rcommands = 'R --silent -f {} --args {}'.format(
-            export_csv_script, directory)
+            export_csv_script, entries)
         # Execute script to generate Sample CSV data
         subprocess.call(rcommands, shell=True)

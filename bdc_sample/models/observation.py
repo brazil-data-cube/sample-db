@@ -11,4 +11,3 @@ class Observation(BaseModel):
     end_date = Column(Date, nullable=False)
     location = Column(Geometry(geometry_type='POINT', srid=4326))
     class_id = Column(Integer, ForeignKey('luc_class.id', ondelete='NO ACTION'), nullable=False)
-    user_id = Column(Integer, ForeignKey('users.id', ondelete='NO ACTION'), nullable=False)
