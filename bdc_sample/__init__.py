@@ -12,7 +12,7 @@ flask_bcrypt = Bcrypt()
 
 def create_app(config_name):
     """
-    Creates Brazil Data Cube WTSS application from config object
+    Creates Brazil Data Cube Samples application from config object
     Args:
         config_name (string|bdc_sample.config.Config) Config instance
     Returns:
