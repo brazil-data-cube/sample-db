@@ -3,12 +3,13 @@ This file contains Brazil Data Cube drivers
 to list the sample and store in database
 """
 
+import logging
 import os
 from abc import abstractmethod, ABCMeta
 from copy import deepcopy
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from osgeo import ogr
+from osgeo import ogr, osr
 import pandas as pd
 from geoalchemy2 import shape
 from geopandas import GeoDataFrame
@@ -311,7 +312,14 @@ class Shapefile(Driver):
         for layer_id in range(gdal_file.GetLayerCount()):
             layer = gdal_file.GetLayer(layer_id)
 
-            self.crs = layer.GetSpatialRef().ExportToProj4()
+            spatial_ref = layer.GetSpatialRef()
+
+            if spatial_ref is None:
+                spatial_ref = osr.SpatialReference()
+                spatial_ref.ImportFromEPSG(4326)
+                logging.info('Dataset {} does not have projection. Using EPSG:4326...'.format(file))
+
+            self.crs = spatial_ref.ExportToProj4()
 
             for feature in layer:
                 dataset = self.build_data_set(feature, **{"layer": layer})

@@ -101,22 +101,17 @@ if __name__ == '__main__':
     # Initialize SQLAlchemy Models
     uri = os.environ.get(
         'SQLALCHEMY_URI',
-        'postgresql://postgres:postgres@localhost:5434/amostras')
+        'postgresql://postgres:postgres@localhost:5434/sampledb')
     db.init_model(uri)
 
-    try:
-        user = User.get(email='admin@admin.com')
-    except BaseException:
-        user = User(full_name='Admin', email='admin@admin.com')
-        user.password = 'admin'
-        user.save()
+    user = "CHANGE_ME_WITH_OAUTH_USER_ID"
 
     for class_system in class_systems:
         try:
             luc_system = LucClassificationSystem.get(
                 system_name=class_system['system_name'])
         except BaseException:
-            luc_system = LucClassificationSystem(user_id=user.id)
+            luc_system = LucClassificationSystem(user_id=user)
             luc_system.authority_name = class_system['authority_name']
             luc_system.description = class_system['description']
             luc_system.system_name = class_system['system_name']
