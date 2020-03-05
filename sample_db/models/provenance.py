@@ -8,7 +8,7 @@
 """SampleDB Provenance Model."""
 from sqlalchemy import Column, ForeignKey, Integer
 
-from sample_db.models.base import BaseModel
+from lccs_db.models.base import BaseModel
 
 from ..config import Config
 
@@ -20,5 +20,5 @@ class Provenance(BaseModel):
 
     dataset_id = Column(Integer, ForeignKey('{}.datasets.id'.format(Config.ACTIVITIES_SCHEMA), ondelete='NO ACTION'), nullable=False,
                              primary_key=True)
-    dataset_parent_id = Column(Integer, ForeignKey('lccs.classes.id', ondelete='NO ACTION'), nullable=False,
-                             primary_key=True)
+    # dataset_parent_id = Column(Integer, ForeignKey('lccs.classes.id', ondelete='NO ACTION'), nullable=False,
+    #                          primary_key=True)

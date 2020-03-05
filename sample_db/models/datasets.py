@@ -9,7 +9,7 @@
 
 from sqlalchemy import Column, Date, Enum, ForeignKey, Integer, String, Text
 
-from sample_db.models.base import BaseModel
+from lccs_db.models.base import BaseModel
 
 from ..config import Config
 
@@ -30,8 +30,8 @@ class Datasets(BaseModel):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('sample.users.id',
                                          ondelete='NO ACTION'), nullable=False)
-    classification_system_id = Column(Integer, ForeignKey('lccs.class_systems.id',
-                                         ondelete='NO ACTION'), nullable=False)
+    # classification_system_id = Column(Integer, ForeignKey('lccs.class_systems.id',
+    #                                      ondelete='NO ACTION'), nullable=False)
     collect_method = Column(Enum(CollectMethodEnum), nullable=False)
     name = Column(String, nullable=True)
     start_date = Column(Date, nullable=False)

@@ -9,7 +9,7 @@
 
 from sqlalchemy import Column, Integer, String
 
-from sample_db.models.base import BaseModel
+from lccs_db.models.base import BaseModel
 
 from ..config import Config
 

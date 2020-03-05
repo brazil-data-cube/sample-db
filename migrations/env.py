@@ -7,7 +7,8 @@ from logging.config import fileConfig
 from sqlalchemy import create_engine, engine_from_config
 from sqlalchemy import pool
 from alembic import context
-from bdc_sample import models
+
+from sample_db import models
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -16,6 +17,11 @@ config = context.config
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)
+
+config.set_main_option(
+    'sqlalchemy.url',
+    os.environ.get('SQLALCHEMY_DATABASE_URI').replace('%', '%%')
+)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
@@ -27,6 +33,14 @@ target_metadata = models.db.Model.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
+
+exclude_tables = [
+    'spatial_ref_sys'
+]
+
+def include_object(object, name, type_, reflected, compare_to):
+    """Ignores the tables in 'exclude_tables'"""
+    return not (type_ == "table" and name in exclude_tables)
 
 
 def run_migrations_offline():
@@ -72,7 +86,12 @@ def run_migrations_online():
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata,
+            include_schemas=True,
+            include_object=include_object,
+            compare_type=True,
+            version_table_schema='sample_db',
         )
 
         with context.begin_transaction():

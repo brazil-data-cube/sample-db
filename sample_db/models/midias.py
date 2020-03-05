@@ -7,19 +7,39 @@
 #
 """SampleDB Midias Model."""
 
-from sqlalchemy import Column, ForeignKey, Integer, String
+from typing import Callable
 
-from sample_db.models.base import BaseModel
+from sqlalchemy import Column, ForeignKey, Integer, String, Table
 
-from ..config import Config
+from lccs_db.models import db
 
-class Midias(BaseModel):
-    """Midias Model."""
+from .base import metadata
 
-    __tablename__ = 'midias'
-    __table_args__ = {'schema': Config.ACTIVITIES_SCHEMA}
 
-    id = Column(Integer, primary_key=True)
-    url = Column(String, nullable=False)
-    observation_id = Column(Integer, ForeignKey('{}.observations.id'.format(Config.ACTIVITIES_SCHEMA),
-                                         ondelete='NO ACTION'), nullable=False)
+def make_midias(table_name: str, observation: Table, create: bool = False) -> Table:
+    """Create customized midia model using a table name.
+    TODO: Create an example
+    Args:
+        table_name - Table name
+        observation - SQLALchemy Table Observation
+        create - Flag to create if not exists
+    Returns
+        Observation definition
+    """
+
+    klass = Table('{}_midias'.format(table_name), metadata,
+        Column('id', Integer, primary_key=True),
+        Column(
+            'observation_id',
+            Integer,
+            ForeignKey(observation.id, ondelete='NO ACTION', onupdate='CASCADE'),
+            nullable=False
+        ),
+        Column('url', String, nullable=False),
+    )
+
+    if create:
+        if not klass.exists(bind=db.engine):
+            klass.create(bind=db.engine)
+
+    return klass
