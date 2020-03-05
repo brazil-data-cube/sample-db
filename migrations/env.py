@@ -10,6 +10,8 @@ from alembic import context
 
 from sample_db import models
 
+from sample_db.config import Config
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -91,7 +93,7 @@ def run_migrations_online():
             include_schemas=True,
             include_object=include_object,
             compare_type=True,
-            version_table_schema='sample_db',
+            version_table_schema=Config.ACTIVITIES_SCHEMA,
         )
 
         with context.begin_transaction():
