@@ -6,7 +6,7 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 """SampleDB Provenance Model."""
-from sqlalchemy import Column, ForeignKey, Integer
+from sqlalchemy import Column, ForeignKey, Integer, PrimaryKeyConstraint
 
 from lccs_db.models.base import BaseModel
 
@@ -16,9 +16,12 @@ class Provenance(BaseModel):
     """Provenance Model."""
 
     __tablename__ = 'provenance'
-    __table_args__ = {'schema': Config.ACTIVITIES_SCHEMA}
+    __table_args__ = (
+        PrimaryKeyConstraint('dataset_id', 'dataset_parent_id'),
+        {'schema': Config.ACTIVITIES_SCHEMA}
+    )
 
     dataset_id = Column(Integer, ForeignKey('{}.datasets.id'.format(Config.ACTIVITIES_SCHEMA), ondelete='NO ACTION'), nullable=False,
                              primary_key=True)
-    # dataset_parent_id = Column(Integer, ForeignKey('lccs.classes.id', ondelete='NO ACTION'), nullable=False,
-    #                          primary_key=True)
+    dataset_parent_id = Column(Integer, ForeignKey('lccs.classes.id', ondelete='NO ACTION'), nullable=False,
+                             primary_key=True)

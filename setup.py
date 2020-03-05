@@ -3,6 +3,8 @@
 import os
 from setuptools import find_packages, setup
 
+readme = open('README.rst').read()
+
 docs_require = [
     'bdc-readthedocs-theme @ git+git://github.com/brazil-data-cube/bdc-readthedocs-theme.git#egg=bdc-readthedocs-theme',
     'Sphinx>=2.1.2',
@@ -27,6 +29,8 @@ extras_require = {
     'tests': tests_require,
 }
 
+extras_require['all'] = [ req for exts, reqs in extras_require.items() for req in reqs ]
+
 setup_requires = [
     'pytest-runner>=5.2',
 ]
@@ -35,10 +39,11 @@ install_requires = [
     'lccs-db @ git+git://github.com/brazil-data-cube/lccs-db.git#egg=lccs-db',
 ]
 
-g = {}
+packages = find_packages()
 with open(os.path.join('sample_db', 'version.py'), 'rt') as fp:
+    g = {}
     exec(fp.read(), g)
-    version = g['version']
+    version = g['__version__']
 
 setup(
     name='bdc-sample',
