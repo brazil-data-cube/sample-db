@@ -9,6 +9,7 @@
 from sqlalchemy import Column, ForeignKey, Integer, PrimaryKeyConstraint
 
 from lccs_db.models.base import BaseModel
+from lccs_db.models.luc_class import LucClass
 
 from ..config import Config
 
@@ -23,5 +24,5 @@ class Provenance(BaseModel):
 
     dataset_id = Column(Integer, ForeignKey('{}.datasets.id'.format(Config.ACTIVITIES_SCHEMA), ondelete='NO ACTION'), nullable=False,
                              primary_key=True)
-    dataset_parent_id = Column(Integer, ForeignKey('lccs.classes.id', ondelete='NO ACTION'), nullable=False,
+    dataset_parent_id = Column(Integer, ForeignKey(LucClass.id, ondelete='NO ACTION'), nullable=False,
                              primary_key=True)

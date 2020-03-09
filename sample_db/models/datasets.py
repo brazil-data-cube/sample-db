@@ -10,6 +10,9 @@
 from sqlalchemy import Column, Date, Enum, ForeignKey, Integer, String, Text
 
 from lccs_db.models.base import BaseModel
+from lccs_db.models.luc_classification_system import LucClassificationSystem
+
+from sample_db.models.users import Users
 
 from ..config import Config
 
@@ -28,9 +31,9 @@ class Datasets(BaseModel):
     __table_args__ = {'schema': Config.ACTIVITIES_SCHEMA}
 
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('sample.users.id',
+    user_id = Column(Integer, ForeignKey(Users.id,
                                          ondelete='NO ACTION'), nullable=False)
-    classification_system_id = Column(Integer, ForeignKey('lccs.class_systems.id',
+    classification_system_id = Column(Integer, ForeignKey(LucClassificationSystem.id,
                                          ondelete='NO ACTION'), nullable=False)
     collect_method = Column(Enum(CollectMethodEnum), nullable=False)
     name = Column(String, nullable=True)

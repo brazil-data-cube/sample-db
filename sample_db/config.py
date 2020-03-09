@@ -8,7 +8,6 @@
 """Define config file for Brazil Data Cube Sample Database Model."""
 
 import os
-import tempfile
 
 CURRENT_DIR = os.path.dirname(__file__)
 
@@ -24,10 +23,6 @@ class Config:
     DEBUG = False
     TESTING = False
     ACTIVITIES_SCHEMA = os.environ.get('ACTIVITIES_SCHEMA', 'sampledb')
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        'SQLALCHEMY_DATABASE_URI',
-        'postgresql://postgres:123456@localhost:5432/sampledb'
-    )
 
 class ProductionConfig(Config):
     """Production Mode."""
