@@ -47,7 +47,7 @@ with open(os.path.join('sample_db', 'version.py'), 'rt') as fp:
     version = g['__version__']
 
 setup(
-    name='bdc-sample',
+    name='sample_db',
     version=version,
     description='Brazilian Data Cube Sample package',
     author='Admin',

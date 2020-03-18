@@ -14,5 +14,5 @@ from sample_db.models.midias import make_midias
 from sample_db.models.observations import make_observation
 from sample_db.models.provenance import Provenance
 
-__all__ = ['db', 'Datasets', 'Midias', 'Observation', 'metadata', 'Users',
-           'make_observation', 'make_midias', 'Provenance',]
+__all__ = ['db', 'Datasets', 'metadata', 'Users', 'make_observation', 'make_midias',
+           'Provenance',]
