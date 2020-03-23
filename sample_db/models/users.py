@@ -23,8 +23,8 @@ class Users(BaseModel):
 
     id = Column(Integer, primary_key=True)
     email = Column(String, nullable=False)
-    password = Column(String, nullable=False)
-    full_name = Column('password', String, nullable=False)
+    full_name = Column(String, nullable=False)
+    password_hash = Column('password', String, nullable=False)
 
     def __init__(self, **kwargs):
         for key, value in kwargs.items():

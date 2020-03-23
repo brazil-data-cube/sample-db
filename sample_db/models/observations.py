@@ -27,6 +27,7 @@ def make_observation(table_name: str, create: bool = False) -> Table:
     """
 
     klass = Table('{}_observations'.format(table_name), metadata,
+        Column('id', Integer, primary_key=True, autoincrement=True),
         Column('user_id', Integer, primary_key=True),
         Column(
             'class_id',

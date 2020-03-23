@@ -1,8 +1,8 @@
-"""create sampledb.
+"""sampledb0.2.0 create tables.
 
-Revision ID: 5ae271b0fd49
+Revision ID: 26eceec0a98a
 Revises: 
-Create Date: 2020-03-05 14:55:10.537108
+Create Date: 2020-03-23 09:18:16.924538
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '5ae271b0fd49'
+revision = '26eceec0a98a'
 down_revision = None
 branch_labels = ('sample_db',)
 depends_on = None
@@ -23,6 +23,7 @@ def upgrade():
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('email', sa.String(), nullable=False),
+    sa.Column('full_name', sa.String(), nullable=False),
     sa.Column('password', sa.String(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     schema='sampledb'
