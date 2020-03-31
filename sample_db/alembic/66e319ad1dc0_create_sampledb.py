@@ -1,8 +1,8 @@
-"""sampledb0.2.0 create tables.
+"""create sampledb.
 
-Revision ID: 26eceec0a98a
+Revision ID: 66e319ad1dc0
 Revises: 
-Create Date: 2020-03-23 09:18:16.924538
+Create Date: 2020-03-30 17:13:04.289364
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '26eceec0a98a'
+revision = '66e319ad1dc0'
 down_revision = None
 branch_labels = ('sample_db',)
 depends_on = None

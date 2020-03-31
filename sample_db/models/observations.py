@@ -37,7 +37,7 @@ def make_observation(table_name: str, create: bool = False) -> Table:
         ),
         Column('start_date', Date, nullable=False),
         Column('end_date', Date, nullable=False),
-        Column('collection_date', Date, nullable=False),
+        Column('collection_date', Date, nullable=True),
         Column('location', Geometry(srid=4326))
     )
 

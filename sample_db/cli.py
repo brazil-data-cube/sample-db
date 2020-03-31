@@ -56,10 +56,8 @@ def insert_observation(ctx: click.Context, observation_name, ifile):
     dataframe = pandas.read_csv(ifile)
 
     for index, df in dataframe.iterrows():
-        print(df['driver'])
         try:
             user = Users.get(full_name=df['user'])
-
         except BaseException:
             print("User does not exist!")
             return
