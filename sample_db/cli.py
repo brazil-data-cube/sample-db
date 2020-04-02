@@ -34,28 +34,30 @@ def init_db(ctx: click.Context):
 
 @cli.command()
 @click.pass_context
-@click.option('--observation_name', type=click.STRING, required=False, help='Observation Table Name')
 @click.option('--ifile', type=click.File('r'),
               help='A csv input file for insert in table observation.',
               required=False)
 # @pass_config
-def insert_observation(ctx: click.Context, observation_name, ifile):
-    """Create table observation inSitu."""
+def insert_observation(ctx: click.Context, ifile):
+    """Create table observation."""
 
     from sample_db_utils import PostgisAccessor, DriversFactory
     import pandas
 
-    observation_table = make_observation(table_name=observation_name, create=True)
-
-    _db.session.commit()
-
-    storager = PostgisAccessor()
-
-    click.secho('table {} create'.format(observation_name))
-
     dataframe = pandas.read_csv(ifile)
 
     for index, df in dataframe.iterrows():
+
+        observation_name = df['observation_table_name']
+
+        observation_table = make_observation(table_name=observation_name, create=True)
+
+        _db.session.commit()
+
+        storager = PostgisAccessor()
+
+        click.secho('table {} create'.format(observation_name))
+
         try:
             user = Users.get(full_name=df['user'])
         except BaseException:
