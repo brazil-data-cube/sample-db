@@ -10,10 +10,12 @@
 import click
 
 from lccs_db.cli import create_cli, create_app, init_db as lccs_init_db
-from sample_db.models import make_observation, Users
+from sample_db.models import make_observation, Users, Datasets, CollectMethod
 from lccs_db.models import db as _db, LucClassificationSystem
 
 from .config import Config
+
+from json import loads as json_load
 
 cli = create_cli(create_app=create_app)
 
@@ -85,6 +87,48 @@ def insert_observation(ctx: click.Context, ifile):
             print('Done {}'.format(driver.__class__.__name__))
         except BaseException as err:
             print(err)
+
+@cli.command()
+@click.pass_context
+@click.option('--ifile', type=click.File('r'),
+              help='A csv input file for insert dataset.',
+              required=False)
+def insert_dataset(ctx: click.Context, ifile):
+
+    import pandas
+
+    dataframe = pandas.read_csv(ifile)
+
+    for index, df in dataframe.iterrows():
+        try:
+            classification_system = LucClassificationSystem.get(name=df['classification_system'])
+            user = Users.get(full_name=df['user'])
+            collect_method = CollectMethod.get(name=df['collect_method'])
+        except BaseException:
+            print("Classification System does not exist!")
+            return
+
+        metadata_json = df['metadata_json']
+
+
+        with open(metadata_json) as json_data:
+            file = json_load(json_data.read())
+
+            dataset = Datasets(classification_system_id=classification_system.id,
+                               user_id=user.id,
+                               name=df['name'],
+                               start_date=df['start_date'],
+                               end_date=df['end_date'],
+                               collect_method_id=collect_method.id,
+                               observation_table_name = df['obs_table_name'],
+                               version = df['version'],
+                               description=df['description'],
+                               metadata_json=file)
+
+            _db.session.add(dataset)
+            _db.session.commit()
+
+            click.echo("DataSet Adicionado {}".format(df['name']))
 
 
 def main(as_module=False):
