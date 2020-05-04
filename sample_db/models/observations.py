@@ -12,6 +12,7 @@ from sqlalchemy import Column, Date, ForeignKey, Integer, Table
 from geoalchemy2 import Geometry
 
 from lccs_db.models import LucClass, db
+from sample_db.models import Users
 
 from .base import metadata
 
@@ -28,7 +29,7 @@ def make_observation(table_name: str, create: bool = False) -> Table:
 
     klass = Table('{}_observations'.format(table_name), metadata,
         Column('id', Integer, primary_key=True, autoincrement=True),
-        Column('user_id', Integer, primary_key=True),
+        Column('user_id', Integer, ForeignKey(Users.id, ondelete='NO ACTION', onupdate='CASCADE')),
         Column(
             'class_id',
             Integer,
@@ -37,7 +38,7 @@ def make_observation(table_name: str, create: bool = False) -> Table:
         ),
         Column('start_date', Date, nullable=False),
         Column('end_date', Date, nullable=False),
-        Column('collection_date', Date, nullable=False),
+        Column('collection_date', Date, nullable=True),
         Column('location', Geometry(srid=4326))
     )
 

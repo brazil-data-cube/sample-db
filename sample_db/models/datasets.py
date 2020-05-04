@@ -7,7 +7,7 @@
 #
 """SampleDB Datasets Model."""
 
-from sqlalchemy import Column, Date, Enum, ForeignKey, Integer, String, Text
+from sqlalchemy import Column, Date, JSON, ForeignKey, Integer, String, Text
 
 from lccs_db.models.base import BaseModel
 from lccs_db.models.luc_classification_system import LucClassificationSystem
@@ -16,13 +16,16 @@ from sample_db.models.users import Users
 
 from ..config import Config
 
-import enum
 
-class CollectMethodEnum(enum.Enum):
-    """Python Enum Class for Collect Method"""
-    VISUAL = "Visual"
-    IN_LOCO = "In Loco"
+class CollectMethod(BaseModel):
+    """Datasets Model."""
 
+    __tablename__ = 'collect_method'
+    __table_args__ = {'schema': Config.ACTIVITIES_SCHEMA}
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=True)
+    description = Column(Text, nullable=True)
 
 class Datasets(BaseModel):
     """Datasets Model."""
@@ -35,12 +38,13 @@ class Datasets(BaseModel):
                                          ondelete='NO ACTION'), nullable=False)
     classification_system_id = Column(Integer, ForeignKey(LucClassificationSystem.id,
                                          ondelete='NO ACTION'), nullable=False)
-    collect_method = Column(Enum(CollectMethodEnum), nullable=False)
+    collect_method_id = Column(Integer, ForeignKey(CollectMethod.id,
+                                         ondelete='NO ACTION'), nullable=True)
     name = Column(String, nullable=True)
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
     observation_table_name = Column(String, nullable=False)
     midias_table_name = Column(String, nullable=True)
-    metadata_json = Column(String, nullable=True)
+    metadata_json = Column(JSON, nullable=True)
     version = Column(String, nullable=True)
     description = Column(Text, nullable=True)
