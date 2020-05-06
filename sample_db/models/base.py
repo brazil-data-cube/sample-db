@@ -12,4 +12,4 @@ from ..config import Config
 from sqlalchemy import MetaData
 
 
-metadata = MetaData(schema=Config.ACTIVITIES_SCHEMA)
+metadata = MetaData(schema=Config.SAMPLEDB_ACTIVITIES_SCHEMA)

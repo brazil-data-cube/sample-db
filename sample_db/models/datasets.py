@@ -7,10 +7,13 @@
 #
 """SampleDB Datasets Model."""
 
-from sqlalchemy import Column, Date, JSON, ForeignKey, Integer, String, Text
+from sqlalchemy import Column, Date, JSON, ForeignKey, Integer, String, Text, select
+from sqlalchemy.orm import aliased
+from sqlalchemy_utils import create_view
 
 from lccs_db.models.base import BaseModel
 from lccs_db.models.luc_classification_system import LucClassificationSystem
+from lccs_db.models.luc_class import LucClass
 
 from sample_db.models.users import Users
 
@@ -21,7 +24,7 @@ class CollectMethod(BaseModel):
     """Datasets Model."""
 
     __tablename__ = 'collect_method'
-    __table_args__ = {'schema': Config.ACTIVITIES_SCHEMA}
+    __table_args__ = {'schema': Config.SAMPLEDB_ACTIVITIES_SCHEMA}
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=True)
@@ -31,7 +34,7 @@ class Datasets(BaseModel):
     """Datasets Model."""
 
     __tablename__ = 'datasets'
-    __table_args__ = {'schema': Config.ACTIVITIES_SCHEMA}
+    __table_args__ = {'schema': Config.SAMPLEDB_ACTIVITIES_SCHEMA}
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey(Users.id,

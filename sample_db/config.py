@@ -22,7 +22,7 @@ class Config:
 
     DEBUG = False
     TESTING = False
-    ACTIVITIES_SCHEMA = os.environ.get('ACTIVITIES_SCHEMA', 'sampledb')
+    SAMPLEDB_ACTIVITIES_SCHEMA = os.environ.get('SAMPLEDB_ACTIVITIES_SCHEMA', 'sampledb')
 
 class ProductionConfig(Config):
     """Production Mode."""
