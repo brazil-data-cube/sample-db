@@ -10,8 +10,10 @@
 import click
 
 from lccs_db.cli import create_cli, create_app, init_db as lccs_init_db
-from sample_db.models import make_observation, Users, Datasets, CollectMethod
+from sample_db.models import make_observation,make_view_observation, Users, Datasets, CollectMethod
 from lccs_db.models import db as _db, LucClassificationSystem
+
+from sqlalchemy import select
 
 from .config import Config
 
@@ -143,6 +145,23 @@ def insert_dataset(ctx: click.Context, ifile):
 
         click.echo("DataSet Adicionado {}".format(df['name']))
 
+
+@cli.command()
+@click.pass_context
+@click.option('--name', type=click.STRING,
+              help='A name of table observation.',
+              required=False)
+# @pass_config
+def create_view_observation(ctx: click.Context, name):
+    """Create View observation."""
+    obs_table_name = "v_" + name
+
+    t = make_view_observation(table_name=name, obs_table_name=obs_table_name)
+
+    if t:
+        click.echo("View {} Create".format(obs_table_name))
+    else:
+        click.echo("Error while creating view {}".format(obs_table_name))
 
 def main(as_module=False):
     # TODO omit sys.argv once https://github.com/pallets/click/issues/536 is fixed

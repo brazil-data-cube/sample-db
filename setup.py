@@ -19,6 +19,7 @@ tests_require = [
     'pydocstyle>=4.0',
     'isort>4.3',
     'sqlalchemy-diff>=0.1.3',
+    'sqlalchemy-views>=0.2.4',
     'alembic-verify>=0.1.4',
     'check-manifest>=0.40'
 ]

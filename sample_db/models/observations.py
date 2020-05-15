@@ -7,14 +7,18 @@
 #
 """SampleDB Observations Model."""
 
-from sqlalchemy import Column, Date, ForeignKey, Integer, Table
-
+from sqlalchemy import Column, Date, ForeignKey, Integer, Table, select, cast, and_
+from sqlalchemy.sql import and_
+from sqlalchemy.sql import func
 from geoalchemy2 import Geometry
+from sqlalchemy_views import CreateView, DropView
 
 from lccs_db.models import LucClass, db
 from sample_db.models import Users
 
+
 from .base import metadata
+from ..config import Config
 
 
 def make_observation(table_name: str, create: bool = False) -> Table:
@@ -47,3 +51,29 @@ def make_observation(table_name: str, create: bool = False) -> Table:
             klass.create(bind=db.engine)
 
     return klass
+
+def make_view_observation(table_name: str, obs_table_name: str) -> bool:
+
+    # reflect observation table
+    obs_table = Table(table_name, metadata, autoload=True, autoload_with=db.engine)
+
+    selectable = select([obs_table.c.id,
+                         obs_table.c.start_date,
+                         obs_table.c.end_date,
+                         obs_table.c.collection_date,
+                         Users.full_name.label('user_name'),
+                         LucClass.name.label('class_name'),
+                         func.Geometry(obs_table.c.location).label('location'),
+                         ]).where(and_(Users.id == obs_table.c.user_id,
+                                       LucClass.id == obs_table.c.class_id))
+
+    view_table = Table(obs_table_name, metadata, schema=Config.SAMPLEDB_ACTIVITIES_SCHEMA)
+
+    try:
+        obs_view = CreateView(view_table, selectable)
+
+        db.engine.execute(obs_view)
+
+        return True
+    except:
+        return False
