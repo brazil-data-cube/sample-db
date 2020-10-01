@@ -8,11 +8,11 @@
 """SampleDB Provenance Model."""
 
 from sample_db.models.base import metadata
-from sample_db.models.datasets import Datasets, CollectMethod
+from sample_db.models.datasets import Datasets, CollectMethod, DatasetView
 from sample_db.models.users import Users
 from sample_db.models.midias import make_midias
-from sample_db.models.observations import make_observation
+from sample_db.models.observations import make_observation, make_view_observation
 from sample_db.models.provenance import Provenance
 
-__all__ = ['db', 'Datasets', 'metadata', 'Users', 'make_observation', 'make_midias',
-           'Provenance', 'CollectMethod',]
+__all__ = ['db', 'Datasets', 'metadata', 'Users', 'make_observation', 'make_view_observation', 'make_midias',
+           'Provenance', 'CollectMethod', 'DatasetView']

@@ -10,12 +10,22 @@
 import click
 
 from lccs_db.cli import create_cli, create_app, init_db as lccs_init_db
-from sample_db.models import make_observation, Users, Datasets, CollectMethod
+from sample_db.models import make_observation,make_view_observation, Users, Datasets, CollectMethod
 from lccs_db.models import db as _db, LucClassificationSystem
+
+from sqlalchemy import select
 
 from .config import Config
 
 from json import loads as json_load
+
+def verify_class_system_exist(class_system_name):
+
+    try:
+        class_system = LucClassificationSystem.get(name=class_system_name)
+        return class_system
+    except BaseException:
+       return None
 
 cli = create_cli(create_app=create_app)
 
@@ -27,11 +37,11 @@ def init_db(ctx: click.Context):
     """Initial Database."""
     ctx.forward(lccs_init_db)
 
-    click.secho('Creating schema {}...'.format(Config.ACTIVITIES_SCHEMA), fg='green')
+    click.secho('Creating schema {}...'.format(Config.SAMPLEDB_ACTIVITIES_SCHEMA), fg='green')
     click.secho('Creating EXTENSION postgis ...', fg='green')
 
     _db.session.execute("CREATE EXTENSION IF NOT EXISTS postgis")
-    _db.session.execute("CREATE SCHEMA IF NOT EXISTS {}".format(Config.ACTIVITIES_SCHEMA))
+    _db.session.execute("CREATE SCHEMA IF NOT EXISTS {}".format(Config.SAMPLEDB_ACTIVITIES_SCHEMA))
     _db.session.commit()
 
 @cli.command()
@@ -65,9 +75,12 @@ def insert_observation(ctx: click.Context, ifile):
         except BaseException:
             print("User does not exist!")
             return
-        try:
-            luc_system = LucClassificationSystem.get(name=df['name'])
-        except BaseException:
+
+        luc_system = verify_class_system_exist(df['name'])
+
+        if luc_system:
+            print("Classification System {} already exist".format(luc_system.name))
+        else:
             click.secho('Creating Classification System {}'.format(df['name']))
             luc_system = LucClassificationSystem()
             luc_system.authority_name = df['authority_name']
@@ -75,6 +88,8 @@ def insert_observation(ctx: click.Context, ifile):
             luc_system.name = df['name']
             luc_system.version = df['version']
             luc_system.save()
+
+            print("Classification System {} Insert".format(luc_system.name))
 
         driver = DriversFactory.make(df['driver'], df['observation'], storager)
 
@@ -128,8 +143,25 @@ def insert_dataset(ctx: click.Context, ifile):
             _db.session.add(dataset)
             _db.session.commit()
 
-            click.echo("DataSet Adicionado {}".format(df['name']))
+        click.echo("DataSet Adicionado {}".format(df['name']))
 
+
+@cli.command()
+@click.pass_context
+@click.option('--name', type=click.STRING,
+              help='A name of table observation.',
+              required=False)
+# @pass_config
+def create_view_observation(ctx: click.Context, name):
+    """Create View observation."""
+    obs_table_name = "v_" + name
+
+    t = make_view_observation(table_name=name, obs_table_name=obs_table_name)
+
+    if t:
+        click.echo("View {} Create".format(obs_table_name))
+    else:
+        click.echo("Error while creating view {}".format(obs_table_name))
 
 def main(as_module=False):
     # TODO omit sys.argv once https://github.com/pallets/click/issues/536 is fixed

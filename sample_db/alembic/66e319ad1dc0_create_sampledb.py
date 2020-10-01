@@ -54,7 +54,7 @@ def upgrade():
     sa.Column('dataset_id', sa.Integer(), nullable=False),
     sa.Column('dataset_parent_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['dataset_id'], ['sampledb.datasets.id'], ondelete='NO ACTION'),
-    sa.ForeignKeyConstraint(['dataset_parent_id'], ['lccs.classes.id'], ondelete='NO ACTION'),
+    sa.ForeignKeyConstraint(['dataset_parent_id'], ['sampledb.datasets.id'], ondelete='NO ACTION'),
     sa.PrimaryKeyConstraint('dataset_id', 'dataset_parent_id'),
     schema='sampledb'
     )
