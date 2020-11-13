@@ -1,2 +1,16 @@
-graft bdc_sample
-global-exclude *.py[cod] __pycache__ *.so
+include *.rst
+include LICENSE
+recursive-include docs *.png
+recursive-include docs *.xml
+recursive-include examples *.R
+recursive-include spec *.md
+recursive-include spec *.sql
+recursive-include spec *.xml
+recursive-include docs *.css
+recursive-include docs *.ico
+recursive-include docs *.bat
+recursive-include docs *.py
+recursive-include docs *.rst
+recursive-include docs Makefile
+
+

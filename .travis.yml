@@ -1,0 +1,50 @@
+#
+# This file is part of Sample Database Model.
+# Copyright (C) 2019-2020 INPE.
+#
+# Sample Database Model is free software; you can redistribute it and/or modify it
+# under the terms of the MIT License; see LICENSE file for more details.
+#
+
+language: python
+
+os: linux
+
+cache:
+    directories:
+        - $HOME/.cache/pip
+
+git:
+    quiet: true
+    submodules: false
+
+branches:
+    only:
+        - master
+        - /^b-\d+\.\d+\.\d+/
+
+dist: bionic
+
+services:
+    - docker
+
+python:
+    - 3.7
+
+before_install:
+    - pip install --upgrade pip
+    - pip install --upgrade setuptools
+
+install:
+    - pip install -e .[tests,docs]
+    - docker pull postgis/postgis:12-3.0
+    - docker run --name bdc-pg -p 127.0.0.1:5432:5432 -e POSTGRES_PASSWORD=postgres -d postgis/postgis:12-3.0
+    - docker ps -a
+
+script:
+    - ./run-tests.sh
+
+after_success:
+    - docker stop bdc-pg
+    - docker rm bdc-pg
+    - coveralls
