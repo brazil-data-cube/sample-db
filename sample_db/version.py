@@ -7,9 +7,9 @@
 #
 
 """Version information for Sample Database Model.
+
 This file is imported by ``sample_db.__init__``,
 and parsed by ``setup.py``.
 """
-
 
 __version__ = '0.2.0'

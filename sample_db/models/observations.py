@@ -7,18 +7,17 @@
 #
 """SampleDB Observations Model."""
 
-from sqlalchemy import Column, Date, ForeignKey, Integer, Table, select, cast, and_
-from sqlalchemy.sql import and_
-from sqlalchemy.sql import func
 from geoalchemy2 import Geometry
+from lccs_db.models import LucClass, db
+from sqlalchemy import (Column, Date, ForeignKey, Integer, Table, and_, cast,
+                        select)
+from sqlalchemy.sql import and_, func
 from sqlalchemy_views import CreateView, DropView
 
-from lccs_db.models import LucClass, db
 from sample_db.models import Users
 
-
-from .base import metadata
 from ..config import Config
+from .base import metadata
 
 
 def make_observation(table_name: str, create: bool = False) -> Table:

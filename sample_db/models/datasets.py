@@ -6,13 +6,12 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 """SampleDB Datasets Model."""
-
-from sqlalchemy import Column, Date, JSON, ForeignKey, Integer, String, Text, select
-from sqlalchemy.sql import and_
-from sqlalchemy_utils import create_view
-
 from lccs_db.models.base import BaseModel
 from lccs_db.models.luc_classification_system import LucClassificationSystem
+from sqlalchemy import (JSON, Column, Date, ForeignKey, Integer, String, Text,
+                        select)
+from sqlalchemy.sql import and_
+from sqlalchemy_utils import create_view
 
 from sample_db.models.users import Users
 
