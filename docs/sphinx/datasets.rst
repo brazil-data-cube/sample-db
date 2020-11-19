@@ -8,3 +8,13 @@
 
 Datasets
 --------
+
+.. autoclass:: sample_db.models.datasets::Datasets
+    :members:
+    :special-members: __init__
+    :member-order: bysource
+
+.. autoclass:: sample_db.models.datasets::CollectMethod
+    :members:
+    :special-members: __init__
+    :member-order: bysource

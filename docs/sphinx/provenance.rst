@@ -8,3 +8,8 @@
 
 Provenance
 ----------
+
+.. autoclass:: sample_db.models.provenance::Provenance
+    :members:
+    :special-members: __init__
+    :member-order: bysource

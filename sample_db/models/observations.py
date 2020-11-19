@@ -14,7 +14,7 @@ from sqlalchemy import (Column, Date, ForeignKey, Integer, Table, and_, cast,
 from sqlalchemy.sql import and_, func
 from sqlalchemy_views import CreateView, DropView
 
-from sample_db.models import Users
+from sample_db.models.users import Users
 
 from ..config import Config
 from .base import metadata
@@ -31,19 +31,19 @@ def make_observation(table_name: str, create: bool = False) -> Table:
     """
 
     klass = Table('{}_observations'.format(table_name), metadata,
-        Column('id', Integer, primary_key=True, autoincrement=True),
-        Column('user_id', Integer, ForeignKey(Users.id, ondelete='NO ACTION', onupdate='CASCADE')),
-        Column(
-            'class_id',
-            Integer,
-            ForeignKey(LucClass.id, ondelete='NO ACTION', onupdate='CASCADE'),
-            nullable=False
-        ),
-        Column('start_date', Date, nullable=False),
-        Column('end_date', Date, nullable=False),
-        Column('collection_date', Date, nullable=True),
-        Column('location', Geometry(srid=4326))
-    )
+                  Column('id', Integer, primary_key=True, autoincrement=True),
+                  Column('user_id', Integer, ForeignKey(Users.id, ondelete='NO ACTION', onupdate='CASCADE')),
+                  Column(
+                      'class_id',
+                      Integer,
+                      ForeignKey(LucClass.id, ondelete='NO ACTION', onupdate='CASCADE'),
+                      nullable=False
+                  ),
+                  Column('start_date', Date, nullable=False),
+                  Column('end_date', Date, nullable=False),
+                  Column('collection_date', Date, nullable=True),
+                  Column('location', Geometry(srid=4326))
+                  )
 
     if create:
         if not klass.exists(bind=db.engine):
@@ -51,7 +51,9 @@ def make_observation(table_name: str, create: bool = False) -> Table:
 
     return klass
 
+
 def make_view_observation(table_name: str, obs_table_name: str) -> bool:
+    """Create a view of an observation model using a table name."""
 
     # reflect observation table
     obs_table = Table(table_name, metadata, autoload=True, autoload_with=db.engine)

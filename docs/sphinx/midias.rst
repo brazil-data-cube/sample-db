@@ -8,3 +8,5 @@
 
 Midias
 ------
+
+.. autofunction:: sample_db.models.midias::make_midias

@@ -8,3 +8,8 @@
 
 Users
 -----
+
+.. autoclass:: sample_db.models.users::Users
+    :members:
+    :special-members: __init__
+    :member-order: bysource

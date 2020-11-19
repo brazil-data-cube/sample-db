@@ -28,6 +28,7 @@ class CollectMethod(BaseModel):
     name = Column(String, nullable=True)
     description = Column(Text, nullable=True)
 
+
 class Datasets(BaseModel):
     """Datasets Model."""
 
@@ -38,9 +39,9 @@ class Datasets(BaseModel):
     user_id = Column(Integer, ForeignKey(Users.id,
                                          ondelete='NO ACTION'), nullable=False)
     classification_system_id = Column(Integer, ForeignKey(LucClassificationSystem.id,
-                                         ondelete='NO ACTION'), nullable=False)
+                                                          ondelete='NO ACTION'), nullable=False)
     collect_method_id = Column(Integer, ForeignKey(CollectMethod.id,
-                                         ondelete='NO ACTION'), nullable=True)
+                                                   ondelete='NO ACTION'), nullable=True)
     name = Column(String, nullable=True)
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
