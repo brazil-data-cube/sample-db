@@ -26,7 +26,7 @@ Clone the software repository:
 
 .. code-block:: shell
 
-        $ git clone https://github.com/brazil-data-cube/sampledb.git
+        $ git clone https://github.com/brazil-data-cube/sample-db.git
 
 
 Go to the source code folder:
@@ -47,7 +47,7 @@ Run the tests:
 
 .. code-block:: shell
 
-        $ ./run-test.sh
+        $ ./run-tests.sh
 
 
 Generate the documentation:
@@ -61,4 +61,4 @@ The above command will generate the documentation in HTML and it will place it u
 
 .. code-block:: shell
 
-    doc/sphinx/_build/html/
+    docs/sphinx/_build/html/
