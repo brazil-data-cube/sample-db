@@ -1,14 +1,14 @@
 ..
-    This file is part of Brazil Data Cube Sample Database module.
-    Copyright (C) 2019 INPE.
+    This file is part of Sample Database.
+    Copyright (C) 2020-2021 INPE.
 
-    Brazil Data Cube Sample Database Module is free software; you can redistribute it and/or modify it
+    Sample Database Module is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
 
 
-=========================================
-Brazil Data Cube - Sample Database module
-=========================================
+==================================
+Brazil Data Cube - Sample Database
+==================================
 
 .. image:: https://img.shields.io/badge/license-MIT-green
         :target: https://github.com//brazil-data-cube/sample-db/blob/master/LICENSE
@@ -18,6 +18,14 @@ Brazil Data Cube - Sample Database module
         :target: https://sample-db.readthedocs.io/en/latest/
         :alt: Documentation Status
 
+.. image:: https://drone.dpi.inpe.br/api/badges/brazil-data-cube/sample-db/status.svg
+        :target: https://drone.dpi.inpe.br/brazil-data-cube/sample-db
+        :alt: Build Status
+
+.. image:: https://codecov.io/gh/brazil-data-cube/sample-db/branch/master/graph/badge.svg?token=WIJ67G1AAO
+        :target: https://codecov.io/gh/brazil-data-cube/sample-db
+        :alt: Code Coverage Test
+
 .. image:: https://img.shields.io/badge/lifecycle-experimental-orange.svg
         :target: https://www.tidyverse.org/lifecycle/#experimental
         :alt: Software Life Cycle
@@ -26,48 +34,38 @@ Brazil Data Cube - Sample Database module
         :target: https://github.com/brazil-data-cube/sample-db/releases
         :alt: Release
 
-.. image:: https://badges.gitter.im/brazil-data-cube/community.png
-        :target: https://gitter.im/brazil-data-cube/community#
-        :alt: Join the chat
+.. image:: https://img.shields.io/discord/689541907621085198?logo=discord&logoColor=ffffff&color=7389D8
+        :target: https://discord.com/channels/689541907621085198#
+        :alt: Join us at Discord
 
+About
+=====
 
-.. role:: raw-html(raw)
-    :format: html
-
-
-:raw-html:`<br />`
 This is the storage module for data samples from the Brazil Data Cube. The module relies on SQLAlchemy related packages in order to store and retrieve data items related to the samples. All the sample collections are recorded in tables according to the following schema:
 
-.. image:: https://github.com/brazil-data-cube/sample-db/raw/master/doc/model/db-schema.png
+.. image:: https://github.com/brazil-data-cube/sample-db/raw/master/docs/model/db-schema.png
         :target: https://github.com/brazil-data-cube/sample-db/tree/master/doc/model
         :width: 90%
         :alt: Database Schema
 
 
-
 Installation
 ============
 
-See `INSTALL.rst <./INSTALL.rst>`_. (UNDER DEVELOPMENT)
+Install from GitHub::
 
+    pip3 install git+https://github.com/brazil-data-cube/sample-db
 
-Running
-=======
+Documentation
+=============
 
-See `RUNNING.rst <./RUNNING.rst>`_. (UNDER DEVELOPMENT)
-
-
-Developer Documentation
-=======================
-
-See https://sample-db.readthedocs.io/en/latest/ (UNDER DEVELOPMENT)
-
+See https://sample-db.readthedocs.io/en/latest/
 
 License
 =======
 
 .. admonition::
-    Copyright (C) 2019 INPE.
+    Copyright (C) 2020-2021 INPE.
 
     Brazil Data Cube Sample Database Module is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
