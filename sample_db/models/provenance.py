@@ -12,6 +12,8 @@ from sqlalchemy import Column, ForeignKey, Integer, PrimaryKeyConstraint
 
 from ..config import Config
 
+from ..config import Config
+
 
 class Provenance(BaseModel):
     """Provenance Model."""
@@ -24,5 +26,5 @@ class Provenance(BaseModel):
 
     dataset_id = Column(Integer, ForeignKey('{}.datasets.id'.format(Config.SAMPLEDB_ACTIVITIES_SCHEMA), ondelete='NO ACTION'), nullable=False,
                              primary_key=True)
-    dataset_parent_id = Column(Integer, ForeignKey(LucClass.id, ondelete='NO ACTION'), nullable=False,
+    dataset_parent_id = Column(Integer, ForeignKey('{}.datasets.id'.format(Config.SAMPLEDB_ACTIVITIES_SCHEMA), ondelete='NO ACTION'), nullable=False,
                              primary_key=True)
