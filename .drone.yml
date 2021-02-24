@@ -1,0 +1,54 @@
+#
+# This file is part of Sample Database Model.
+# Copyright (C) 2020-2021 INPE.
+#
+# Sample Database Model is free software; you can redistribute it and/or modify it
+# under the terms of the MIT License; see LICENSE file for more details.
+#
+
+kind: pipeline
+name: sample-db
+
+steps:
+- name: build
+  image: python:3.7
+  commands:
+  - lccs-db db init
+  - lccs-db db create-namespaces
+  - lccs-db alembic upgrade
+  - lccs-db db load-scripts
+  - pip install --upgrade pip
+  - pip install --upgrade setuptools
+  - pip install -e .[tests,docs]
+  - ./run-tests.sh
+  environment:
+    SQLALCHEMY_DATABASE_URI: postgresql://postgres:mysecretpassword@pg_database:5432/bdc_db
+
+- name: coverage
+  image: plugins/codecov
+  settings:
+    files:
+    - coverage.xml
+    - .coverage
+    token:
+      from_secret: codecov_token
+  when:
+    event:
+    - push
+
+- name: discord-notify
+  image: brazildatacube/bdc-drone-discord
+  settings:
+    webhook:
+      from_secret: discord_webhook
+  when:
+    status:
+      - failure
+      - success
+
+services:
+- name: pg_database
+  image: postgis/postgis:13-3.1
+  environment:
+    POSTGRES_PASSWORD: mysecretpassword
+    POSTGRES_USER: postgres
