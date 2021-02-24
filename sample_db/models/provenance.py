@@ -6,12 +6,12 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 """SampleDB Provenance Model."""
-from sqlalchemy import Column, ForeignKey, Integer, PrimaryKeyConstraint
-
 from lccs_db.models.base import BaseModel
 from lccs_db.models.luc_class import LucClass
+from sqlalchemy import Column, ForeignKey, Integer, PrimaryKeyConstraint
 
 from ..config import Config
+
 
 class Provenance(BaseModel):
     """Provenance Model."""

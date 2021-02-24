@@ -12,39 +12,7 @@ import os
 CURRENT_DIR = os.path.dirname(__file__)
 
 
-def get_settings(env):
-    """Retrieve respective config context."""
-    return CONFIG.get(env)
-
-
 class Config:
     """Define common config along contexts."""
 
-    DEBUG = False
-    TESTING = False
-    ACTIVITIES_SCHEMA = os.environ.get('ACTIVITIES_SCHEMA', 'sampledb')
-
-class ProductionConfig(Config):
-    """Production Mode."""
-
-    DEBUG = False
-
-
-class DevelopmentConfig(Config):
-    """Development Mode."""
-
-    DEVELOPMENT = True
-
-
-class TestingConfig(Config):
-    """Testing Mode (Continous Integration)."""
-
-    TESTING = True
-    DEBUG = True
-
-
-CONFIG = {
-    "DevelopmentConfig": DevelopmentConfig(),
-    "ProductionConfig": ProductionConfig(),
-    "TestingConfig": TestingConfig()
-}
+    SAMPLEDB_SCHEMA_NAME = os.environ.get('LCCS_SCHEMA_NAME', 'lccs')
