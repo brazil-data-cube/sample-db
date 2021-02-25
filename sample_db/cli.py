@@ -35,7 +35,7 @@ cli = create_cli(create_app=create_app)
 @click.pass_context
 # @pass_config
 def init_db(ctx: click.Context):
-    """Initial Database."""
+    """Initialize Database."""
     ctx.forward(lccs_init_db)
 
     click.secho('Creating schema {}...'.format(Config.SAMPLEDB_ACTIVITIES_SCHEMA), fg='green')
@@ -162,7 +162,9 @@ def create_view_observation(ctx: click.Context, name):
     else:
         click.echo("Error while creating view {}".format(obs_table_name))
 
+
 def main(as_module=False):
+    """Run run the library module as a script."""
     # TODO omit sys.argv once https://github.com/pallets/click/issues/536 is fixed
     import sys
     cli.main(args=sys.argv[1:], prog_name="python -m sample_db" if as_module else None)

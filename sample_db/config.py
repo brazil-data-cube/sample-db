@@ -15,6 +15,5 @@ CURRENT_DIR = os.path.dirname(__file__)
 class Config:
     """Define common config along contexts."""
 
-
     SAMPLEDB_ACTIVITIES_SCHEMA = os.environ.get('SAMPLEDB_ACTIVITIES_SCHEMA', 'sampledb')
 

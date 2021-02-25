@@ -16,10 +16,8 @@ from sqlalchemy_views import CreateView, DropView
 
 from sample_db.models.users import Users
 
-
 from ..config import Config
 from .base import metadata
-from ..config import Config
 
 
 def make_observation(table_name: str, create: bool = False) -> Table:
