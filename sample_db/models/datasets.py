@@ -22,7 +22,7 @@ class CollectMethod(BaseModel):
     """Datasets Model."""
 
     __tablename__ = 'collect_method'
-    __table_args__ = {'schema': Config.SAMPLEDB_ACTIVITIES_SCHEMA}
+    __table_args__ = {'schema': Config.SAMPLEDB_SCHEMA}
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=True)
@@ -32,7 +32,7 @@ class Datasets(BaseModel):
     """Datasets Model."""
 
     __tablename__ = 'datasets'
-    __table_args__ = {'schema': Config.SAMPLEDB_ACTIVITIES_SCHEMA}
+    __table_args__ = {'schema': Config.SAMPLEDB_SCHEMA}
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey(Users.id,
@@ -76,4 +76,4 @@ class DatasetView(BaseModel):
                                        CollectMethod.id == Datasets.collect_method_id)),
         metadata=BaseModel.metadata,
     )
-    __table__.schema = Config.SAMPLEDB_ACTIVITIES_SCHEMA
+    __table__.schema = Config.SAMPLEDB_SCHEMA

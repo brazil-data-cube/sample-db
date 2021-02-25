@@ -18,7 +18,7 @@ class Users(BaseModel):
     """User Model."""
 
     __tablename__ = 'users'
-    __table_args__ = {'schema': Config.SAMPLEDB_ACTIVITIES_SCHEMA}
+    __table_args__ = {'schema': Config.SAMPLEDB_SCHEMA}
 
     id = Column(Integer, primary_key=True)
     email = Column(String, nullable=False)

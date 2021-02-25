@@ -16,5 +16,5 @@ class Config:
     """Define common config along contexts."""
 
 
-    SAMPLEDB_ACTIVITIES_SCHEMA = os.environ.get('SAMPLEDB_ACTIVITIES_SCHEMA', 'sampledb')
+    SAMPLEDB_SCHEMA = os.environ.get('SAMPLEDB_SCHEMA', 'sampledb')
 

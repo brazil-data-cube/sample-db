@@ -16,9 +16,6 @@ from sqlalchemy_views import CreateView, DropView
 
 from sample_db.models.users import Users
 
-
-from ..config import Config
-from .base import metadata
 from ..config import Config
 
 
@@ -32,7 +29,7 @@ def make_observation(table_name: str, create: bool = False) -> Table:
         Observation definition
     """
 
-    klass = Table('{}_observations'.format(table_name), metadata,
+    klass = Table('{}_observations'.format(table_name), db.metadata,
         Column('id', Integer, primary_key=True, autoincrement=True),
         Column('user_id', Integer, ForeignKey(Users.id, ondelete='NO ACTION', onupdate='CASCADE')),
         Column(
@@ -58,7 +55,7 @@ def make_view_observation(table_name: str, obs_table_name: str) -> bool:
     """Create a view of an observation model using a table name."""
 
     # reflect observation table
-    obs_table = Table(table_name, metadata, autoload=True, autoload_with=db.engine)
+    obs_table = Table(table_name, db.metadata, autoload=True, autoload_with=db.engine)
 
     selectable = select([obs_table.c.id,
                          obs_table.c.start_date,
@@ -70,7 +67,7 @@ def make_view_observation(table_name: str, obs_table_name: str) -> bool:
                          ]).where(and_(Users.id == obs_table.c.user_id,
                                        LucClass.id == obs_table.c.class_id))
 
-    view_table = Table(obs_table_name, metadata, schema=Config.SAMPLEDB_ACTIVITIES_SCHEMA)
+    view_table = Table(obs_table_name, db.metadata, schema=Config.SAMPLEDB_ACTIVITIES_SCHEMA)
 
     try:
         obs_view = CreateView(view_table, selectable)
