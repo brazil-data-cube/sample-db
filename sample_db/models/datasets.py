@@ -28,6 +28,7 @@ class CollectMethod(BaseModel):
     name = Column(String, nullable=True)
     description = Column(Text, nullable=True)
 
+
 class Datasets(BaseModel):
     """Datasets Model."""
 

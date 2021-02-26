@@ -12,6 +12,7 @@ from typing import Callable
 from lccs_db.models import db
 from sqlalchemy import Column, ForeignKey, Integer, String, Table
 
+from .base import metadata
 
 
 def make_midias(table_name: str, observation: Table, create: bool = False) -> Table:
@@ -25,7 +26,7 @@ def make_midias(table_name: str, observation: Table, create: bool = False) -> Ta
         Observation definition
     """
 
-    klass = Table('{}_midias'.format(table_name), db.metadata,
+    klass = Table('{}_midias'.format(table_name), metadata,
         Column('id', Integer, primary_key=True),
         Column(
             'observation_id',

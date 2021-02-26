@@ -22,7 +22,10 @@ class Provenance(BaseModel):
         {'schema': Config.SAMPLEDB_SCHEMA}
     )
 
-    dataset_id = Column(Integer, ForeignKey('{}.datasets.id'.format(Config.SAMPLEDB_SCHEMA), ondelete='NO ACTION'), nullable=False,
-                             primary_key=True)
-    dataset_parent_id = Column(Integer, ForeignKey('{}.datasets.id'.format(Config.SAMPLEDB_SCHEMA), ondelete='NO ACTION'), nullable=False,
-                             primary_key=True)
+    dataset_id = Column(Integer, ForeignKey('{}.datasets.id'.format(Config.SAMPLEDB_SCHEMA), ondelete='NO ACTION'),
+                        nullable=False,
+                        primary_key=True)
+    dataset_parent_id = Column(Integer,
+                               ForeignKey('{}.datasets.id'.format(Config.SAMPLEDB_SCHEMA), ondelete='NO ACTION'),
+                               nullable=False,
+                               primary_key=True)

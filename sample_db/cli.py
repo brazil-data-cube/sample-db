@@ -6,15 +6,16 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 """Command-Line Interface for the Sample Database Model ."""
-import click
 import json
+
+import click
 from bdc_db.cli import cli
 from bdc_db.db import db as _db
 from flask.cli import with_appcontext
 from lccs_db.utils import get_mimetype
 from sample_db_utils.factory import factory
 
-from .models import Users
+from .models import Users, make_view_observation
 from .utils import create_dataset
 
 
@@ -47,9 +48,6 @@ def insert_user(verbose, full_name, email, password):
 @sample.command()
 @with_appcontext
 @click.option('-v', '--verbose', is_flag=True, default=False)
-# @click.option('--dataset_json', type=click.File('r'),
-#               help='A JSON input file with all parameters (required if the others is omitted).',
-#               required=False)
 @click.option('--user_full_name', type=click.STRING, required=True, help='The user full name.')
 @click.option('--observation_table_name', type=click.STRING, required=True, help='The observation table name.')
 @click.option('--dataset_name', type=click.STRING, required=True, help='The dataset name.')
@@ -62,10 +60,10 @@ def insert_user(verbose, full_name, email, password):
 @click.option('--classification_system_name', type=click.STRING, required=True, help='The classification system name.')
 @click.option('--classification_system_version', type=click.STRING, required=True,
               help='The classification system version.')
-@click.option('--metadata_file',  type=click.Path(exists=True, readable=True), help='A JSON metadata file.', required=True)
+@click.option('--metadata_file',  type=click.Path(exists=True, readable=True), help='A JSON metadata file.', required=False)
 @click.option('--observation_file', type=click.Path(exists=True), required=True,
               help='File path with the observation to insert')
-@click.option('--obs_already_exist', is_flag=True, default=False)
+@click.option('--obs_already_exist', is_flag=True, default=True)
 def insert_dataset(verbose, user_full_name, observation_table_name, dataset_name, start_date, end_date,
                    version, collect_method, description, mappings, classification_system_name,
                    classification_system_version,
@@ -79,34 +77,64 @@ def insert_dataset(verbose, user_full_name, observation_table_name, dataset_name
     
     if 'collect_date' not in mappings_json:
         mappings_json['collect_date'] = None
+
+    metadata_json = None
     
-    with open(metadata_file, "r") as f:
-        metadata_json = json.load(f)
+    if metadata_file:
+        with open(metadata_file, "r") as f:
+            metadata_json = json.load(f)
     
     observation_drive_type = get_mimetype(observation_file)
     
     driver_klass = factory.get(observation_drive_type)
     
-    dataset_info = dict()
+    args = dict()
     
-    dataset_info["mappings_json"] = mappings_json
-    dataset_info["observation_file"] = observation_file
-    dataset_info["dataset_name"] = dataset_name
-    dataset_info["collect_method"] = collect_method
-    dataset_info["start_date"] = start_date
-    dataset_info["end_date"] = end_date
-    dataset_info["version"] = version
-    dataset_info["description"] = description
-    dataset_info["metadata_json"] = metadata_json
-    dataset_info["obs_already_exist"] = obs_already_exist
+    args["mappings_json"] = mappings_json
+    args["observation_file"] = observation_file
+    args["dataset_name"] = dataset_name
+    args["collect_method"] = collect_method
+    args["start_date"] = start_date
+    args["end_date"] = end_date
+    args["version"] = version
+    args["description"] = description
+    args["metadata_json"] = metadata_json
+    args["obs_already_exist"] = obs_already_exist
     
     affected_rows = create_dataset(user_full_name=user_full_name,
                                    observation_table_name=observation_table_name,
                                    classification_system_name=classification_system_name,
                                    classification_system_version=classification_system_version,
-                                   driver_type=driver_klass, **dataset_info)
+                                   driver_type=driver_klass, **args)
 
-    print("terminnou")
+    click.secho(f'Dataset {dataset_name} loaded!', bold=True, fg='green')
+
+    if verbose:
+        click.secho(f'\tNumber of observations inserted {affected_rows}.', bold=False, fg='black')
+
+
+@sample.command()
+@with_appcontext
+@click.option('-v', '--verbose', is_flag=True, default=False)
+@click.option('--observation_table_name', type=click.STRING, help='A name of observation table.', required=True)
+def create_view_observation(verbose, observation_table_name):
+    """Create View observation."""
+    if verbose:
+        click.secho(f'Create view for {observation_table_name}..', bold=True, fg='yellow')
+        
+    table_name = f'{observation_table_name}_observations'
+
+    obs_table_name = f'v_{table_name}'
+    
+    t = make_view_observation(table_name=table_name, obs_table_name=obs_table_name)
+
+    if t:
+        click.secho(f'View {obs_table_name} created.', bold=True, fg='black')
+    else:
+        click.secho(f"Error while creating view {obs_table_name}.", bold=True, fg='yellow')
+
+    if verbose:
+        click.secho('\tFinished!', bold=False, fg='black')
 
 
 def main(as_module=False):

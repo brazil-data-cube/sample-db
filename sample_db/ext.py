@@ -7,22 +7,23 @@
 #
 
 """Sample extension for Brazil Data Cube applications and services."""
-
+from bdc_db.db import db as _db
 from bdc_db.ext import BrazilDataCubeDB
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
 from .cli import cli
-from bdc_db.db import db as _db
 
 
 class BDCSample:
     """Image sample extension."""
+
     # Reference to BrazilDataCubeDB app instance
     _db_ext = None
 
     def __init__(self, app=None):
         """Initialize the sample_db extension.
+
         Args:
             app: Flask application
             kwargs: Optional arguments (not used).
@@ -32,6 +33,7 @@ class BDCSample:
 
     def init_app(self, app: Flask):
         """Initialize Flask application instance.
+
         Args:
             app: Flask application
             kwargs: Optional arguments (not used).
@@ -44,6 +46,7 @@ class BDCSample:
     @property
     def db(self) -> SQLAlchemy:
         """Retrieve instance Flask-SQLALchemy instance.
+
         Notes:
             Make sure to initialize the `BDCCatalog` before.
         """
