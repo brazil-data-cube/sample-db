@@ -1,3 +1,4 @@
+#
 # This file is part of Sample Database Model.
 # Copyright (C) 2020-2021 INPE.
 #
