@@ -18,7 +18,7 @@ from sample_db.models import Datasets, CollectMethod, Users, DatasetView
 revision = '752b10fba4f9'
 down_revision = 'e6ed17b95ec0'
 branch_labels = ()
-depends_on = None
+depends_on = 'e8b12ba52665'  # LCCS-DB reference id
 
 
 def upgrade():

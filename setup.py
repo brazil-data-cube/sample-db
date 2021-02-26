@@ -48,8 +48,8 @@ setup_requires = [
 ]
 
 install_requires = [
-    'lccs-db @ git+https://github.com/brazil-data-cube/lccs-db.git@master',
-    'GeoAlchemy2>=0.6.3',
+    #'lccs-db @ git+https://github.com/brazil-data-cube/lccs-db.git@master',
+    #'GeoAlchemy2>=0.6.3',
 ]
 
 packages = find_packages()
@@ -66,24 +66,27 @@ setup(
     license='MIT',
     author='Brazil Data Cube Team',
     author_email='brazildatacube@inpe.br',
-    url='https://github.com/brazil-data-cube/lccs-db',
+    url='https://github.com/brazil-data-cube/sample-db',
     packages=packages,
     zip_safe=False,
     include_package_data=True,
     platforms='any',
     entry_points={
         'console_scripts': [
-            'sample_db = sample_db.cli:cli',
+            'sample-db = sample_db.cli:cli',
         ],
         'bdc_db.alembic': [
-            'sample_db = sample_db:alembic'
+            'sample-db = sample_db:alembic'
         ],
         'bdc_db.models': [
-            'sample_db = sample_db.models'
+            'sample-db = sample_db.models'
         ],
-	'bdc_db.namespaces':[
-	    'sample_db = sample_db.config:Config.SAMPLEDB_SCHEMA'
-	]
+        'bdc_db.scripts': [
+            'sample-db = lccs_db.scripts'
+        ],
+        'bdc_db.namespaces': [
+            'sample-db = sample_db.config:Config.SAMPLEDB_SCHEMA'
+        ]
     },
     install_requires=install_requires,
     extras_require=extras_require,
