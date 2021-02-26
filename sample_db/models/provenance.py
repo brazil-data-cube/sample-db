@@ -7,7 +7,6 @@
 #
 """SampleDB Provenance Model."""
 from lccs_db.models.base import BaseModel
-from lccs_db.models.luc_class import LucClass
 from sqlalchemy import Column, ForeignKey, Integer, PrimaryKeyConstraint
 
 from ..config import Config

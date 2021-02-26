@@ -137,6 +137,7 @@ def create_view_observation(verbose, observation_table_name):
         click.secho('\tFinished!', bold=False, fg='black')
 
 
+
 def main(as_module=False):
     """Run run the library module as a script."""
     # TODO omit sys.argv once https://github.com/pallets/click/issues/536 is fixed

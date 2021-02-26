@@ -13,10 +13,6 @@ steps:
 - name: build
   image: python:3.7
   commands:
-  - lccs-db db init
-  - lccs-db db create-namespaces
-  - lccs-db alembic upgrade
-  - lccs-db db load-scripts
   - pip install --upgrade pip
   - pip install --upgrade setuptools
   - pip install -e .[tests,docs]
