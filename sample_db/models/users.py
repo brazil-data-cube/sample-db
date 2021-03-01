@@ -8,7 +8,7 @@
 """SampleDB User Model."""
 
 from lccs_db.models.base import BaseModel
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Index, Integer, String
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from ..config import Config
@@ -18,12 +18,17 @@ class Users(BaseModel):
     """User Model."""
 
     __tablename__ = 'users'
-    __table_args__ = {'schema': Config.SAMPLEDB_SCHEMA}
 
     id = Column(Integer, primary_key=True)
     email = Column(String, nullable=False)
     full_name = Column(String, nullable=False)
     password_hash = Column('password', String, nullable=False)
+
+    __table_args__ = (
+        Index(None, email),
+        Index(None, full_name),
+        dict(schema=Config.SAMPLEDB_SCHEMA),
+    )
 
     def __init__(self, **kwargs):
         for key, value in kwargs.items():

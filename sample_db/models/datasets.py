@@ -8,7 +8,7 @@
 """SampleDB Datasets Model."""
 from lccs_db.models.base import BaseModel
 from lccs_db.models.luc_classification_system import LucClassificationSystem
-from sqlalchemy import (JSON, Column, Date, ForeignKey, Integer, String, Text,
+from sqlalchemy import (JSON, Boolean, Column, Date, ForeignKey, Integer, Index, String, Text,
                         select)
 from sqlalchemy.sql import and_
 from sqlalchemy_utils import create_view
@@ -22,18 +22,21 @@ class CollectMethod(BaseModel):
     """Datasets Model."""
 
     __tablename__ = 'collect_method'
-    __table_args__ = {'schema': Config.SAMPLEDB_SCHEMA}
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=True)
     description = Column(Text, nullable=True)
+
+    __table_args__ = (
+        Index(None, name),
+        dict(schema=Config.SAMPLEDB_SCHEMA),
+    )
 
 
 class Datasets(BaseModel):
     """Datasets Model."""
 
     __tablename__ = 'datasets'
-    __table_args__ = {'schema': Config.SAMPLEDB_SCHEMA}
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey(Users.id,
@@ -44,6 +47,8 @@ class Datasets(BaseModel):
                                                    ondelete='NO ACTION'), nullable=True)
 
     name = Column(String, nullable=True)
+    identifier = Column(String, nullable=True)
+    is_public = Column(Boolean(), nullable=False, default=True)
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
     observation_table_name = Column(String, nullable=False)
@@ -51,6 +56,17 @@ class Datasets(BaseModel):
     metadata_json = Column(JSON, nullable=True)
     version = Column(String, nullable=True)
     description = Column(Text, nullable=True)
+
+    __table_args__ = (
+        Index(None, name),
+        Index(None, user_id),
+        Index(None, classification_system_id),
+        Index(None, collect_method_id),
+        Index(None, collect_method_id),
+        Index('idx_datasets_start_date_end_date', start_date, end_date),
+        Index(None, start_date.desc()),
+        dict(schema=Config.SAMPLEDB_SCHEMA),
+    )
 
 
 class DatasetView(BaseModel):
