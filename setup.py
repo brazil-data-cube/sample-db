@@ -48,8 +48,8 @@ setup_requires = [
 ]
 
 install_requires = [
-    #'lccs-db @ git+https://github.com/brazil-data-cube/lccs-db.git@master',
-    #'GeoAlchemy2>=0.6.3',
+    'lccs-db @ git+https://github.com/brazil-data-cube/lccs-db.git@master',
+    'GeoAlchemy2>=0.6.3',
 ]
 
 packages = find_packages()
