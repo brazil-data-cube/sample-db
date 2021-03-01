@@ -44,7 +44,7 @@ About
 This is the storage module for data samples from the Brazil Data Cube. The module relies on SQLAlchemy related packages in order to store and retrieve data items related to the samples. All the sample collections are recorded in tables according to the following schema:
 
 .. image:: https://github.com/brazil-data-cube/sample-db/raw/master/docs/model/db-schema.png
-        :target: https://github.com/brazil-data-cube/sample-db/tree/master/doc/model
+        :target: https://github.com/brazil-data-cube/sample-db/tree/master/docs/model
         :width: 90%
         :alt: Database Schema
 

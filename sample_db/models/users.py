@@ -21,7 +21,7 @@ class Users(BaseModel):
 
     id = Column(Integer, primary_key=True)
     email = Column(String, nullable=False)
-    full_name = Column(String, nullable=False)
+    full_name = Column(String, nullable=False, unique=True)
     password_hash = Column('password', String, nullable=False)
 
     __table_args__ = (
