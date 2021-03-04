@@ -47,9 +47,7 @@ def make_observation(table_name: str, create: bool = False) -> Table:
     Index(None, klass.c.location, postgresql_using='gist')
     Index(None, klass.c.user_id)
     Index(None, klass.c.class_id)
-    Index(f'idx_{table_name}_observations_start_date_end_date', klass.c.start_date, klass.c.end_date),
-    Index(None, klass.c.start_date.desc())
-    Index(None, klass.c.collection_date.desc())
+    Index(f'idx_{table_name}_observations_start_date_end_date', klass.c.start_date, klass.c.end_date)
 
     if create:
         if not klass.exists(bind=db.engine):

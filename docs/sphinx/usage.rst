@@ -64,6 +64,15 @@ You should get a similar output::
     sampledb | users              | table | postgres
     (5 rows)
 
+Insert a new user::
+
+    SQLALCHEMY_DATABASE_URI="postgresql://username:password@host:5432/dbname" \
+    sample-db sample insert-user \
+    --full_name "BDC" \
+    --email "email@example.com"
+
+Insert a new observation::
+
 .. note::
 
     For more information on ``sample-db`` commands, please, type in the command line::
