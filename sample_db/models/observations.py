@@ -9,10 +9,9 @@
 
 from geoalchemy2 import Geometry
 from lccs_db.models import LucClass, db
-from sqlalchemy import (Column, Date, ForeignKey, Integer, Index, Table, and_, cast,
-                        select)
+from sqlalchemy import Column, Date, ForeignKey, Index, Integer, Table, select
 from sqlalchemy.sql import and_, func
-from sqlalchemy_views import CreateView, DropView
+from sqlalchemy_views import CreateView
 
 from ..config import Config
 from .base import metadata

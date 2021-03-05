@@ -13,7 +13,6 @@ from sample_db.models.observations import (make_observation,
 from sample_db.models.provenance import Provenance
 from sample_db.models.users import Users
 
-
 __all__ = ['Datasets', 'Users', 'make_observation', 'make_view_observation', 'make_midias',
            'Provenance', 'CollectMethod', 'DatasetView']
 

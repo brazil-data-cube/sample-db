@@ -8,8 +8,8 @@
 """SampleDB Datasets Model."""
 from lccs_db.models.base import BaseModel
 from lccs_db.models.luc_classification_system import LucClassificationSystem
-from sqlalchemy import (JSON, Boolean, Column, Date, ForeignKey, Integer, Index, String, Text,
-                        UniqueConstraint, select)
+from sqlalchemy import (JSON, Boolean, Column, Date, ForeignKey, Index,
+                        Integer, String, Text, UniqueConstraint, select)
 from sqlalchemy.sql import and_
 from sqlalchemy_utils import create_view
 

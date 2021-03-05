@@ -15,9 +15,9 @@ from flask.cli import with_appcontext
 from lccs_db.utils import get_mimetype
 from sample_db_utils.factory import factory
 
-from sample_db.models.users import Users
-from sample_db.models.observations import make_view_observation
 import sample_db.utils as utils
+from sample_db.models.observations import make_view_observation
+from sample_db.models.users import Users
 
 
 @cli.group()

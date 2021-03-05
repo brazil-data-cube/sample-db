@@ -10,7 +10,7 @@
 from typing import Callable
 
 from lccs_db.models import db
-from sqlalchemy import Column, ForeignKey, Integer, Index, String, Table
+from sqlalchemy import Column, ForeignKey, Index, Integer, String, Table
 
 from .base import metadata
 
