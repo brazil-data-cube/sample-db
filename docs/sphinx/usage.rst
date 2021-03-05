@@ -73,6 +73,32 @@ Insert a new user::
 
 Insert a new observation::
 
+    SQLALCHEMY_DATABASE_URI="postgresql://username:password@host:5432/dbname"  \
+    sample-db sample insert-observation \
+    --user_full_name "BDC" \
+    --observation_table_name bdc_cerrado \
+    --mappings /path/to/mapping/mapping.json \
+    --classification_system_name BDC \
+    --classification_system_version 1 \
+    --observation_file /path/to/observation.zip --verbose
+
+Create a dataset::
+
+    SQLALCHEMY_DATABASE_URI="postgresql://username:password@host:5432/dbname"  \
+    sample insert-dataset \
+    --user_full_name "BDC" \
+    --observation_table_name bdc_cerrado \
+    --dataset_name sample-cerrado-2017_2018 \
+    --start_date 2017-06-01 \
+    --end_date 2018-06-30 \
+    --version 1 \
+    --collect_method VISUAL \
+    --description This is a description of the dataset \
+    --classification_system_name BDC \
+    --classification_system_version 1 \
+    --metadata_file /path/to/metadata/sample-metadata.json --verbose
+
+
 .. note::
 
     For more information on ``sample-db`` commands, please, type in the command line::
