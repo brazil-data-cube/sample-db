@@ -5,10 +5,19 @@
 # Sample Database Model is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 #
-"""SampleDB Base Model."""
 
-from sqlalchemy import MetaData
+version: 2
 
-from ..config import Config
+sphinx:
+    configuration: docs/sphinx/conf.py
 
-metadata = MetaData(schema=Config.SAMPLEDB_ACTIVITIES_SCHEMA)
+formats: []
+
+python:
+    version: 3.7
+
+    install:
+        - method: pip
+          path: .
+          extra_requirements:
+              - docs

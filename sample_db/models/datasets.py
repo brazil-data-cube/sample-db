@@ -1,18 +1,17 @@
 #
 # This file is part of Sample Database Model.
-# Copyright (C) 2019 INPE.
+# Copyright (C) 2020-2021 INPE.
 #
 # Sample Database Model is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 """SampleDB Datasets Model."""
-
-from sqlalchemy import Column, Date, JSON, ForeignKey, Integer, String, Text, select
-from sqlalchemy.sql import and_
-from sqlalchemy_utils import create_view
-
 from lccs_db.models.base import BaseModel
 from lccs_db.models.luc_classification_system import LucClassificationSystem
+from sqlalchemy import (JSON, Column, Date, ForeignKey, Integer, String, Text,
+                        select)
+from sqlalchemy.sql import and_
+from sqlalchemy_utils import create_view
 
 from sample_db.models.users import Users
 
@@ -39,9 +38,10 @@ class Datasets(BaseModel):
     user_id = Column(Integer, ForeignKey(Users.id,
                                          ondelete='NO ACTION'), nullable=False)
     classification_system_id = Column(Integer, ForeignKey(LucClassificationSystem.id,
-                                         ondelete='NO ACTION'), nullable=False)
+                                                          ondelete='NO ACTION'), nullable=False)
     collect_method_id = Column(Integer, ForeignKey(CollectMethod.id,
-                                         ondelete='NO ACTION'), nullable=True)
+                                                   ondelete='NO ACTION'), nullable=True)
+
     name = Column(String, nullable=True)
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)

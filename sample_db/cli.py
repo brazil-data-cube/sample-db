@@ -6,35 +6,36 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 """SampleDB Command Line."""
+from json import loads as json_load
 
 import click
+from lccs_db.cli import create_app, create_cli
+from lccs_db.cli import init_db as lccs_init_db
+from lccs_db.models import LucClassificationSystem
+from lccs_db.models import db as _db
 
-from lccs_db.cli import create_cli, create_app, init_db as lccs_init_db
-from sample_db.models import make_observation,make_view_observation, Users, Datasets, CollectMethod
-from lccs_db.models import db as _db, LucClassificationSystem
-
-from sqlalchemy import select
+from sample_db.models import (CollectMethod, Datasets, Users, make_observation,
+                              make_view_observation)
 
 from .config import Config
 
-from json import loads as json_load
 
 def verify_class_system_exist(class_system_name):
-
+    """Verify if a classification system exist."""
     try:
         class_system = LucClassificationSystem.get(name=class_system_name)
         return class_system
     except BaseException:
-       return None
+        return None
 
 cli = create_cli(create_app=create_app)
+
 
 @cli.command()
 @click.pass_context
 # @pass_config
 def init_db(ctx: click.Context):
-
-    """Initial Database."""
+    """Initialize Database."""
     ctx.forward(lccs_init_db)
 
     click.secho('Creating schema {}...'.format(Config.SAMPLEDB_ACTIVITIES_SCHEMA), fg='green')
@@ -52,9 +53,8 @@ def init_db(ctx: click.Context):
 # @pass_config
 def insert_observation(ctx: click.Context, ifile):
     """Create table observation."""
-
-    from sample_db_utils import PostgisAccessor, DriversFactory
     import pandas
+    from sample_db_utils import DriversFactory, PostgisAccessor
 
     dataframe = pandas.read_csv(ifile)
 
@@ -109,7 +109,7 @@ def insert_observation(ctx: click.Context, ifile):
               help='A csv input file for insert dataset.',
               required=False)
 def insert_dataset(ctx: click.Context, ifile):
-
+    """Insert a dataset giving a csv file."""
     import pandas
 
     dataframe = pandas.read_csv(ifile)
@@ -125,7 +125,6 @@ def insert_dataset(ctx: click.Context, ifile):
 
         metadata_json = df['metadata_json']
 
-
         with open(metadata_json) as json_data:
             file = json_load(json_data.read())
 
@@ -135,8 +134,9 @@ def insert_dataset(ctx: click.Context, ifile):
                                start_date=df['start_date'],
                                end_date=df['end_date'],
                                collect_method_id=collect_method.id,
-                               observation_table_name = df['obs_table_name'],
-                               version = df['version'],
+                               observation_table_name=df['obs_table_name'],
+                               version=df['version'],
+                               
                                description=df['description'],
                                metadata_json=file)
 
@@ -151,7 +151,6 @@ def insert_dataset(ctx: click.Context, ifile):
 @click.option('--name', type=click.STRING,
               help='A name of table observation.',
               required=False)
-# @pass_config
 def create_view_observation(ctx: click.Context, name):
     """Create View observation."""
     obs_table_name = "v_" + name
@@ -163,7 +162,9 @@ def create_view_observation(ctx: click.Context, name):
     else:
         click.echo("Error while creating view {}".format(obs_table_name))
 
+
 def main(as_module=False):
+    """Run run the library module as a script."""
     # TODO omit sys.argv once https://github.com/pallets/click/issues/536 is fixed
     import sys
     cli.main(args=sys.argv[1:], prog_name="python -m sample_db" if as_module else None)

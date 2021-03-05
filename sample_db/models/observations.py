@@ -1,24 +1,23 @@
 #
 # This file is part of Sample Database Model.
-# Copyright (C) 2019 INPE.
+# Copyright (C) 2020-2021 INPE.
 #
 # Sample Database Model is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 """SampleDB Observations Model."""
 
-from sqlalchemy import Column, Date, ForeignKey, Integer, Table, select, cast, and_
-from sqlalchemy.sql import and_
-from sqlalchemy.sql import func
 from geoalchemy2 import Geometry
+from lccs_db.models import LucClass, db
+from sqlalchemy import (Column, Date, ForeignKey, Integer, Table, and_, cast,
+                        select)
+from sqlalchemy.sql import and_, func
 from sqlalchemy_views import CreateView, DropView
 
-from lccs_db.models import LucClass, db
-from sample_db.models import Users
+from sample_db.models.users import Users
 
-
-from .base import metadata
 from ..config import Config
+from .base import metadata
 
 
 def make_observation(table_name: str, create: bool = False) -> Table:
@@ -52,7 +51,9 @@ def make_observation(table_name: str, create: bool = False) -> Table:
 
     return klass
 
+
 def make_view_observation(table_name: str, obs_table_name: str) -> bool:
+    """Create a view of an observation model using a table name."""
 
     # reflect observation table
     obs_table = Table(table_name, metadata, autoload=True, autoload_with=db.engine)

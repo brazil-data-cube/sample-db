@@ -9,9 +9,8 @@
 
 from typing import Callable
 
-from sqlalchemy import Column, ForeignKey, Integer, String, Table
-
 from lccs_db.models import db
+from sqlalchemy import Column, ForeignKey, Integer, String, Table
 
 from .base import metadata
 
