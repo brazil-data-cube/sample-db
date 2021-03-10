@@ -11,4 +11,4 @@ from sqlalchemy import MetaData
 
 from ..config import Config
 
-metadata = MetaData(schema=Config.SAMPLEDB_ACTIVITIES_SCHEMA)
+metadata = MetaData(schema=Config.SAMPLEDB_SCHEMA)

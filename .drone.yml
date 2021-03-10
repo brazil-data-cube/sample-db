@@ -13,6 +13,10 @@ steps:
 - name: build
   image: python:3.7
   commands:
+  - apt-get update
+  - apt-get install -y libgdal-dev
+  - pip install numpy
+  - pip install GDAL==$(gdal-config --version) --global-option=build_ext --global-option="$(gdal-config --cflags)"
   - pip install --upgrade pip
   - pip install --upgrade setuptools
   - pip install -e .[tests,docs]
