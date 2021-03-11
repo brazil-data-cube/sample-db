@@ -85,7 +85,7 @@ Insert a new observation::
 Create a dataset::
 
     SQLALCHEMY_DATABASE_URI="postgresql://username:password@host:5432/dbname"  \
-    sample insert-dataset \
+    sample-db sample create-dataset \
     --user_full_name "BDC" \
     --observation_table_name bdc_cerrado \
     --dataset_name sample-cerrado-2017_2018 \
