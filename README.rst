@@ -62,6 +62,8 @@ This package is related to other softwares in the Brazil Data Cube project:
 
 - `SAMPLE.py <https://github.com/brazil-data-cube/sample.py>`_: Python Client Library for Sample-DB.
 
+- `LCCS-DB <https://github.com/brazil-data-cube/lccs-db>`_: Land Cover Classification System Database Model.
+
 - `LCCS-WS-SPEC <https://github.com/brazil-data-cube/lccs-ws-spec>`_: Land Cover Classification System Web Service specification.
 
 - `LCCS-WS <https://github.com/brazil-data-cube/lccs-ws>`_: Land Cover Classification System Web Service implementation.
