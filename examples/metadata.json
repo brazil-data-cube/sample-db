@@ -1,0 +1,93 @@
+{
+  "id": "lapig_pontos_de_campo_uso_cobertura",
+  "types": {
+    "resourceTypeGeneral": "Dataset",
+    "resourceType": "Dataset",
+    "schemaOrg": "Dataset",
+    "citeproc": "dataset",
+    "bibtex": "misc",
+    "ris": "DATA"
+  },
+  "creators": [
+    {
+      "@type": "Organization",
+      "familyName": "Laboratório de Processamento de Imagens e Geoprocessamento (Lapig)"
+    }
+  ],
+  "titles": {
+    "title": "Pontos coletados em campo de Uso e cobertura da terra",
+    "lang": "pt"
+  },
+  "subjects": [
+    {
+      "subject": "Uso e cobertura da terra",
+      "lang": "pt"
+    },
+    {
+      "subject": "Brasil",
+      "lang": "pt"
+    }
+  ],
+  "contributors": [
+    {
+      "contributorType": "HostingInstitution",
+      "name": "Laboratório de Processamento de Imagens e Geoprocessamento (Lapig)",
+      "nameType": "Organizational"
+    }
+  ],
+  "dates": [
+   {
+      "date": "2019",
+      "dateType": "Available",
+      "dateInformation": "Date of the publishing in symposium."
+   }
+  ],
+  "language": "pt",
+  "sizes": [],
+  "formats": [],
+  "version": "4.",
+  "rightsList": [
+    {
+      "rights": "Termos de Uso para os arquivos providos pelo LAPIG",
+      "rightsUri": "https://pastagem.org/index.php/en-us/"
+    }
+  ],
+  "descriptions": [
+    {
+      "description": "Nos últimos anos o LAPIG realizou vários trabalhos de campo, buscando coletar coordenadas de uso e cobertura do solo, bem com dados sobre forrageiras, condições e manejo de pastagens em vários municípios do Brasil.",
+      "descriptionType": "Abstract",
+      "lang": "pt"
+    }
+  ],
+  "geoLocations": [],
+  "fundingReferences": [
+    {
+      "funderName": "Fundacao Gordon and Betty Moore (GBMF)"
+    },
+    {
+      "funderName": "WWF Brasil"
+    },
+    {
+      "funderName": "Fundacao de Amparo a Pesquisa do Estado de Goias (FAPEG)"
+    },
+    {
+      "funderName": "Conselho Nacional de Desenvolvimento Cientifico e Tecnologico (CNPq)"
+    },
+    {
+      "funderName": "The Nature Conservancy (TNC)"
+    }
+  ],
+  "schemaVersion": "http://datacite.org/schema/kernel-4",
+  "agency": "LAPIG",
+  "state": "unfindable",
+  "relatedIdentifiers": [
+    {
+      "title": "ATLAS DIGITAL DAS PASTAGENS BRASILEIRAS: DADOS E INFORMAÇÕES SOBRE A MAIOR CLASSE DE USO DA TERRA DO BRASIL",
+      "relatedIdentifierType": "URL",
+      "relatedIdentifier": "https://proceedings.science/sbsr-2019/papers/atlas-digital-das-pastagens-brasileiras--dados-e-informacoes-sobre-a-maior-classe-de-uso-da-terra-do-brasil",
+      "relationType": "IsCitedBy",
+      "resourceTypeGeneral": "Text",
+      "relatedMetadataScheme": "application/pdf"
+    }
+  ]
+}
