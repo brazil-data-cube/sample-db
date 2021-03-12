@@ -20,8 +20,8 @@ class Users(BaseModel):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
-    email = Column(String, nullable=False)
-    full_name = Column(String, nullable=False, unique=True)
+    email = Column(String, nullable=False, unique=True)
+    full_name = Column(String, nullable=False)
     password_hash = Column('password', String, nullable=False)
 
     __table_args__ = (
