@@ -6,9 +6,9 @@
     under the terms of the MIT License; see LICENSE file for more details.
 
 
-==================================
-Brazil Data Cube - Sample Database
-==================================
+========================================
+Brazil Data Cube - Sample Database Model
+========================================
 
 .. image:: https://img.shields.io/badge/license-MIT-green
         :target: https://github.com//brazil-data-cube/sample-db/blob/master/LICENSE
@@ -41,13 +41,34 @@ Brazil Data Cube - Sample Database
 About
 =====
 
-This is the storage module for data samples from the Brazil Data Cube. The module relies on SQLAlchemy related packages in order to store and retrieve data items related to the samples. All the sample collections are recorded in tables according to the following schema:
+Currently, several projects systematically provide information on the dynamics of land use and cover. Well known projects include PRODES, DETER and TerraClass. These projects are developed by INPE and they produce information on land use and coverage used by the Brazilian Government to make public policy decisions. Besides these projects there are other initiatives from universities and space agencies devoted to the creation of national and global maps.
+
+These data products are generated using different approaches and methodologies. In this context, the data set used in the sample and validation plays a fundamental role in the classification algorithms that generate new land use and coverage maps. A classified map’s accuracy depends directly on the quality of the training samples used by the machine learning methods.
+
+Land use and cover samples are collected by different projects and individuals, using different methods, such as in situ gathering in fieldwork and visual interpretation of high-resolution satellite images. An important requirement is to be able to describe samples with proper metadata that characterize their differences and organize them in a shared database to facilitate the reproducibility of experiments. It is also important to develop tools to easily discover, query, access, and process this shared sample database.
+
+Sample-DB (Sample Database) provides a data model that represents the land use and cover samples collected by different projects and individuals.
+
+The following diagram shows the tables used in this system:
 
 .. image:: https://github.com/brazil-data-cube/sample-db/raw/master/docs/model/db-schema.png
-        :target: https://github.com/brazil-data-cube/sample-db/tree/master/doc/model
+        :target: https://github.com/brazil-data-cube/sample-db/tree/master/docs/model
         :width: 90%
         :alt: Database Schema
 
+This package is related to other softwares in the Brazil Data Cube project:
+
+- `SAMPLE-DB-UTILS <https://github.com/brazil-data-cube/sample-db-utils>`_: Utility Functions for the SAMPLE-DB.
+
+- `SAMPLE.py <https://github.com/brazil-data-cube/sample.py>`_: Python Client Library for Sample-DB.
+
+- `LCCS-DB <https://github.com/brazil-data-cube/lccs-db>`_: Land Cover Classification System Database Model.
+
+- `LCCS-WS-SPEC <https://github.com/brazil-data-cube/lccs-ws-spec>`_: Land Cover Classification System Web Service specification.
+
+- `LCCS-WS <https://github.com/brazil-data-cube/lccs-ws>`_: Land Cover Classification System Web Service implementation.
+
+- `LCCS.py <https://github.com/brazil-data-cube/lccs.py>`_: Python Client Library for Land Cover Classification System Web Service.
 
 Installation
 ============

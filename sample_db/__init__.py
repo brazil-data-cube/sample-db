@@ -8,6 +8,8 @@
 
 """Python Sample Database Model."""
 
+from .ext import BDCSample
 from .version import __version__
 
-__all__ = ('__version__',)
+__all__ = ('__version__',
+           'BDCSample',)

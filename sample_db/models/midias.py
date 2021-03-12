@@ -10,7 +10,7 @@
 from typing import Callable
 
 from lccs_db.models import db
-from sqlalchemy import Column, ForeignKey, Integer, String, Table
+from sqlalchemy import Column, ForeignKey, Index, Integer, String, Table
 
 from .base import metadata
 
@@ -31,11 +31,13 @@ def make_midias(table_name: str, observation: Table, create: bool = False) -> Ta
         Column(
             'observation_id',
             Integer,
-            ForeignKey(observation.id, ondelete='NO ACTION', onupdate='CASCADE'),
+            ForeignKey(observation.id, ondelete='CASCADE', onupdate='CASCADE'),
             nullable=False
         ),
         Column('url', String, nullable=False),
     )
+
+    Index(None, klass.c.observation_id)
 
     if create:
         if not klass.exists(bind=db.engine):
