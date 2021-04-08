@@ -22,7 +22,7 @@ def app():
 
 
 def pytest_sessionstart(session):
-    """Load LCCS-DB and prepare database environment."""
+    """Load SAMPLE-DB and prepare database environment."""
     for command in ['init', 'create-namespaces', 'create-schema', 'load-scripts', 'create-extension-postgis']:
         subprocess.call(f'sample-db db {command}', shell=True)
 
