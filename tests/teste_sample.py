@@ -12,15 +12,10 @@ import subprocess
 import sys
 
 from click.testing import CliRunner
-from flask.cli import ScriptInfo
 
 import pytest
 from sample_db.cli import cli
 from sample_db import BDCSample
-
-from bdc_db.config import SQLALCHEMY_DATABASE_URI
-
-from sqlalchemy_utils.functions import database_exists
 
 
 def test_basic_cli():
@@ -31,7 +26,7 @@ def test_basic_cli():
 
 
 def test_cli_module():
-    """Test the BDCCatalog invoked as a module."""
+    """Test the sample-db invoked as a module."""
     res = subprocess.call(f'{sys.executable} -m sample_db', shell=True)
 
     assert res == 0
