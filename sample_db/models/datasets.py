@@ -78,6 +78,8 @@ class DatasetView(BaseModel):
                            Datasets.updated_at,
                            Datasets.id,
                            Datasets.name,
+                           Datasets.identifier,
+                           Datasets.is_public,
                            Datasets.start_date,
                            Datasets.end_date,
                            Datasets.observation_table_name,
