@@ -21,7 +21,7 @@ Version 0.6.0 (2021-04-14)
 
 - Change Alembic to Flask-Alembic (`#26 <https://github.com/brazil-data-cube/sample-db-utils/issues/26>`_).
 
-- Added minimum test (`#44 <https://github.com/brazil-data-cube/sample-db-utils/issues/44>`_).
+- Add minimum test (`#44 <https://github.com/brazil-data-cube/sample-db-utils/issues/44>`_).
 
 - Command Line Interface (CLI).
 
