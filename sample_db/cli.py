@@ -58,9 +58,9 @@ def insert_user(verbose, full_name, email, password):
               help='The classification system version.')
 @click.option('--observation_file', type=click.Path(exists=True), required=True,
               help='File path with the observation to insert')
-@click.option('--obs_already_exist', is_flag=True, default=True, required=False)
+@click.option('--create_table', is_flag=True, default=True, required=False)
 def insert_observation(verbose, user_full_name, observation_table_name, mappings, classification_system_name,
-                       classification_system_version, observation_file, obs_already_exist):
+                       classification_system_version, observation_file, create_table):
     """Insert a new observation."""
     print(mappings)
     if verbose:
@@ -80,7 +80,7 @@ def insert_observation(verbose, user_full_name, observation_table_name, mappings
 
     args["mappings_json"] = mappings_json
     args["observation_file"] = observation_file
-    args["obs_already_exist"] = obs_already_exist
+    args["obs_already_exist"] = create_table
 
     affected_rows = utils.create_observation(user_full_name=user_full_name,
                                              observation_table_name=observation_table_name,
