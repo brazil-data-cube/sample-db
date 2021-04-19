@@ -30,7 +30,6 @@ tests_require = [
     'pydocstyle>=4.0',
     'isort>4.3',
     'sqlalchemy-diff>=0.1.3',
-    'sqlalchemy-views>=0.2.4',
     'alembic-verify>=0.1.4',
     'check-manifest>=0.40'
 ]
@@ -49,6 +48,7 @@ setup_requires = [
 
 install_requires = [
     'sample-db-utils @ git+https://github.com/brazil-data-cube/sample-db-utils.git@master',
+    'sqlalchemy-views>=0.2.4',
     'GeoAlchemy2>=0.6.3',
 ]
 

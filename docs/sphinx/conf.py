@@ -80,7 +80,7 @@ html_baseurl = 'https://brazil-data-cube.github.io/'
 
 #html_style = ''
 
-html_title = 'LCCS-DB'
+html_title = 'SAMPLE-DB'
 
 html_context = {
     'display_github': False,
