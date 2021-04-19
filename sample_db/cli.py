@@ -100,6 +100,8 @@ def insert_observation(verbose, user_full_name, observation_table_name, mappings
 @click.option('--user_full_name', type=click.STRING, required=True, help='The user full name.')
 @click.option('--observation_table_name', type=click.STRING, required=True, help='The observation table name.')
 @click.option('--dataset_name', type=click.STRING, required=True, help='The dataset name.')
+@click.option('--dataset_identifier', type=click.STRING, required=True, help='The dataset identifier.')
+@click.option('--public/--no-public', required=True, default=False, help='Is this dataset public?.')
 @click.option('--start_date', type=click.STRING, required=True, help='The dataset start date.')
 @click.option('--end_date', type=click.STRING, required=True, help='The dataset end date.')
 @click.option('--version', type=click.STRING, required=True, help='The dataset version.')
@@ -109,7 +111,8 @@ def insert_observation(verbose, user_full_name, observation_table_name, mappings
 @click.option('--classification_system_version', type=click.STRING, required=True,
               help='The classification system version.')
 @click.option('--metadata_file',  type=click.Path(exists=True, readable=True), help='A JSON metadata file.', required=False)
-def create_dataset(verbose, user_full_name, observation_table_name, dataset_name, start_date, end_date, version,
+def create_dataset(verbose, user_full_name, observation_table_name, dataset_name, dataset_identifier, public,
+                   start_date, end_date, version,
                    collect_method, description, classification_system_name, classification_system_version,
                    metadata_file):
     """Create a new dataset."""
@@ -124,7 +127,9 @@ def create_dataset(verbose, user_full_name, observation_table_name, dataset_name
 
     args = dict()
 
-    args["dataset_name"] = dataset_name
+    args["name"] = dataset_name
+    args["identifier"] = dataset_identifier
+    args["is_public"] = public
     args["start_date"] = start_date
     args["end_date"] = end_date
     args["version"] = version

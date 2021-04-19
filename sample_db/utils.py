@@ -144,22 +144,12 @@ def create_dataset(user_full_name, classification_system_name, classification_sy
 
     observation_full_name = f"{observation_name}_observations"
 
-    dataset_info = dict()
+    kwargs["classification_system_id"] = class_system.id
+    kwargs["user_id"] = user.id
+    kwargs["collect_method_id"] = collect_method.id
+    kwargs["observation_table_name"] = observation_full_name
 
-    dataset_info["classification_system_id"] = class_system.id
-    dataset_info["user_id"] = user.id
-    dataset_info["name"] = kwargs['dataset_name']
-    dataset_info["start_date"] = kwargs['start_date']
-    dataset_info["end_date"] = kwargs['end_date']
-    dataset_info["collect_method_id"] = collect_method.id
-    dataset_info["observation_table_name"] = observation_full_name
-    dataset_info["version"] = kwargs['version']
-    dataset_info["description"] = kwargs['description']
-
-    if kwargs['metadata_json'] is not None:
-        dataset_info["metadata_json"] = kwargs['metadata_json']
-
-    dataset = Datasets(**dataset_info)
+    dataset = Datasets(**kwargs)
 
     try:
         with _db.session.begin_nested():
