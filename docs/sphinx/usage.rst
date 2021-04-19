@@ -33,7 +33,7 @@ You can see all namespaces::
     sample-db db show-namespaces
 
 
-Enable the PostGIS extension::
+Enable the ``PostGIS`` extension::
 
     SQLALCHEMY_DATABASE_URI="postgresql://username:password@host:5432/dbname" \
     sample-db db create-extension-postgis
@@ -60,44 +60,77 @@ You should get a similar output::
     sampledb | collect_method     | table | postgres
     sampledb | datasets           | table | postgres
     sampledb | provenance         | table | postgres
-    sampledb | teste_observations | table | postgres
     sampledb | users              | table | postgres
-    (5 rows)
+    (4 rows)
 
-Insert a new user::
+
+Loading Default Class Systems
++++++++++++++++++++++++++++++
+
+
+You can load well-known classification systems with the CLI::
+
+    SQLALCHEMY_DATABASE_URI="postgresql://username:password@host:5432/dbname" \
+    lccs-db db load-scripts
+
+
+Insert data into Sample
++++++++++++++++++++++++
+
+For create a new ``user`` run the command::
 
     SQLALCHEMY_DATABASE_URI="postgresql://username:password@host:5432/dbname" \
     sample-db sample insert-user \
     --full_name "BDC" \
     --email "email@example.com"
 
-Insert a new observation::
+To create a new dataset, you must first enter the data that contains the geometry and classes of the samples. To do this, run the command below. One of the parameters to be informed is the path to the data that you want to store in the database ::
 
     SQLALCHEMY_DATABASE_URI="postgresql://username:password@host:5432/dbname"  \
-    sample-db sample insert-observation \
+    sample-db sample insert-dataset-table \
     --user_full_name "BDC" \
-    --observation_table_name bdc_cerrado \
+    --dataset_table_name bdc_cerrado \
     --mappings /path/to/mapping/mapping.json \
     --classification_system_name BDC \
     --classification_system_version 1 \
-    --observation_file /path/to/observation.zip --verbose
+    --dataset_file /path/to/observation.zip --verbose
+
+You should get a similar output::
+
+                  List of relations
+      Schema  |        Name        | Type  |  Owner
+    ----------+--------------------+-------+----------
+     sampledb | dataset_bdc_cerrado| table | postgres
+     sampledb | collect_method     | table | postgres
+     sampledb | datasets           | table | postgres
+     sampledb | provenance         | table | postgres
+     sampledb | users              | table | postgres
+    (5 rows)
+
 
 Create a dataset::
 
     SQLALCHEMY_DATABASE_URI="postgresql://username:password@host:5432/dbname"  \
     sample-db sample create-dataset \
     --user_full_name "BDC" \
-    --observation_table_name bdc_cerrado \
-    --dataset_name sample-cerrado-2017_2018 \
+    --dataset_table_name bdc_cerrado \
+    --name sample-cerrado-2017_2018 \
+    --title BDC-Dados-Cerrado-2017-2018 \
     --start_date 2017-06-01 \
     --end_date 2018-06-30 \
     --version 1 \
-    --collect_method VISUAL \
+    --no-public \
+    --collect_method Visual \
     --description This is a description of the dataset \
-    --classification_system_name BDC \
-    --classification_system_version 1 \
+    --classification_system_name PRODES \
+    --classification_system_version 1.0 \
     --metadata_file /path/to/metadata/sample-metadata.json --verbose
 
+To create a view of ``dataset_table``, run the commannd::
+
+    SQLALCHEMY_DATABASE_URI="postgresql://username:password@host:5432/dbname"  \
+    sample-db sample create-view-dataset-table \
+    --dataset_table_name bdc_cerrado
 
 .. note::
 

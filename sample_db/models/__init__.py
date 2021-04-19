@@ -7,12 +7,11 @@
 #
 """SampleDB Provenance Model."""
 from sample_db.models.datasets import CollectMethod, Datasets, DatasetView
-from sample_db.models.midias import make_midias
-from sample_db.models.observations import (make_observation,
-                                           make_view_observation)
+from sample_db.models.observations import (make_dataset_table,
+                                           make_view_dataset_table)
 from sample_db.models.provenance import Provenance
 from sample_db.models.users import Users
 
-__all__ = ['Datasets', 'Users', 'make_observation', 'make_view_observation', 'make_midias',
+__all__ = ['Datasets', 'Users', 'make_dataset_table', 'make_view_dataset_table',
            'Provenance', 'CollectMethod', 'DatasetView']
 

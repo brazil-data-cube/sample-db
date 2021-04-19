@@ -12,7 +12,7 @@ from sample_db_utils.core.driver import Driver
 from sample_db_utils.core.postgis_accessor import PostgisAccessor
 from sqlalchemy.orm.exc import NoResultFound
 
-from .models import CollectMethod, Datasets, Users, make_observation
+from .models import CollectMethod, Datasets, Users, make_dataset_table
 
 
 def get_user(user_full_name):
@@ -48,18 +48,18 @@ def get_collect_method(collect_method_name):
     return collect_method
 
 
-def create_sample(user_full_name, observation_table_name, classification_system_name, classification_system_version,
-                  driver_type, **kwargs):
-    """Create a dataset."""
+def create_dataset_table(user_full_name, dataset_table_name, classification_system_name,
+                         classification_system_version, driver_type, **kwargs):
+    """Insert dataset data into database."""
     user = get_user(user_full_name)
 
     class_system = get_classification_system(classification_system_name, classification_system_version)
 
+    observation_table = make_dataset_table(table_name=dataset_table_name, create=kwargs['obs_already_exist'])
+
     _accessor = PostgisAccessor(system_id=class_system.id)
 
-    observation_table = make_observation(table_name=observation_table_name, create=kwargs['obs_already_exist'])
-
-    driver: Driver = driver_type(entries=kwargs['observation_file'],
+    driver: Driver = driver_type(entries=kwargs['dataset_file'],
                                  mappings=kwargs['mappings_json'],
                                  storager=_accessor,
                                  user=user.id,
@@ -69,61 +69,7 @@ def create_sample(user_full_name, observation_table_name, classification_system_
     try:
         driver.load_data_sets()
         driver.store(observation_table)
-        print('Observation table insert {}'.format(driver.__class__.__name__))
-    except BaseException as err:
-        print(err)
-
-    affected_rows = len(driver.get_data_sets())
-
-    collect_method = get_collect_method(kwargs['collect_method'])
- 
-    dataset_info = dict()
-    
-    dataset_info["classification_system_id"] = class_system.id
-    dataset_info["user_id"] = user.id
-    dataset_info["name"] = kwargs['dataset_name']
-    dataset_info["start_date"] = kwargs['start_date']
-    dataset_info["end_date"] = kwargs['end_date']
-    dataset_info["collect_method_id"] = collect_method.id
-    dataset_info["observation_table_name"] = observation_table.name
-    dataset_info["version"] = kwargs['version']
-    dataset_info["description"] = kwargs['description']
-
-    if kwargs['metadata_json'] is not None:
-        dataset_info["metadata_json"] = kwargs['metadata_json']
-    
-    dataset = Datasets(**dataset_info)
-
-    with _db.session.begin_nested():
-        _db.session.add(dataset)
-    
-    _db.session.commit()
-
-    return affected_rows
-
-
-def create_observation(user_full_name, observation_table_name, classification_system_name,
-                       classification_system_version, driver_type, **kwargs):
-    """Insert observation into database."""
-    user = get_user(user_full_name)
-
-    class_system = get_classification_system(classification_system_name, classification_system_version)
-
-    observation_table = make_observation(table_name=observation_table_name, create=kwargs['obs_already_exist'])
-
-    _accessor = PostgisAccessor(system_id=class_system.id)
-
-    driver: Driver = driver_type(entries=kwargs['observation_file'],
-                                 mappings=kwargs['mappings_json'],
-                                 storager=_accessor,
-                                 user=user.id,
-                                 system=class_system)
-    _db.session.commit()
-
-    try:
-        driver.load_data_sets()
-        driver.store(observation_table)
-        print('Observation table insert {}'.format(driver.__class__.__name__))
+        print('Data inserted in table {}'.format(driver.__class__.__name__))
     except BaseException as err:
         _db.session.rollback()
         print(err)
@@ -134,7 +80,7 @@ def create_observation(user_full_name, observation_table_name, classification_sy
 
 
 def create_dataset(user_full_name, classification_system_name, classification_system_version, collect_method_name,
-                   observation_name, **kwargs):
+                   dataset_table_name, **kwargs):
     """Insert a new dataset."""
     user = get_user(user_full_name)
 
@@ -142,12 +88,12 @@ def create_dataset(user_full_name, classification_system_name, classification_sy
 
     collect_method = get_collect_method(collect_method_name)
 
-    observation_full_name = f"{observation_name}_observations"
+    dataset_table_full_name = f"dataset_{dataset_table_name}"
 
     kwargs["classification_system_id"] = class_system.id
     kwargs["user_id"] = user.id
     kwargs["collect_method_id"] = collect_method.id
-    kwargs["observation_table_name"] = observation_full_name
+    kwargs["dataset_table_name"] = dataset_table_full_name
 
     dataset = Datasets(**kwargs)
 

@@ -17,11 +17,13 @@ class Provenance(BaseModel):
 
     __tablename__ = 'provenance'
 
-    dataset_id = Column(Integer, ForeignKey('{}.datasets.id'.format(Config.SAMPLEDB_SCHEMA), ondelete='NO ACTION'),
+    dataset_id = Column(Integer, ForeignKey('{}.datasets.id'.format(Config.SAMPLEDB_SCHEMA), ondelete='CASCADE',
+                                            onupdate='CASCADE'),
                         nullable=False,
                         primary_key=True)
     dataset_parent_id = Column(Integer,
-                               ForeignKey('{}.datasets.id'.format(Config.SAMPLEDB_SCHEMA), ondelete='NO ACTION'),
+                               ForeignKey('{}.datasets.id'.format(Config.SAMPLEDB_SCHEMA), ondelete='CASCADE',
+                                          onupdate='CASCADE'),
                                nullable=False,
                                primary_key=True)
 
