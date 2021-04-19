@@ -84,6 +84,9 @@ setup(
         'bdc_db.triggers': [
             'sample-db = sample_db.triggers'
         ],
+        'bdc_db.scripts': [
+            'sample-db = sample_db.scripts'
+        ],
         'bdc_db.namespaces': [
             'sample-db = sample_db.config:Config.SAMPLEDB_SCHEMA'
         ]

@@ -70,7 +70,9 @@ class Datasets(BaseModel):
 
 
 class DatasetView(BaseModel):
-    __tablename__ = 'v_dataset'
+    """Datasets View Model."""
+
+    __tablename__ = 'v_datasets'
 
     __table__ = create_view(
         name=__tablename__,

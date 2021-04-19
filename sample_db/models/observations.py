@@ -61,14 +61,14 @@ def _drop_composite_type(drop, compiler, **kw):
     return 'DROP TYPE dataset_type'
 
 
-def make_observation(table_name: str, create: bool = False) -> Table:
-    """Create customized observation model using a table name.
+def make_dataset_table(table_name: str, create: bool = False) -> Table:
+    """Create customized dataset table using a table name.
     TODO: Create an example
     Args:
         table_name - Table name
         create - Flag to create if not exists
     Returns
-        Observation definition
+        dataset_table definition
     """
     if create:
         if not db.engine.dialect.has_table(connection=db.engine, table_name=table_name, schema=Config.SAMPLEDB_SCHEMA):
@@ -95,6 +95,9 @@ def make_observation(table_name: str, create: bool = False) -> Table:
                 db.engine.execute(CreateIndex(Index(None, klass.c.user_id)))
                 db.engine.execute(CreateIndex(Index(None, klass.c.class_id)))
                 db.engine.execute(CreateIndex(Index(None, klass.c.location, postgresql_using='gist')))
+                db.engine.execute(CreateIndex(Index(None, klass.c.start_date)))
+                db.engine.execute(CreateIndex(Index(None, klass.c.end_date)))
+                Index(f'idx_{klass.name}_start_end_date', klass.c.start_date, klass.c.end_date)
                 db.engine.execute(AddConstraint(
                     ForeignKeyConstraint(name=f"dataset_{table_name}_{klass.c.user_id.name}_fkey", columns=[klass.c.user_id], refcolumns=[Users.id], onupdate="CASCADE",
                                          ondelete="CASCADE")))
@@ -110,30 +113,30 @@ def make_observation(table_name: str, create: bool = False) -> Table:
     return klass
 
 
-def make_view_observation(table_name: str, obs_table_name: str) -> bool:
+def make_view_dataset_table(table_name: str, obs_table_name: str) -> bool:
     """Create a view of an observation model using a table name."""
 
-    # reflect observation table
-    obs_table = Table(table_name, metadata, autoload=True, autoload_with=db.engine)
+    # reflect dataset table
+    dt_table = Table(table_name, metadata, autoload=True, autoload_with=db.engine, schema=Config.SAMPLEDB_SCHEMA)
 
-    selectable = select([obs_table.c.id,
-                         obs_table.c.start_date,
-                         obs_table.c.end_date,
-                         obs_table.c.collection_date,
-                         obs_table.c.user_id.label('user_id'),
+    selectable = select([dt_table.c.id,
+                         dt_table.c.start_date,
+                         dt_table.c.end_date,
+                         dt_table.c.collection_date,
+                         dt_table.c.user_id.label('user_id'),
                          Users.full_name.label('user_name'),
-                         obs_table.c.class_id.label('class_id'),
+                         dt_table.c.class_id.label('class_id'),
                          LucClass.name.label('class_name'),
-                         func.Geometry(obs_table.c.location).label('location'),
-                         ]).where(and_(Users.id == obs_table.c.user_id,
-                                       LucClass.id == obs_table.c.class_id))
+                         func.Geometry(dt_table.c.location).label('location'),
+                         ]).where(and_(Users.id == dt_table.c.user_id,
+                                       LucClass.id == dt_table.c.class_id))
 
     view_table = Table(obs_table_name, metadata, schema=Config.SAMPLEDB_SCHEMA)
 
     try:
-        obs_view = CreateView(view_table, selectable)
+        dt_view = CreateView(view_table, selectable)
 
-        db.engine.execute(obs_view)
+        db.engine.execute(dt_view)
 
         return True
     except:
