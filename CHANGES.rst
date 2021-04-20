@@ -8,7 +8,7 @@
 Changes
 =======
 
-Version 0.6.0 (2021-04-14)
+Version 0.6.0 (2021-04-22)
 --------------------------
 
 - Drone integration (`#34 <https://github.com/brazil-data-cube/sample-db-utils/issues/34>`_).
