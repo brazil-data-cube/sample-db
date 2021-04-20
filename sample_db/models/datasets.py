@@ -92,6 +92,7 @@ class DatasetView(BaseModel):
                            Datasets.description,
                            Datasets.classification_system_id.label('classification_system_id'),
                            LucClassificationSystem.name.label('classification_system_name'),
+                           LucClassificationSystem.version.label('classification_system_version'),
                            Datasets.user_id.label('user_id'),
                            Users.full_name.label('user_name'),
                            Datasets.collect_method_id.label('collect_method_id'),

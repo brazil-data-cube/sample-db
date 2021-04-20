@@ -5,7 +5,7 @@
     Sample Database Model is free software; you can redistribute it and/or modify it
     under the terms of the MIT License; see LICENSE file for more details.
 
-Midias
-------
+Observations
+------------
 
-.. autofunction:: sample_db.models.midias::make_midias
+.. autofunction:: sample_db.models.dataset_table::make_view_dataset_table

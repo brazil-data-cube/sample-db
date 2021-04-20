@@ -16,7 +16,7 @@ from lccs_db.utils import get_mimetype
 from sample_db_utils.factory import factory
 
 import sample_db.utils as utils
-from sample_db.models.observations import make_view_dataset_table
+from sample_db.models.dataset_table import make_view_dataset_table
 from sample_db.models.users import Users
 
 
