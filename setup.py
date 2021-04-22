@@ -38,6 +38,9 @@ tests_require = [
 extras_require = {
     'docs': docs_require,
     'tests': tests_require,
+    'tools': [
+        'sample-db-utils @ git+https://github.com/brazil-data-cube/sample-db-utils.git@v0.6.0',
+    ]
 }
 
 extras_require['all'] = [ req for exts, reqs in extras_require.items() for req in reqs ]
@@ -47,7 +50,6 @@ setup_requires = [
 ]
 
 install_requires = [
-    'sample-db-utils @ git+https://github.com/brazil-data-cube/sample-db-utils.git@master',
     'sqlalchemy-views>=0.2.4',
     'GeoAlchemy2>=0.6.3',
 ]
