@@ -14,10 +14,6 @@ Brazil Data Cube - Sample Database Model
         :target: https://github.com//brazil-data-cube/sample-db/blob/master/LICENSE
         :alt: Software License
 
-.. image:: https://readthedocs.org/projects/sample-db/badge/?version=latest
-        :target: https://sample-db.readthedocs.io/en/latest/
-        :alt: Documentation Status
-
 .. image:: https://drone.dpi.inpe.br/api/badges/brazil-data-cube/sample-db/status.svg
         :target: https://drone.dpi.inpe.br/brazil-data-cube/sample-db
         :alt: Build Status
@@ -25,6 +21,11 @@ Brazil Data Cube - Sample Database Model
 .. image:: https://codecov.io/gh/brazil-data-cube/sample-db/branch/master/graph/badge.svg?token=WIJ67G1AAO
         :target: https://codecov.io/gh/brazil-data-cube/sample-db
         :alt: Code Coverage Test
+
+.. image:: https://readthedocs.org/projects/sample-db/badge/?version=latest
+        :target: https://sample-db.readthedocs.io/en/latest/
+        :alt: Documentation Status
+
 
 .. image:: https://img.shields.io/badge/lifecycle-experimental-orange.svg
         :target: https://www.tidyverse.org/lifecycle/#experimental

@@ -18,7 +18,6 @@ Sample-DB API
     :caption: Models:
 
     datasets
-    midias
-    observations
+    dataset_table
     provenance
     users

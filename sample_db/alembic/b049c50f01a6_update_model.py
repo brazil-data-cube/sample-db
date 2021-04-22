@@ -11,7 +11,7 @@ import sqlalchemy as sa
 from sqlalchemy.orm.session import Session
 from lccs_db.models import LucClassificationSystem
 from sample_db.models import Datasets, CollectMethod, Users, DatasetView
-from sample_db.models.observations import DatasetType
+from sample_db.models.dataset_table import DatasetType
 
 # revision identifiers, used by Alembic.
 revision = 'b049c50f01a6'
@@ -81,8 +81,8 @@ def upgrade():
                     "datasets.title, datasets.start_date, datasets.end_date, datasets.dataset_table_name, " \
                     "datasets.version, datasets.version_successor, datasets.version_predecessor, " \
                     "datasets.description, class_systems.name AS classification_system_name, " \
-                    "class_systems.id AS classification_system_id, users.id AS user_id," \
-                    "users.full_name AS user_name, collect_method.name AS collect_method_name, " \
+                    "class_systems.id AS classification_system_id, class_systems.version AS classification_system_version, " \
+                    "users.id AS user_id, users.full_name AS user_name, collect_method.name AS collect_method_name, " \
                     "collect_method.id AS collect_method_id, " \
                     "datasets.metadata_json, datasets.is_public "
                     "FROM {} AS datasets, {} AS class_systems, {} AS users, {} AS collect_method " \
