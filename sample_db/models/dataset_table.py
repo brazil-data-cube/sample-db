@@ -70,12 +70,12 @@ def make_dataset_table(table_name: str, create: bool = False) -> Table:
     Returns
         dataset_table definition
     """
+    s_name = f"{Config.SAMPLEDB_SCHEMA}.dataset_{table_name}_id_seq"
+
     if create:
         if not db.engine.dialect.has_table(connection=db.engine, table_name=table_name, schema=Config.SAMPLEDB_SCHEMA):
             with db.session.begin_nested():
                 db.engine.execute(f"CREATE TABLE {Config.SAMPLEDB_SCHEMA}.dataset_{table_name} OF dataset_type")
-
-                s_name = f"{Config.SAMPLEDB_SCHEMA}.dataset_{table_name}_id_seq"
                 db.engine.execute(f"CREATE SEQUENCE {s_name}")
 
                 klass = Table(f'dataset_{table_name}', metadata, autoload=True, autoload_with=db.engine, extend_existing=True)
@@ -110,7 +110,7 @@ def make_dataset_table(table_name: str, create: bool = False) -> Table:
     else:
         klass = Table(f'dataset_{table_name}', metadata, autoload=True, autoload_with=db.engine)
 
-    return klass
+    return klass, s_name
 
 
 def make_view_dataset_table(table_name: str, obs_table_name: str) -> bool:
@@ -133,6 +133,7 @@ def make_view_dataset_table(table_name: str, obs_table_name: str) -> bool:
 
     view_table = Table(obs_table_name, metadata, schema=Config.SAMPLEDB_SCHEMA)
 
+    #TODO improve error return
     try:
         dt_view = CreateView(view_table, selectable)
 
