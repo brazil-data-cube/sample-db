@@ -102,6 +102,7 @@ def create_dataset_table(user_full_name, dataset_table_name, classification_syst
     except BaseException as err:
         _db.session.rollback()
         print(err)
+        drop_dataset_table(dataset_data_table, field_seq)
         raise RuntimeError('Error while insert the dataset table data')
 
 

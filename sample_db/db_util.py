@@ -11,17 +11,6 @@ from lccs_db.models import LucClass
 from lccs_db.models import db as _db
 
 
-def store_classes(classes):
-    """Insert multiple sample classes on database.
-
-    Args:
-        classes (dict[]): list List of classes objects to save
-
-    """
-    _db.session.bulk_insert_mappings(LucClass, classes)
-    _db.session.commit()
-
-
 class DBAccessor(object):
     """DBAccessor Class."""
 
@@ -31,14 +20,19 @@ class DBAccessor(object):
         self.samples_map_id = {}
         self.classification_system_id = system_id
 
-    @staticmethod
-    def store_data(data_sets, dataset_table):
-        """Store sample data into database.
+    def store_classes(self, classes):
+        """Insert multiple sample classes on database.
+        Args:
+            classes (dict[]): list List of classes objects to save
+        """
+        _db.session.bulk_insert_mappings(LucClass, classes)
+        _db.session.commit()
 
+    def store_data(self, data_sets, dataset_table):
+        """Store sample data into database.
         Args:
             data_sets (dict[]): List of data sets observation to store
             dataset_table (table): Dataset table to insert
-
         """
         _db.engine.execute(
             dataset_table.insert(),
@@ -47,7 +41,7 @@ class DBAccessor(object):
         _db.session.commit()
 
     def load(self):
-        """Load the classes of sample in memory."""
+        """Load sample classes in memory."""
         if self.classification_system_id:
             self.sample_classes = LucClass.filter(class_system_id=self.classification_system_id)
         else:

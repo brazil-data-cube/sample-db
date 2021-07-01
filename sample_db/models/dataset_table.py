@@ -97,6 +97,7 @@ def make_dataset_table(table_name: str, create: bool = False) -> Table:
                 db.engine.execute(CreateIndex(Index(None, klass.c.location, postgresql_using='gist')))
                 db.engine.execute(CreateIndex(Index(None, klass.c.start_date)))
                 db.engine.execute(CreateIndex(Index(None, klass.c.end_date)))
+                db.engine.execute(CreateIndex(Index(None, klass.c.collection_date)))
                 Index(f'idx_{klass.name}_start_end_date', klass.c.start_date, klass.c.end_date)
                 db.engine.execute(AddConstraint(
                     ForeignKeyConstraint(name=f"dataset_{table_name}_{klass.c.user_id.name}_fkey", columns=[klass.c.user_id], refcolumns=[Users.id], onupdate="CASCADE",
@@ -133,12 +134,11 @@ def make_view_dataset_table(table_name: str, obs_table_name: str) -> bool:
 
     view_table = Table(obs_table_name, metadata, schema=Config.SAMPLEDB_SCHEMA)
 
-    #TODO improve error return
     try:
         dt_view = CreateView(view_table, selectable)
 
         db.engine.execute(dt_view)
-
         return True
-    except:
-        return False
+    except BaseException as err:
+        print(err)
+        raise RuntimeError('Error while create the dataset table data')
