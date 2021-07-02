@@ -163,7 +163,7 @@ def create_dataset(verbose, user_full_name, dataset_table_name, name, title, pub
 @click.option('-v', '--verbose', is_flag=True, default=False)
 @click.option('--dataset_table_name', type=click.STRING, help='A dataset table name.', required=True)
 def create_view_dataset_table(verbose, dataset_table_name):
-    """Create View observation."""
+    """Create View dataset-table."""
     if verbose:
         click.secho(f'Create view for {dataset_table_name}..', bold=True, fg='yellow')
         
@@ -180,6 +180,24 @@ def create_view_dataset_table(verbose, dataset_table_name):
 
     if verbose:
         click.secho('\tFinished!', bold=False, fg='black')
+
+
+@sample.command()
+@with_appcontext
+@click.option('-v', '--verbose', is_flag=True, default=False)
+@click.option('--name', type=click.STRING, required=True, help='The dataset name.')
+@click.option('--version', type=click.STRING, required=True, help='The dataset version.')
+def delete_dataset(verbose, name, version):
+    """Delete a specific dataset and dataset-table."""
+    if verbose:
+        click.secho(f'Deleting the dataset {name}..', bold=True, fg='yellow')
+
+        utils.delete_dataset_table(ds_name=name, ds_version=version)
+
+        click.secho('\tFinished!', bold=False, fg='black')
+
+    else:
+        utils.delete_dataset_table(ds_name=name, ds_version=version)
 
 
 def main(as_module=False):

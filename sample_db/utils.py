@@ -8,11 +8,15 @@
 """Utils Interface for the Sample Database Model ."""
 from bdc_db.db import db as _db
 from lccs_db.models import LucClassificationSystem
+from sqlalchemy import Table
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.schema import DropSequence
+from sqlalchemy.sql import and_
 
+from .config import Config
 from .db_util import DBAccessor
 from .models import CollectMethod, Datasets, Users, make_dataset_table
+from .models.base import metadata
 
 
 def drop_dataset_table(dataset_data_table, sequence):
@@ -146,3 +150,27 @@ def create_dataset(user_full_name, classification_system_name, classification_sy
     _db.session.commit()
 
     return dataset_infos
+
+
+def delete_dataset_table(ds_name, ds_version):
+    """Delete dataset table."""
+    ds_sq = ds_name.replace("-", "_")
+
+    s_name = f"{Config.SAMPLEDB_SCHEMA}.dataset_{ds_sq}_id_seq"
+
+    ds_table = _db.session.query(Datasets).filter(
+        and_(Datasets.name == ds_name,
+             Datasets.version == ds_version)
+    ).first_or_404()
+
+    dataset_table_info = Table(ds_table.dataset_table_name, metadata, autoload=True, autoload_with=_db.engine,
+                               extend_existing=True)
+
+    with _db.session.begin_nested():
+        _db.session.delete(ds_table)
+        dataset_table_info.drop(bind=_db.engine)
+        _db.session.execute(f"DROP SEQUENCE {s_name};")
+
+    _db.session.commit()
+
+    return
