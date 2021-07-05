@@ -7,13 +7,11 @@
 #
 """SampleDB Observations Model."""
 from geoalchemy2 import Geometry
-from lccs_db.config import Config as LCCSConfig
 from lccs_db.models import LucClass, db
 from sqlalchemy import (Column, Date, ForeignKey, ForeignKeyConstraint, Index,
                         Integer, PrimaryKeyConstraint, Sequence, Table, select)
 from sqlalchemy.ext.compiler import compiles
-from sqlalchemy.schema import (AddConstraint, CreateIndex, CreateSequence,
-                               _CreateDropBase)
+from sqlalchemy.schema import AddConstraint, CreateIndex, _CreateDropBase
 from sqlalchemy.sql import and_, func
 from sqlalchemy.types import UserDefinedType
 from sqlalchemy_views import CreateView
@@ -140,5 +138,4 @@ def make_view_dataset_table(table_name: str, obs_table_name: str) -> bool:
         db.engine.execute(dt_view)
         return True
     except BaseException as err:
-        print(err)
         raise RuntimeError('Error while create the dataset table data')

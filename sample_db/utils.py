@@ -6,6 +6,8 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 """Utils Interface for the Sample Database Model ."""
+import logging
+
 from bdc_db.db import db as _db
 from lccs_db.models import LucClassificationSystem
 from sqlalchemy import Table
@@ -26,7 +28,7 @@ def drop_dataset_table(dataset_data_table, sequence):
         _db.session.execute(DropSequence(sequence))
         _db.session.session.commit()
     except BaseException as err:
-        print(err)
+        logging.warning('Error while delete dataset table data')
 
 
 def get_user(user_full_name):
@@ -82,7 +84,6 @@ def create_dataset_table(user_full_name, dataset_table_name, classification_syst
     try:
         dataset_data_table, field_seq = make_dataset_table(table_name=dataset_table_name, create=extra_fields['create'])
     except BaseException as err:
-        print(err)
         drop_dataset_table(dataset_data_table, field_seq)
         raise RuntimeError('Error while create the dataset table data')
 
@@ -99,13 +100,12 @@ def create_dataset_table(user_full_name, dataset_table_name, classification_syst
 
         _db.session.commit()
 
-        print('Data inserted in table {}'.format(driver.__class__.__name__))
+        logging.info('Data inserted in table {}'.format(driver.__class__.__name__))
 
         affected_rows = len(driver.get_data_sets())
         return dataset_data_table, field_seq, affected_rows
     except BaseException as err:
         _db.session.rollback()
-        print(err)
         drop_dataset_table(dataset_data_table, field_seq)
         raise RuntimeError('Error while insert the dataset table data')
 
