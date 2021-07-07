@@ -7,13 +7,11 @@
 #
 """SampleDB Observations Model."""
 from geoalchemy2 import Geometry
-from lccs_db.config import Config as LCCSConfig
 from lccs_db.models import LucClass, db
 from sqlalchemy import (Column, Date, ForeignKey, ForeignKeyConstraint, Index,
                         Integer, PrimaryKeyConstraint, Sequence, Table, select)
 from sqlalchemy.ext.compiler import compiles
-from sqlalchemy.schema import (AddConstraint, CreateIndex, CreateSequence,
-                               _CreateDropBase)
+from sqlalchemy.schema import AddConstraint, CreateIndex, _CreateDropBase
 from sqlalchemy.sql import and_, func
 from sqlalchemy.types import UserDefinedType
 from sqlalchemy_views import CreateView
@@ -70,12 +68,12 @@ def make_dataset_table(table_name: str, create: bool = False) -> Table:
     Returns
         dataset_table definition
     """
+    s_name = f"{Config.SAMPLEDB_SCHEMA}.dataset_{table_name}_id_seq"
+
     if create:
         if not db.engine.dialect.has_table(connection=db.engine, table_name=table_name, schema=Config.SAMPLEDB_SCHEMA):
             with db.session.begin_nested():
                 db.engine.execute(f"CREATE TABLE {Config.SAMPLEDB_SCHEMA}.dataset_{table_name} OF dataset_type")
-
-                s_name = f"{Config.SAMPLEDB_SCHEMA}.dataset_{table_name}_id_seq"
                 db.engine.execute(f"CREATE SEQUENCE {s_name}")
 
                 klass = Table(f'dataset_{table_name}', metadata, autoload=True, autoload_with=db.engine, extend_existing=True)
@@ -97,6 +95,7 @@ def make_dataset_table(table_name: str, create: bool = False) -> Table:
                 db.engine.execute(CreateIndex(Index(None, klass.c.location, postgresql_using='gist')))
                 db.engine.execute(CreateIndex(Index(None, klass.c.start_date)))
                 db.engine.execute(CreateIndex(Index(None, klass.c.end_date)))
+                db.engine.execute(CreateIndex(Index(None, klass.c.collection_date)))
                 Index(f'idx_{klass.name}_start_end_date', klass.c.start_date, klass.c.end_date)
                 db.engine.execute(AddConstraint(
                     ForeignKeyConstraint(name=f"dataset_{table_name}_{klass.c.user_id.name}_fkey", columns=[klass.c.user_id], refcolumns=[Users.id], onupdate="CASCADE",
@@ -110,7 +109,7 @@ def make_dataset_table(table_name: str, create: bool = False) -> Table:
     else:
         klass = Table(f'dataset_{table_name}', metadata, autoload=True, autoload_with=db.engine)
 
-    return klass
+    return klass, s_name
 
 
 def make_view_dataset_table(table_name: str, obs_table_name: str) -> bool:
@@ -137,7 +136,6 @@ def make_view_dataset_table(table_name: str, obs_table_name: str) -> bool:
         dt_view = CreateView(view_table, selectable)
 
         db.engine.execute(dt_view)
-
         return True
-    except:
-        return False
+    except BaseException as err:
+        raise RuntimeError('Error while create the dataset table data')
