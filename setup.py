@@ -36,7 +36,7 @@ tests_require = [
 ]
 
 sample_requires = [
-    'sample-db-utils @ git+https://github.com/brazil-data-cube/sample-db-utils.git@v0.6.0',
+    'sample-db-utils @ git+https://github.com/brazil-data-cube/sample-db-utils.git@v0.6.1',
 ]
 
 extras_require = {
