@@ -16,3 +16,5 @@ class Config:
     """Define common config along contexts."""
 
     SAMPLEDB_SCHEMA = os.environ.get('SAMPLEDB_SCHEMA', 'sampledb')
+    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI',
+                                        'postgresql://postgres:postgres@localhost:5432/sample')

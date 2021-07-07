@@ -19,6 +19,7 @@ docs_require = [
     'Sphinx>=2.2',
     'sphinx_rtd_theme',
     'sphinx-copybutton',
+    'docutils>=0.10,<0.15'
 ]
 
 tests_require = [
@@ -34,10 +35,14 @@ tests_require = [
     'check-manifest>=0.40'
 ]
 
+sample_requires = [
+    'sample-db-utils @ git+https://github.com/brazil-data-cube/sample-db-utils.git@v0.6.1',
+]
 
 extras_require = {
     'docs': docs_require,
     'tests': tests_require,
+    'sample-utils': sample_requires,
 }
 
 extras_require['all'] = [ req for exts, reqs in extras_require.items() for req in reqs ]
@@ -47,9 +52,9 @@ setup_requires = [
 ]
 
 install_requires = [
-    'sample-db-utils @ git+https://github.com/brazil-data-cube/sample-db-utils.git@v0.6.0',
-    'sqlalchemy-views>=0.2.4',
+    'lccs-db @ git+https://github.com/brazil-data-cube/lccs-db.git@v0.6.0',
     'GeoAlchemy2>=0.6.3',
+    'sqlalchemy-views>=0.2.4',
 ]
 
 packages = find_packages()

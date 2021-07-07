@@ -8,6 +8,16 @@
 Changes
 =======
 
+Version 0.6.1 (2021-07-07)
+--------------------------
+
+- Remove the sample-db-utils as required (`#65 <https://github.com/brazil-data-cube/sample-db-utils/issues/65>`_).
+
+- Bug Fix:  Add index in collection_date (`#64 <https://github.com/brazil-data-cube/sample-db-utils/issues/64>`_).
+
+- Add delete dataset in cli.py (`#63 <https://github.com/brazil-data-cube/sample-db-utils/issues/#63>`_).
+
+
 Version 0.6.0 (2021-04-22)
 --------------------------
 
