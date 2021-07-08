@@ -13,8 +13,6 @@ from sqlalchemy import (JSON, Boolean, Column, Date, ForeignKey, Index,
 from sqlalchemy.sql import and_
 from sqlalchemy_utils import create_view
 
-from sample_db.models.users import Users
-
 from ..config import Config
 
 
@@ -55,7 +53,7 @@ class Datasets(BaseModel):
                                       nullable=False)
     collect_method_id = Column(Integer, ForeignKey(CollectMethod.id, ondelete='CASCADE', onupdate='CASCADE'),
                                nullable=True)
-    user_id = Column(Integer, ForeignKey(Users.id, ondelete='CASCADE'), nullable=False)
+    user_id = Column(Integer, nullable=False)
 
     __table_args__ = (
         Index(None, user_id),
@@ -90,15 +88,13 @@ class DatasetView(BaseModel):
                            Datasets.version_successor,
                            Datasets.version_predecessor,
                            Datasets.description,
+                           Datasets.user_id,
                            Datasets.classification_system_id.label('classification_system_id'),
                            LucClassificationSystem.name.label('classification_system_name'),
                            LucClassificationSystem.version.label('classification_system_version'),
-                           Datasets.user_id.label('user_id'),
-                           Users.full_name.label('user_name'),
                            Datasets.collect_method_id.label('collect_method_id'),
                            CollectMethod.name.label('collect_method_name')]
-                          ).where(and_(Users.id == Datasets.user_id,
-                                       LucClassificationSystem.id == Datasets.classification_system_id,
+                          ).where(and_(LucClassificationSystem.id == Datasets.classification_system_id,
                                        CollectMethod.id == Datasets.collect_method_id)),
         metadata=BaseModel.metadata,
     )

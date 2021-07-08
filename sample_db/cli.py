@@ -16,7 +16,6 @@ from lccs_db.utils import get_mimetype
 
 import sample_db.utils as utils
 from sample_db.models.dataset_table import make_view_dataset_table
-from sample_db.models.users import Users
 
 
 @cli.group()
@@ -27,28 +26,7 @@ def sample():
 @sample.command()
 @with_appcontext
 @click.option('-v', '--verbose', is_flag=True, default=False)
-@click.option('--full_name', type=click.STRING, required=True, help='The user full name.')
-@click.option('--email', type=click.STRING, required=True, help='The user email.')
-@click.option('--password', prompt=True, hide_input=True, confirmation_prompt=True)
-def insert_user(verbose, full_name, email, password):
-    """Insert user."""
-    if verbose:
-        click.secho(f'Insert {full_name} user..', bold=True, fg='yellow')
-    
-    with _db.session.begin_nested():
-        user = Users(full_name=full_name, email=email, password=password)
-        
-        _db.session.add(user)
-    
-    _db.session.commit()
-    
-    click.secho(f'User {full_name} insert!', bold=True, fg='green')
-
-
-@sample.command()
-@with_appcontext
-@click.option('-v', '--verbose', is_flag=True, default=False)
-@click.option('--user_full_name', type=click.STRING, required=True, help='The user full name.')
+@click.option('--user_id', type=click.INT, required=True, help='The user id.')
 @click.option('--dataset_table_name', type=click.STRING, required=True, help='The dataset table name with the data.')
 @click.option('--mappings', type=click.Path(exists=True, readable=True), required=True,
               help='Mappings used for location columns in file.')
@@ -58,7 +36,7 @@ def insert_user(verbose, full_name, email, password):
 @click.option('--dataset_file', type=click.Path(exists=True), required=True,
               help='File path with the data to insert')
 @click.option('--create_table', is_flag=True, default=True, required=False)
-def insert_dataset_table(verbose, user_full_name, dataset_table_name, mappings, classification_system_name,
+def insert_dataset_table(verbose, user_id, dataset_table_name, mappings, classification_system_name,
                          classification_system_version, dataset_file, create_table):
     """Insert data into a dataset table."""
     if verbose:
@@ -78,7 +56,7 @@ def insert_dataset_table(verbose, user_full_name, dataset_table_name, mappings, 
     args["dataset_file"] = dataset_file
     args["create"] = create_table
 
-    _, _, affected_rows = utils.create_dataset_table(user_full_name=user_full_name,
+    _, _, affected_rows = utils.create_dataset_table(user_id=user_id,
                                                      dataset_table_name=dataset_table_name,
                                                      classification_system_name=classification_system_name,
                                                      classification_system_version=classification_system_version,
@@ -113,8 +91,8 @@ def insert_dataset_table(verbose, user_full_name, dataset_table_name, mappings, 
               help='The classification system version.')
 @click.option('--metadata_file', type=click.Path(exists=True, readable=True), help='A JSON metadata file.',
               required=False)
-@click.option('--user_full_name', type=click.STRING, required=True, help='The user full name.')
-def create_dataset(verbose, user_full_name, dataset_table_name, name, title, public,
+@click.option('--user_id', type=click.INT, required=True, help='The user id.')
+def create_dataset(verbose, user_id, dataset_table_name, name, title, public,
                    start_date, end_date, version, version_predecessor, version_successor,
                    collect_method, description, classification_system_name, classification_system_version,
                    metadata_file):
@@ -146,7 +124,7 @@ def create_dataset(verbose, user_full_name, dataset_table_name, name, title, pub
     if version_successor:
         args["version_successor"] = version_successor
 
-    utils.create_dataset(user_full_name=user_full_name, classification_system_name=classification_system_name,
+    utils.create_dataset(user_id=user_id, classification_system_name=classification_system_name,
                          classification_system_version=classification_system_version,
                          collect_method_name=collect_method,
                          dataset_name=name,

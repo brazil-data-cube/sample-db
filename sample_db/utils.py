@@ -17,7 +17,7 @@ from sqlalchemy.sql import and_
 
 from .config import Config
 from .db_util import DBAccessor
-from .models import CollectMethod, Datasets, Users, make_dataset_table
+from .models import CollectMethod, Datasets, make_dataset_table
 from .models.base import metadata
 
 
@@ -29,18 +29,6 @@ def drop_dataset_table(dataset_data_table, sequence):
         _db.session.session.commit()
     except BaseException as err:
         logging.warning('Error while delete dataset table data')
-
-
-def get_user(user_full_name):
-    """Return the user object."""
-    try:
-        user = _db.session.query(Users) \
-            .filter_by(full_name=user_full_name) \
-            .one()
-    except NoResultFound:
-        raise RuntimeError(f'User {user_full_name} not found!')
-
-    return user
 
 
 def get_classification_system(classification_system_name, classification_system_version):
@@ -64,7 +52,7 @@ def get_collect_method(collect_method_name):
     return collect_method
 
 
-def create_dataset_table(user_full_name, dataset_table_name, classification_system_name,
+def create_dataset_table(user_id, dataset_table_name, classification_system_name,
                          classification_system_version, mimetype, dataset_file, **extra_fields):
     """Insert dataset data into database."""
     from sample_db_utils.core.driver import Driver
@@ -72,8 +60,6 @@ def create_dataset_table(user_full_name, dataset_table_name, classification_syst
 
     extra_fields.setdefault('create', True)
     extra_fields.setdefault('mappings_json', dict(class_name="label", start_date="start_date", end_date="end_date"))
-
-    user = get_user(user_full_name)
 
     driver_type = factory.get(mimetype)
 
@@ -91,7 +77,7 @@ def create_dataset_table(user_full_name, dataset_table_name, classification_syst
         driver: Driver = driver_type(entries=dataset_file,
                                      mappings=extra_fields['mappings_json'],
                                      storager=_accessor,
-                                     user=user.id,
+                                     user=user_id,
                                      system=class_system)
 
         driver.load_data_sets()
@@ -110,7 +96,7 @@ def create_dataset_table(user_full_name, dataset_table_name, classification_syst
         raise RuntimeError('Error while insert the dataset table data')
 
 
-def create_dataset(user_full_name, classification_system_name, classification_system_version, collect_method_name,
+def create_dataset(user_id, classification_system_name, classification_system_version, collect_method_name,
                    dataset_name, dataset_table_name, title, start_date, end_date, version, **extra_fields):
     """Insert a new dataset."""
     extra_fields.setdefault('description', "")
@@ -118,8 +104,6 @@ def create_dataset(user_full_name, classification_system_name, classification_sy
     extra_fields.setdefault('version_successor', None)
     extra_fields.setdefault('metadata_json', None)
     extra_fields.setdefault('is_public', True)
-
-    user = get_user(user_full_name)
 
     classification_system = get_classification_system(classification_system_name, classification_system_version)
 
@@ -139,7 +123,7 @@ def create_dataset(user_full_name, classification_system_name, classification_sy
         collect_method_id=collect_method.id,
         metadata_json=extra_fields['metadata_json'],
         dataset_table_name=dataset_table_name,
-        user_id=user.id
+        user_id=user_id
     )
 
     with _db.session.begin_nested():

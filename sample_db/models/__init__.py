@@ -12,6 +12,6 @@ from sample_db.models.datasets import CollectMethod, Datasets, DatasetView
 from sample_db.models.provenance import Provenance
 from sample_db.models.users import Users
 
-__all__ = ['Datasets', 'Users', 'make_dataset_table', 'make_view_dataset_table',
+__all__ = ['Datasets',  'Users', 'make_dataset_table', 'make_view_dataset_table',
            'Provenance', 'CollectMethod', 'DatasetView']
 
