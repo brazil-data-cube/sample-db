@@ -35,6 +35,25 @@ def upgrade():
         session.execute(f"DROP VIEW IF EXISTS {r[0]};")
     session.execute(f"DROP TABLE {Users.__table__} CASCADE;")
     session.commit()
+
+    session.execute("CREATE OR REPLACE VIEW {} AS " \
+                    "SELECT datasets.created_at, datasets.updated_at, datasets.id, datasets.name, " \
+                    "datasets.title, datasets.start_date, datasets.end_date, datasets.dataset_table_name, " \
+                    "datasets.version, datasets.version_successor, datasets.version_predecessor, " \
+                    "datasets.description, class_systems.name AS classification_system_name, " \
+                    "class_systems.id AS classification_system_id, class_systems.version AS classification_system_version, " \
+                    "datasets.id AS user_id, collect_method.name AS collect_method_name, " \
+                    "collect_method.id AS collect_method_id, " \
+                    "datasets.metadata_json, datasets.is_public "
+                    "FROM {} AS datasets, {} AS class_systems, {} AS collect_method " \
+                    "WHERE class_systems.id = datasets.classification_system_id " \
+                    "AND collect_method.id = datasets.collect_method_id;"
+                    .format(DatasetView.__table__,
+                            Datasets.__table__,
+                            LucClassificationSystem.__table__,
+                            CollectMethod.__table__)
+                    )
+    session.commit()
     # ### end Alembic commands ###
 
 
