@@ -60,35 +60,37 @@ You should get a similar output::
     sampledb | collect_method     | table | postgres
     sampledb | datasets           | table | postgres
     sampledb | provenance         | table | postgres
-    sampledb | users              | table | postgres
-    (4 rows)
+    (3 rows)
 
 
-Loading Default Class Systems
-+++++++++++++++++++++++++++++
+Setting up PL/pgSQL Triggers and Loading default script data
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+You can show the triggers loaded using the command line::
+
+    SQLALCHEMY_DATABASE_URI="postgresql://username:password@host:5432/dbname" \
+    sample-db db show-triggers
+
+To register them into the database system, use the command::
+
+    SQLALCHEMY_DATABASE_URI="postgresql://username:password@host:5432/dbname" \
+    sample-db db create-triggers
 
 You can load well-known classification systems with the CLI::
 
     SQLALCHEMY_DATABASE_URI="postgresql://username:password@host:5432/dbname" \
-    lccs-db db load-scripts
+    sample-db db load-scripts
 
 
 Insert data into Sample
 +++++++++++++++++++++++
 
-For create a new ``user`` run the command::
-
-    SQLALCHEMY_DATABASE_URI="postgresql://username:password@host:5432/dbname" \
-    sample-db sample insert-user \
-    --full_name "BDC" \
-    --email "email@example.com"
 
 To create a new dataset, you must first enter the data that contains the geometry and classes of the samples. To do this, run the command below. One of the parameters to be informed is the path to the data that you want to store in the database ::
 
     SQLALCHEMY_DATABASE_URI="postgresql://username:password@host:5432/dbname"  \
     sample-db sample insert-dataset-table \
-    --user_full_name "BDC" \
+    --user_id 1 \
     --dataset_table_name bdc_cerrado \
     --mappings /path/to/mapping/mapping.json \
     --classification_system_name BDC \
@@ -104,15 +106,14 @@ You should get a similar output::
      sampledb | collect_method     | table | postgres
      sampledb | datasets           | table | postgres
      sampledb | provenance         | table | postgres
-     sampledb | users              | table | postgres
-    (5 rows)
+    (4 rows)
 
 
 Create a dataset::
 
     SQLALCHEMY_DATABASE_URI="postgresql://username:password@host:5432/dbname"  \
     sample-db sample create-dataset \
-    --user_full_name "BDC" \
+    --user_id 1 \
     --dataset_table_name bdc_cerrado \
     --name sample-cerrado-2017_2018 \
     --title BDC-Dados-Cerrado-2017-2018 \

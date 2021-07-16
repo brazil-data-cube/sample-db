@@ -12,13 +12,12 @@ from sqlalchemy import (Column, Date, ForeignKey, ForeignKeyConstraint, Index,
                         Integer, PrimaryKeyConstraint, Sequence, Table, select)
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.schema import AddConstraint, CreateIndex, _CreateDropBase
-from sqlalchemy.sql import and_, func
+from sqlalchemy.sql import func
 from sqlalchemy.types import UserDefinedType
 from sqlalchemy_views import CreateView
 
 from ..config import Config
 from .base import metadata
-from .users import Users
 
 
 class DatasetType(UserDefinedType):
@@ -97,9 +96,7 @@ def make_dataset_table(table_name: str, create: bool = False) -> Table:
                 db.engine.execute(CreateIndex(Index(None, klass.c.end_date)))
                 db.engine.execute(CreateIndex(Index(None, klass.c.collection_date)))
                 Index(f'idx_{klass.name}_start_end_date', klass.c.start_date, klass.c.end_date)
-                db.engine.execute(AddConstraint(
-                    ForeignKeyConstraint(name=f"dataset_{table_name}_{klass.c.user_id.name}_fkey", columns=[klass.c.user_id], refcolumns=[Users.id], onupdate="CASCADE",
-                                         ondelete="CASCADE")))
+
                 db.engine.execute(AddConstraint(
                     ForeignKeyConstraint(name=f"dataset_{table_name}_{klass.c.class_id.name}_fkey",
                                          columns=[klass.c.class_id], refcolumns=[LucClass.id], onupdate="CASCADE",
@@ -123,12 +120,10 @@ def make_view_dataset_table(table_name: str, obs_table_name: str) -> bool:
                          dt_table.c.end_date,
                          dt_table.c.collection_date,
                          dt_table.c.user_id.label('user_id'),
-                         Users.full_name.label('user_name'),
                          dt_table.c.class_id.label('class_id'),
                          LucClass.name.label('class_name'),
                          func.Geometry(dt_table.c.location).label('location'),
-                         ]).where(and_(Users.id == dt_table.c.user_id,
-                                       LucClass.id == dt_table.c.class_id))
+                         ]).where(LucClass.id == dt_table.c.class_id)
 
     view_table = Table(obs_table_name, metadata, schema=Config.SAMPLEDB_SCHEMA)
 

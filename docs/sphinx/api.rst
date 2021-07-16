@@ -20,4 +20,3 @@ Sample-DB API
     datasets
     dataset_table
     provenance
-    users
