@@ -6,7 +6,7 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 """SampleDB Base Model."""
-
+from bdc_db.db import db
 from sqlalchemy import MetaData
 
 from ..config import Config

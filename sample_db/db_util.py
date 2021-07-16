@@ -40,7 +40,6 @@ class DBAccessor(object):
             dataset_table.insert(),
             data_sets
         )
-        _db.session.commit()
 
     def load(self):
         """Load sample classes in memory."""

@@ -7,7 +7,7 @@
 #
 """SampleDB Observations Model."""
 from geoalchemy2 import Geometry
-from lccs_db.models import LucClass, db
+from lccs_db.models import LucClass
 from sqlalchemy import (Column, Date, ForeignKey, ForeignKeyConstraint, Index,
                         Integer, PrimaryKeyConstraint, Sequence, Table, select)
 from sqlalchemy.ext.compiler import compiles
@@ -17,7 +17,7 @@ from sqlalchemy.types import UserDefinedType
 from sqlalchemy_views import CreateView
 
 from ..config import Config
-from .base import metadata
+from .base import db, metadata
 
 
 class DatasetType(UserDefinedType):
@@ -71,66 +71,38 @@ def make_dataset_table(table_name: str, create: bool = False) -> Table:
 
     if create:
         if not db.engine.dialect.has_table(connection=db.engine, table_name=table_name, schema=Config.SAMPLEDB_SCHEMA):
-            with db.session.begin_nested():
-                db.engine.execute(f"CREATE TABLE {Config.SAMPLEDB_SCHEMA}.dataset_{table_name} OF dataset_type")
-                db.engine.execute(f"CREATE SEQUENCE {s_name}")
+            db.engine.execute(f"CREATE TABLE {Config.SAMPLEDB_SCHEMA}.dataset_{table_name} OF dataset_type")
+            db.engine.execute(f"CREATE SEQUENCE {s_name}")
 
-                klass = Table(f'dataset_{table_name}', metadata, autoload=True, autoload_with=db.engine, extend_existing=True)
+            klass = Table(f'dataset_{table_name}', metadata, autoload=True, autoload_with=db.engine, extend_existing=True)
 
-                # Add index, primary key and foreign key
-                db.engine.execute(
-                    f"ALTER TABLE {Config.SAMPLEDB_SCHEMA}.{klass.name} ALTER COLUMN {klass.c.class_id.name} SET NOT NULL")
-                db.engine.execute(
-                    f"ALTER TABLE {Config.SAMPLEDB_SCHEMA}.{klass.name} ALTER COLUMN {klass.c.start_date.name} SET NOT NULL")
-                db.engine.execute(
-                    f"ALTER TABLE {Config.SAMPLEDB_SCHEMA}.{klass.name} ALTER COLUMN {klass.c.end_date.name} SET NOT NULL")
+            # Add index, primary key and foreign key
+            db.engine.execute(
+                f"ALTER TABLE {Config.SAMPLEDB_SCHEMA}.{klass.name} ALTER COLUMN {klass.c.class_id.name} SET NOT NULL")
+            db.engine.execute(
+                f"ALTER TABLE {Config.SAMPLEDB_SCHEMA}.{klass.name} ALTER COLUMN {klass.c.start_date.name} SET NOT NULL")
+            db.engine.execute(
+                f"ALTER TABLE {Config.SAMPLEDB_SCHEMA}.{klass.name} ALTER COLUMN {klass.c.end_date.name} SET NOT NULL")
 
-                db.engine.execute(
-                    f"ALTER TABLE {Config.SAMPLEDB_SCHEMA}.{klass.name} ALTER {klass.c.id.name} SET DEFAULT NEXTVAL('{s_name}');")
+            db.engine.execute(
+                f"ALTER TABLE {Config.SAMPLEDB_SCHEMA}.{klass.name} ALTER {klass.c.id.name} SET DEFAULT NEXTVAL('{s_name}');")
 
-                db.engine.execute(AddConstraint(PrimaryKeyConstraint(klass.c.id)))
-                db.engine.execute(CreateIndex(Index(None, klass.c.user_id)))
-                db.engine.execute(CreateIndex(Index(None, klass.c.class_id)))
-                db.engine.execute(CreateIndex(Index(None, klass.c.location, postgresql_using='gist')))
-                db.engine.execute(CreateIndex(Index(None, klass.c.start_date)))
-                db.engine.execute(CreateIndex(Index(None, klass.c.end_date)))
-                db.engine.execute(CreateIndex(Index(None, klass.c.collection_date)))
-                Index(f'idx_{klass.name}_start_end_date', klass.c.start_date, klass.c.end_date)
+            db.engine.execute(AddConstraint(PrimaryKeyConstraint(klass.c.id)))
+            db.engine.execute(CreateIndex(Index(None, klass.c.user_id)))
+            db.engine.execute(CreateIndex(Index(None, klass.c.class_id)))
+            db.engine.execute(CreateIndex(Index(None, klass.c.location, postgresql_using='gist')))
+            db.engine.execute(CreateIndex(Index(None, klass.c.start_date)))
+            db.engine.execute(CreateIndex(Index(None, klass.c.end_date)))
+            db.engine.execute(CreateIndex(Index(None, klass.c.collection_date)))
+            Index(f'idx_{klass.name}_start_end_date', klass.c.start_date, klass.c.end_date)
 
-                db.engine.execute(AddConstraint(
-                    ForeignKeyConstraint(name=f"dataset_{table_name}_{klass.c.class_id.name}_fkey",
-                                         columns=[klass.c.class_id], refcolumns=[LucClass.id], onupdate="CASCADE",
-                                         ondelete="CASCADE")))
-
-            db.session.commit()
+            db.engine.execute(AddConstraint(
+                ForeignKeyConstraint(name=f"dataset_{table_name}_{klass.c.class_id.name}_fkey",
+                                     columns=[klass.c.class_id], refcolumns=[LucClass.id], onupdate="CASCADE",
+                                     ondelete="CASCADE")))
+        else:
+            raise RuntimeError(f'Table {table_name} already exists')
     else:
         klass = Table(f'dataset_{table_name}', metadata, autoload=True, autoload_with=db.engine)
 
     return klass, s_name
-
-
-def make_view_dataset_table(table_name: str, obs_table_name: str) -> bool:
-    """Create a view of an observation model using a table name."""
-
-    # reflect dataset table
-    dt_table = Table(table_name, metadata, autoload=True, autoload_with=db.engine, schema=Config.SAMPLEDB_SCHEMA)
-
-    selectable = select([dt_table.c.id,
-                         dt_table.c.start_date,
-                         dt_table.c.end_date,
-                         dt_table.c.collection_date,
-                         dt_table.c.user_id.label('user_id'),
-                         dt_table.c.class_id.label('class_id'),
-                         LucClass.name.label('class_name'),
-                         func.Geometry(dt_table.c.location).label('location'),
-                         ]).where(LucClass.id == dt_table.c.class_id)
-
-    view_table = Table(obs_table_name, metadata, schema=Config.SAMPLEDB_SCHEMA)
-
-    try:
-        dt_view = CreateView(view_table, selectable)
-
-        db.engine.execute(dt_view)
-        return True
-    except BaseException as err:
-        raise RuntimeError('Error while create the dataset table data')
