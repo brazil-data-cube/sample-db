@@ -15,15 +15,16 @@ from flask import Flask
 
 @pytest.fixture
 def app():
-    """Flask application fixture."""
-    app = Flask(__name__)
+    """Create and initialize BDCSample extension."""
+    _app = Flask(__name__)
 
-    return app
+    with _app.app_context():
+        yield _app
 
 
 def pytest_sessionstart(session):
     """Load SAMPLE-DB and prepare database environment."""
-    for command in ['init', 'create-namespaces', 'create-schema', 'load-scripts', 'create-extension-postgis']:
+    for command in ['init', 'create-namespaces', 'create-extension-postgis', 'create-schema', 'load-scripts']:
         subprocess.call(f'sample-db db {command}', shell=True)
 
 

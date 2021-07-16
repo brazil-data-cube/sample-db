@@ -32,7 +32,8 @@ tests_require = [
     'isort>4.3',
     'sqlalchemy-diff>=0.1.3',
     'alembic-verify>=0.1.4',
-    'check-manifest>=0.40'
+    'check-manifest>=0.40',
+    'shapely>=1.7,<2',
 ]
 
 sample_requires = [
