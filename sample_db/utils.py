@@ -149,8 +149,8 @@ def create_dataset(user_id, classification_system_id, collect_method_id,
 
 
 def delete_dataset_table(dataset_name, dataset_version):
-    """Delete dataset table."""
-    ds_sq = dataset_name.replace("-", "_")
+    """Delete dataset and drop data table."""
+    ds_sq = f'{dataset_name.replace("-", "_")}_{dataset_version}'
 
     s_name = f"{Config.SAMPLEDB_SCHEMA}.dataset_{ds_sq.lower()}_id_seq"
 

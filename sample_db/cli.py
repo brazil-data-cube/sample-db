@@ -50,10 +50,10 @@ def insert_dataset_data(verbose, name, user_id, version, dataset_file, mappings)
     args["mappings_json"] = mappings_json
 
     ds, affected_rows = utils.add_dataset_data_file(user_id=user_id,
-                                                dataset_name=name,
-                                                dataset_version=version,
-                                                dataset_file=dataset_file,
-                                                mimetype=mimetype, **args)
+                                                    dataset_name=name,
+                                                    dataset_version=version,
+                                                    dataset_file=dataset_file,
+                                                    mimetype=mimetype, **args)
 
     if affected_rows is not None:
         click.secho(f'Data loaded into dataset {name} !', bold=True, fg='green')
@@ -112,7 +112,8 @@ def create_dataset(verbose, user_id, name, title, public,
     if version_successor:
         args["version_successor"] = version_successor
 
-    utils.create_dataset(user_id=user_id, classification_system_id=classification_system_id,
+    utils.create_dataset(user_id=user_id,
+                         classification_system_id=classification_system_id,
                          collect_method_id=collect_method_id,
                          dataset_name=name, **args)
 

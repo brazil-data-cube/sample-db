@@ -24,7 +24,7 @@ def _prepare_samples_fields():
     return dict(
         table_name='FakeSample',
         version="1",
-        # features=features
+        features=features
     )
 
 
@@ -60,8 +60,6 @@ def test_create_collect(db):
 
 
 def test_create_ds_table(db):
-    samples = _prepare_samples_fields()
-    # fields = _prepare_ds_fields()
     with db.session.begin_nested():
         dataset_type = DatasetType()
         dataset_type.create()
