@@ -10,15 +10,13 @@ import logging
 
 from bdc_db.db import db as _db
 from lccs_db.models import LucClassificationSystem
-from sqlalchemy import Table
+from sqlalchemy import exc
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.schema import DropSequence
-from sqlalchemy.sql import and_
 
 from .config import Config
 from .db_util import DBAccessor
-from .models import CollectMethod, Datasets, make_dataset_table
-from .models.base import metadata
+from .models import CollectMethod, Datasets
 
 
 def drop_dataset_table(dataset_data_table, sequence):
@@ -52,52 +50,75 @@ def get_collect_method(collect_method_name):
     return collect_method
 
 
-def create_dataset_table(user_id, dataset_table_name, classification_system_name,
-                         classification_system_version, mimetype, dataset_file, **extra_fields):
+def add_dataset_data_file(dataset_name, dataset_version, user_id,
+                          mimetype, dataset_file, **extra_fields):
     """Insert dataset data into database."""
     from sample_db_utils.core.driver import Driver
     from sample_db_utils.factory import factory
 
-    extra_fields.setdefault('create', True)
-    extra_fields.setdefault('mappings_json', dict(class_name="label", start_date="start_date", end_date="end_date"))
+    extra_fields.setdefault('create', False)
+    extra_fields.setdefault('mappings_json', dict(class_id="class_id", start_date="start_date", end_date="end_date"))
+
+    affected_rows = 0
+    ds = None
 
     driver_type = factory.get(mimetype)
 
-    class_system = get_classification_system(classification_system_name, classification_system_version)
+    _accessor = DBAccessor()
 
-    _accessor = DBAccessor(system_id=class_system.id)
+    with _db.session.begin_nested():
+        try:
+            ds = _db.session.query(Datasets)\
+                .filter(Datasets.name == dataset_name, Datasets.version == dataset_version)\
+                .first()
+        except ValueError:
+            raise RuntimeError(f'Dataset {dataset_name}-V{dataset_version} not found!')
 
-    try:
-        dataset_data_table, field_seq = make_dataset_table(table_name=dataset_table_name, create=extra_fields['create'])
-    except BaseException as err:
-        drop_dataset_table(dataset_data_table, field_seq)
-        raise RuntimeError('Error while create the dataset table data')
-
-    try:
         driver: Driver = driver_type(entries=dataset_file,
                                      mappings=extra_fields['mappings_json'],
                                      storager=_accessor,
-                                     user=user_id,
-                                     system=class_system)
+                                     user=user_id)
 
         driver.load_data_sets()
+        dataset_table = ds.ds_table
 
-        driver.store(dataset_data_table)
+        try:
+            driver.store(dataset_table)
+            logging.info('Data inserted in table {}'.format(driver.__class__.__name__))
+            affected_rows = len(driver.get_data_sets())
+        except exc.SQLAlchemyError as e:
+            _db.session.rollback()
+            raise RuntimeError(f'Error while store data: {e}')
 
-        _db.session.commit()
+    _db.session.commit()
 
-        logging.info('Data inserted in table {}'.format(driver.__class__.__name__))
-
-        affected_rows = len(driver.get_data_sets())
-        return dataset_data_table, field_seq, affected_rows
-    except BaseException as err:
-        _db.session.rollback()
-        drop_dataset_table(dataset_data_table, field_seq)
-        raise RuntimeError('Error while insert the dataset table data')
+    return ds, affected_rows
 
 
-def create_dataset(user_id, classification_system_name, classification_system_version, collect_method_name,
-                   dataset_name, dataset_table_name, title, start_date, end_date, version, **extra_fields):
+def create_view(dataset_name, dataset_version):
+    """Create dataset_view."""
+    with _db.session.begin_nested():
+        try:
+            ds = _db.session.query(Datasets)\
+                .filter(Datasets.name == dataset_name, Datasets.version == dataset_version)\
+                .first()
+        except ValueError:
+            raise RuntimeError(f'Dataset {dataset_name}-V{dataset_version} not found!')
+
+        try:
+            result = ds.make_view_dataset_data
+            _db.engine.execute(result)
+        except exc.SQLAlchemyError as e:
+            _db.session.rollback()
+            raise RuntimeError(f'Error while create view data: {e}')
+
+    _db.session.commit()
+
+    return
+
+
+def create_dataset(user_id, classification_system_id, collect_method_id,
+                   dataset_name, title, start_date, end_date, version, **extra_fields):
     """Insert a new dataset."""
     extra_fields.setdefault('description', "")
     extra_fields.setdefault('version_predecessor', None)
@@ -105,54 +126,46 @@ def create_dataset(user_id, classification_system_name, classification_system_ve
     extra_fields.setdefault('metadata_json', None)
     extra_fields.setdefault('is_public', True)
 
-    classification_system = get_classification_system(classification_system_name, classification_system_version)
-
-    collect_method = get_collect_method(collect_method_name)
-
-    dataset_infos = dict(
-        name=dataset_name,
-        title=title,
-        start_date=start_date,
-        end_date=end_date,
-        description=extra_fields["description"],
-        version=version,
-        version_predecessor=extra_fields["version_predecessor"],
-        version_successor=extra_fields["version_successor"],
-        is_public=extra_fields["is_public"],
-        classification_system_id=classification_system.id,
-        collect_method_id=collect_method.id,
-        metadata_json=extra_fields['metadata_json'],
-        dataset_table_name=dataset_table_name,
-        user_id=user_id
-    )
-
     with _db.session.begin_nested():
-        ds = Datasets(**dict(dataset_infos))
+        ds = Datasets.create_ds_table(table_name=dataset_name, version=version)
+        ds.name = dataset_name
+        ds.title = title
+        ds.start_date = start_date
+        ds.end_date = end_date
+        ds.description = extra_fields["description"]
+        ds.version_predecessor = extra_fields["version_predecessor"]
+        ds.version_successor = extra_fields["version_successor"]
+        ds.is_public = extra_fields["is_public"]
+        ds.classification_system_id = classification_system_id
+        ds.collect_method_id = collect_method_id
+        ds.metadata_json = extra_fields['metadata_json']
+        ds.user_id = user_id
 
         _db.session.add(ds)
 
     _db.session.commit()
 
-    return dataset_infos
+    return ds
 
 
-def delete_dataset_table(ds_name, ds_version):
+def delete_dataset_table(dataset_name, dataset_version):
     """Delete dataset table."""
-    ds_sq = ds_name.replace("-", "_")
+    ds_sq = dataset_name.replace("-", "_")
 
-    s_name = f"{Config.SAMPLEDB_SCHEMA}.dataset_{ds_sq}_id_seq"
-
-    ds_table = _db.session.query(Datasets).filter(
-        and_(Datasets.name == ds_name,
-             Datasets.version == ds_version)
-    ).first_or_404()
-
-    dataset_table_info = Table(ds_table.dataset_table_name, metadata, autoload=True, autoload_with=_db.engine,
-                               extend_existing=True)
+    s_name = f"{Config.SAMPLEDB_SCHEMA}.dataset_{ds_sq.lower()}_id_seq"
 
     with _db.session.begin_nested():
-        _db.session.delete(ds_table)
-        dataset_table_info.drop(bind=_db.engine)
+        try:
+            ds = _db.session.query(Datasets) \
+                .filter(Datasets.name == dataset_name, Datasets.version == dataset_version) \
+                .first()
+        except ValueError:
+            raise RuntimeError(f'Dataset {dataset_name}-V{dataset_version} not found!')
+
+        ds_table = ds.ds_table
+
+        _db.session.delete(ds)
+        _db.session.execute(f"DROP TABLE {Config.SAMPLEDB_SCHEMA}.{ds_table.name} CASCADE;")
         _db.session.execute(f"DROP SEQUENCE {s_name};")
 
     _db.session.commit()

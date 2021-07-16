@@ -48,6 +48,6 @@ class BDCSample:
         """Retrieve instance Flask-SQLALchemy instance.
 
         Notes:
-            Make sure to initialize the `BDCCatalog` before.
+            Make sure to initialize the `BDCSample` before.
         """
         return _db

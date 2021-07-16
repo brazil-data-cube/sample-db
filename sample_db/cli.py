@@ -10,12 +10,10 @@ import json
 
 import click
 from bdc_db.cli import cli
-from bdc_db.db import db as _db
 from flask.cli import with_appcontext
 from lccs_db.utils import get_mimetype
 
 import sample_db.utils as utils
-from sample_db.models.dataset_table import make_view_dataset_table
 
 
 @cli.group()
@@ -27,49 +25,44 @@ def sample():
 @with_appcontext
 @click.option('-v', '--verbose', is_flag=True, default=False)
 @click.option('--user_id', type=click.INT, required=True, help='The user id.')
-@click.option('--dataset_table_name', type=click.STRING, required=True, help='The dataset table name with the data.')
-@click.option('--mappings', type=click.Path(exists=True, readable=True), required=True,
-              help='Mappings used for location columns in file.')
-@click.option('--classification_system_name', type=click.STRING, required=True, help='The classification system name.')
-@click.option('--classification_system_version', type=click.STRING, required=True,
-              help='The classification system version.')
+@click.option('--name', type=click.STRING, required=True, help='The dataset name.')
+@click.option('--version', type=click.STRING, required=True, help='The dataset version.')
+@click.option('--mappings', type=click.Path(exists=True, readable=True), required=False,
+              default=None,help='Mappings used for location columns in file.')
 @click.option('--dataset_file', type=click.Path(exists=True), required=True,
               help='File path with the data to insert')
-@click.option('--create_table', is_flag=True, default=True, required=False)
-def insert_dataset_table(verbose, user_id, dataset_table_name, mappings, classification_system_name,
-                         classification_system_version, dataset_file, create_table):
+def insert_dataset_data(verbose, name, user_id, version, dataset_file, mappings):
     """Insert data into a dataset table."""
     if verbose:
-        click.secho(f'Insert data into dataset_{dataset_table_name}..', bold=True, fg='yellow')
+        click.secho(f'Insert data into dataset {name}..', bold=True, fg='yellow')
 
-    with open(mappings, "r") as m:
-        mappings_json = json.load(m)
+    if mappings is not None:
+        with open(mappings, "r") as m:
+            mappings_json = json.load(m)
 
-    if 'collect_date' not in mappings_json:
-        mappings_json['collect_date'] = None
+        if 'collect_date' not in mappings_json:
+            mappings_json['collect_date'] = None
 
     mimetype = get_mimetype(dataset_file)
 
     args = dict()
 
     args["mappings_json"] = mappings_json
-    args["dataset_file"] = dataset_file
-    args["create"] = create_table
 
-    _, _, affected_rows = utils.create_dataset_table(user_id=user_id,
-                                                     dataset_table_name=dataset_table_name,
-                                                     classification_system_name=classification_system_name,
-                                                     classification_system_version=classification_system_version,
-                                                     mimetype=mimetype, **args)
+    ds, affected_rows = utils.add_dataset_data_file(user_id=user_id,
+                                                dataset_name=name,
+                                                dataset_version=version,
+                                                dataset_file=dataset_file,
+                                                mimetype=mimetype, **args)
 
     if affected_rows is not None:
-        click.secho(f'Dataset table dataset_{dataset_table_name} loaded!', bold=True, fg='green')
+        click.secho(f'Data loaded into dataset {name} !', bold=True, fg='green')
 
         if verbose:
             click.secho(f'\tNumber of data inserted {affected_rows}.', bold=False, fg='black')
 
     else:
-        click.secho(f'Error while creating dataset', bold=True, fg='green')
+        click.secho(f'Error while inserting data into dataset {name}', bold=True, fg='green')
 
 
 @sample.command()
@@ -83,18 +76,15 @@ def insert_dataset_table(verbose, user_id, dataset_table_name, mappings, classif
 @click.option('--description', type=click.STRING, required=True, help='The dataset description.')
 @click.option('--start_date', type=click.STRING, required=True, help='The dataset start date.')
 @click.option('--end_date', type=click.STRING, required=True, help='The dataset end date.')
-@click.option('--dataset_table_name', type=click.STRING, required=True, help='The dataset table name (with the data).')
 @click.option('--public/--no-public', required=True, default=False, help='Is this dataset public?.')
-@click.option('--collect_method', type=click.STRING, required=True, help='The dataset collect method.')
-@click.option('--classification_system_name', type=click.STRING, required=True, help='The classification system name.')
-@click.option('--classification_system_version', type=click.STRING, required=True,
-              help='The classification system version.')
+@click.option('--collect_method_id', type=click.INT, required=True, help='The dataset collect method id.')
+@click.option('--classification_system_id', type=click.INT, required=True, help='The classification system id.')
 @click.option('--metadata_file', type=click.Path(exists=True, readable=True), help='A JSON metadata file.',
               required=False)
 @click.option('--user_id', type=click.INT, required=True, help='The user id.')
-def create_dataset(verbose, user_id, dataset_table_name, name, title, public,
+def create_dataset(verbose, user_id, name, title, public,
                    start_date, end_date, version, version_predecessor, version_successor,
-                   collect_method, description, classification_system_name, classification_system_version,
+                   collect_method_id, description, classification_system_id,
                    metadata_file):
     """Create a new dataset."""
     if verbose:
@@ -117,20 +107,16 @@ def create_dataset(verbose, user_id, dataset_table_name, name, title, public,
     args["description"] = description
     args["metadata_json"] = metadata_json
 
-    ds_table_name = f"dataset_{dataset_table_name}"
-
     if version_predecessor:
         args["version_predecessor"] = version_predecessor
     if version_successor:
         args["version_successor"] = version_successor
 
-    utils.create_dataset(user_id=user_id, classification_system_name=classification_system_name,
-                         classification_system_version=classification_system_version,
-                         collect_method_name=collect_method,
-                         dataset_name=name,
-                         dataset_table_name=ds_table_name, **args)
+    utils.create_dataset(user_id=user_id, classification_system_id=classification_system_id,
+                         collect_method_id=collect_method_id,
+                         dataset_name=name, **args)
 
-    click.secho(f'Dataset {name} loaded!', bold=True, fg='green')
+    click.secho(f'Dataset {name} created!', bold=True, fg='green')
 
     if verbose:
         click.secho(f'\tFinished !.', bold=False, fg='black')
@@ -139,25 +125,23 @@ def create_dataset(verbose, user_id, dataset_table_name, name, title, public,
 @sample.command()
 @with_appcontext
 @click.option('-v', '--verbose', is_flag=True, default=False)
-@click.option('--dataset_table_name', type=click.STRING, help='A dataset table name.', required=True)
-def create_view_dataset_table(verbose, dataset_table_name):
+@click.option('--name', type=click.STRING, required=True, help='The dataset name.')
+@click.option('--version', type=click.STRING, required=True, help='The dataset version.')
+def create_view_dataset_table(verbose, name, version):
     """Create View dataset-table."""
     if verbose:
-        click.secho(f'Create view for {dataset_table_name}..', bold=True, fg='yellow')
-        
-    table_name = f'dataset_{dataset_table_name}'
+        click.secho(f'Create view for {name}..', bold=True, fg='yellow')
 
-    dt_table_name = f'v_{table_name}'
-    
-    t = make_view_dataset_table(table_name=table_name, obs_table_name=dt_table_name)
+        utils.create_view(dataset_name=name, dataset_version=version)
 
-    if t:
-        click.secho(f'View {dt_table_name} created.', bold=True, fg='black')
-    else:
-        click.secho(f"Error while creating view {dt_table_name}.", bold=True, fg='yellow')
+        click.secho(f'View of dataset {name} created.', bold=True, fg='black')
 
-    if verbose:
         click.secho('\tFinished!', bold=False, fg='black')
+
+    else:
+        utils.create_view(dataset_name=name, dataset_version=version)
+
+        click.secho(f'View of dataset {name} created.', bold=True, fg='black')
 
 
 @sample.command()
@@ -170,12 +154,14 @@ def delete_dataset(verbose, name, version):
     if verbose:
         click.secho(f'Deleting the dataset {name}..', bold=True, fg='yellow')
 
-        utils.delete_dataset_table(ds_name=name, ds_version=version)
+        utils.delete_dataset_table(dataset_name=name, dataset_version=version)
 
         click.secho('\tFinished!', bold=False, fg='black')
 
     else:
-        utils.delete_dataset_table(ds_name=name, ds_version=version)
+        utils.delete_dataset_table(dataset_name=name, dataset_version=version)
+
+        click.secho(f'Dataset {name} deleted!', bold=False, fg='yellow')
 
 
 def main(as_module=False):

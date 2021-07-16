@@ -13,9 +13,7 @@ import sys
 
 from click.testing import CliRunner
 
-import pytest
 from sample_db.cli import cli
-from sample_db import BDCSample
 
 
 def test_basic_cli():

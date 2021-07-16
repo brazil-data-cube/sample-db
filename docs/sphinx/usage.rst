@@ -85,17 +85,34 @@ You can load well-known classification systems with the CLI::
 Insert data into Sample
 +++++++++++++++++++++++
 
-
-To create a new dataset, you must first enter the data that contains the geometry and classes of the samples. To do this, run the command below. One of the parameters to be informed is the path to the data that you want to store in the database ::
+To create a new dataset use the follow command::
 
     SQLALCHEMY_DATABASE_URI="postgresql://username:password@host:5432/dbname"  \
-    sample-db sample insert-dataset-table \
+    sample-db sample create-dataset \
+    --name sample-cerrado-2017_2018 \
+    --title BDC-Dados-Cerrado-2017-2018 \
+    --start_date 2017-06-01 \
+    --end_date 2018-06-30 \
+    --version 1 \
+    --no-public \
+    --description This is a description of the dataset \
     --user_id 1 \
-    --dataset_table_name bdc_cerrado \
+    --collect_method_id 1 \
+    --classification_id 1 \
+    --metadata_file /path/to/metadata/sample-metadata.json --verbose
+
+
+
+To insert data into dataset, you must enter the data that contains the geometry and classes of the samples. To do this, run the command below. One of the parameters to be informed is the path to the data that you want to store in the database ::
+
+    SQLALCHEMY_DATABASE_URI="postgresql://username:password@host:5432/dbname"  \
+    sample-db sample insert-dataset-data \
+    --user_id 1 \
+    --name bdc_cerrado \
+    --version 1 \
     --mappings /path/to/mapping/mapping.json \
-    --classification_system_name BDC \
-    --classification_system_version 1 \
     --dataset_file /path/to/observation.zip --verbose
+
 
 You should get a similar output::
 
@@ -108,24 +125,6 @@ You should get a similar output::
      sampledb | provenance         | table | postgres
     (4 rows)
 
-
-Create a dataset::
-
-    SQLALCHEMY_DATABASE_URI="postgresql://username:password@host:5432/dbname"  \
-    sample-db sample create-dataset \
-    --user_id 1 \
-    --dataset_table_name bdc_cerrado \
-    --name sample-cerrado-2017_2018 \
-    --title BDC-Dados-Cerrado-2017-2018 \
-    --start_date 2017-06-01 \
-    --end_date 2018-06-30 \
-    --version 1 \
-    --no-public \
-    --collect_method Visual \
-    --description This is a description of the dataset \
-    --classification_system_name PRODES \
-    --classification_system_version 1.0 \
-    --metadata_file /path/to/metadata/sample-metadata.json --verbose
 
 To create a view of ``dataset_table``, run the commannd::
 

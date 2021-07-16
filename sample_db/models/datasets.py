@@ -6,14 +6,22 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 """SampleDB Datasets Model."""
+from typing import Dict, Iterable, Union
+
+from lccs_db.models import LucClass, LucClassificationSystem
 from lccs_db.models.base import BaseModel
-from lccs_db.models.luc_classification_system import LucClassificationSystem
 from sqlalchemy import (JSON, Boolean, Column, Date, ForeignKey, Index,
-                        Integer, String, Text, UniqueConstraint, select)
-from sqlalchemy.sql import and_
+                        Integer, String, Table, Text, UniqueConstraint, select)
+from sqlalchemy.dialects.postgresql import OID
+from sqlalchemy.sql import and_, func
 from sqlalchemy_utils import create_view
+from sqlalchemy_views import CreateView
 
 from ..config import Config
+from .base import db as _db
+from .dataset_table import make_dataset_table
+
+Feature = Dict[str, str]
 
 
 class CollectMethod(BaseModel):
@@ -41,7 +49,7 @@ class Datasets(BaseModel):
     title = Column(String(255), nullable=False)
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
-    dataset_table_name = Column(String, nullable=False)
+    dataset_table_id = Column(OID, nullable=False)
     description = Column(Text, nullable=True)
     version = Column(String, nullable=False)
     version_predecessor = Column(ForeignKey(id, onupdate='CASCADE', ondelete='CASCADE'))
@@ -66,6 +74,114 @@ class Datasets(BaseModel):
         dict(schema=Config.SAMPLEDB_SCHEMA),
     )
 
+    @classmethod
+    def create_ds_table(cls, table_name: str, version: str, **kwargs) -> 'Datasets':
+        """Create an sample table to store and retrieve a respective dataset instance.
+
+        Args:
+            table_name - Dataset name (Used as table_name).
+            version - Dataset version.
+        """
+        ds = cls()
+        ds.name = table_name
+        ds.version = version
+
+        ds_table_name = table_name.replace("-", "_")
+
+        ds_table, _ = make_dataset_table(ds_table_name.lower(), create=True)
+
+        table_id = cls.get_table_id(ds_table_name)
+
+        ds.dataset_table_id = table_id
+
+        return ds
+
+    @classmethod
+    def get_table_id(cls, ds_table_name: str) -> str:
+        """Retrieve a Table OID from a sample dataset name.
+
+        Raises:
+            Exception when there is no sample table for ds name.
+        """
+        res = _db.session.execute(
+            f'SELECT \'{Config.SAMPLEDB_SCHEMA}.dataset_{ds_table_name.lower()}\'::regclass::oid AS table_id'
+        ).first()
+
+        if res.table_id is None:
+            raise RuntimeError(f'Table oid is null')
+
+        return res.table_id
+
+    @classmethod
+    def get_ds_table(cls, ds_name: str, ds_version: str) -> Union[Table, None]:
+        """Retrieve the sample dataset table based in the given name and version.
+
+        Notes:
+            It does not raise error when dataset does not exist.
+
+        Args:
+            ds_name: The Dataset name
+            ds_version: The Dataset version
+        Returns:
+            Table: A SQLAlchemy table reference to dataset geometry table.
+        """
+        expr = 'SELECT relname AS table_name, ' \
+               'relnamespace::regnamespace::text AS schema ' \
+               f'FROM {Config.SAMPLEDB_SCHEMA}.datasets as ds, pg_class ' \
+               f'WHERE ds.dataset_table_id = pg_class.oid AND ' \
+               f'LOWER(ds.name) = \'{ds_name}\' AND ' \
+               f'LOWER(ds.version) = \'{ds_version}\''
+
+        res = _db.session.execute(expr).fetchone()
+
+        if res:
+            return Table(res.table_name, _db.metadata, schema=Config.SAMPLEDB_SCHEMA, autoload=True,
+                         autoload_with=_db.engine)
+
+        return None
+
+    @property
+    def ds_table(self) -> Union[Table, None]:
+        """Retrieve instance dataset table."""
+        return self.get_ds_table(self.name, self.version)
+
+    @property
+    def insert_ds_table(self, features: Iterable[Feature], **kwargs) -> None:
+        """Insert data into dataset table."""
+
+        ds = self.ds_table
+
+        _db.session.execute(ds.insert().values(features))
+
+    @property
+    def make_view_dataset_data(self) -> Table:
+        """Create a view of an observation model using a table name."""
+
+        # reflect dataset table
+        dt_table = self.ds_table
+
+        selectable = select([dt_table.c.id,
+                             dt_table.c.start_date,
+                             dt_table.c.end_date,
+                             dt_table.c.collection_date,
+                             dt_table.c.user_id.label('user_id'),
+                             dt_table.c.class_id.label('class_id'),
+                             LucClass.name.label('class_name'),
+                             func.Geometry(dt_table.c.location).label('location'),
+                             ]).where(LucClass.id == dt_table.c.class_id)
+
+        view_table = Table(f'view_{dt_table.name}', _db.metadata, schema=Config.SAMPLEDB_SCHEMA)
+
+        try:
+            dt_view = CreateView(view_table, selectable)
+
+            # _db.engine.execute(dt_view)
+        except BaseException as err:
+            _db.session.rollback()
+            raise RuntimeError('Error while create the dataset view')
+
+        return dt_view
+
 
 class DatasetView(BaseModel):
     """Datasets View Model."""
@@ -82,7 +198,7 @@ class DatasetView(BaseModel):
                            Datasets.is_public,
                            Datasets.start_date,
                            Datasets.end_date,
-                           Datasets.dataset_table_name,
+                           Datasets.dataset_table_id,
                            Datasets.metadata_json,
                            Datasets.version,
                            Datasets.version_successor,
