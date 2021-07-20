@@ -149,11 +149,7 @@ def create_dataset(user_id, classification_system_id, collect_method_id,
 
 
 def delete_dataset_table(dataset_name, dataset_version):
-    """Delete dataset table."""
-    ds_sq = dataset_name.replace("-", "_")
-
-    s_name = f"{Config.SAMPLEDB_SCHEMA}.dataset_{ds_sq.lower()}_id_seq"
-
+    """Delete dataset and drop data table."""
     with _db.session.begin_nested():
         try:
             ds = _db.session.query(Datasets) \
@@ -165,8 +161,7 @@ def delete_dataset_table(dataset_name, dataset_version):
         ds_table = ds.ds_table
 
         _db.session.delete(ds)
-        _db.session.execute(f"DROP TABLE {Config.SAMPLEDB_SCHEMA}.{ds_table.name} CASCADE;")
-        _db.session.execute(f"DROP SEQUENCE {s_name};")
+        ds_table.drop(bind=_db.engine, checkfirst=True)
 
     _db.session.commit()
 

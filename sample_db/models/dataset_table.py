@@ -70,7 +70,7 @@ def make_dataset_table(table_name: str, create: bool = False) -> Table:
     s_name = f"{Config.SAMPLEDB_SCHEMA}.dataset_{table_name}_id_seq"
 
     if create:
-        if not db.engine.dialect.has_table(connection=db.engine, table_name=table_name, schema=Config.SAMPLEDB_SCHEMA):
+        if not db.engine.dialect.has_table(connection=db.engine, table_name=f'dataset_{table_name}', schema=Config.SAMPLEDB_SCHEMA):
             db.engine.execute(f"CREATE TABLE {Config.SAMPLEDB_SCHEMA}.dataset_{table_name} OF dataset_type")
             db.engine.execute(f"CREATE SEQUENCE {s_name}")
 
@@ -86,6 +86,8 @@ def make_dataset_table(table_name: str, create: bool = False) -> Table:
 
             db.engine.execute(
                 f"ALTER TABLE {Config.SAMPLEDB_SCHEMA}.{klass.name} ALTER {klass.c.id.name} SET DEFAULT NEXTVAL('{s_name}');")
+
+            db.engine.execute(f"ALTER SEQUENCE {s_name} owned by {Config.SAMPLEDB_SCHEMA}.{klass.c.id};")
 
             db.engine.execute(AddConstraint(PrimaryKeyConstraint(klass.c.id)))
             db.engine.execute(CreateIndex(Index(None, klass.c.user_id)))

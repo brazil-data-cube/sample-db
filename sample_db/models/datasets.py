@@ -86,9 +86,9 @@ class Datasets(BaseModel):
         ds.name = table_name
         ds.version = version
 
-        ds_table_name = table_name.replace("-", "_")
+        ds_table_name = f'{table_name.replace("-", "_")}_{version}'
 
-        ds_table, _ = make_dataset_table(ds_table_name.lower(), create=True)
+        ds_table, _ = make_dataset_table(f'{ds_table_name.lower()}', create=True)
 
         table_id = cls.get_table_id(ds_table_name)
 
