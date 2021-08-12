@@ -10,7 +10,7 @@ from sqlalchemy.orm.session import Session
 from lccs_db.models import LucClassificationSystem
 import sqlalchemy as sa
 
-from sample_db.models import Datasets, CollectMethod, Users, DatasetView
+from sample_db.models import Datasets, CollectMethod, DatasetView
 
 
 # revision identifiers, used by Alembic.
@@ -28,31 +28,27 @@ def upgrade():
     session.commit()
 
     result = session.execute(
-        "SELECT table_name FROM information_schema.tables WHERE table_name ~ '^dataset_' AND table_schema = 'sampledb';"
+            """SELECT con.conname, information_schema.tables.table_name
+                   FROM pg_catalog.pg_constraint con
+                        INNER JOIN pg_catalog.pg_class rel
+                                   ON rel.oid = con.conrelid
+                        INNER JOIN pg_catalog.pg_namespace nsp
+                                   ON nsp.oid = connamespace
+                        INNER JOIN information_schema.tables
+                                    ON  information_schema.tables.table_schema = nsp.nspname
+                                    AND  nsp.nspname = 'sampledb'
+                                    AND rel.relname = information_schema.tables.table_name
+                   WHERE information_schema.tables.table_name ~ '^dataset_'
+                   AND con.conname ~ 'user_id_fkey$';
+                   """
     )
+
     for r in result:
-        op.drop_constraint(f'{r[0]}_user_id_fkey', f'{r[0]}', schema='sampledb', type_='foreignkey')
-        session.execute(f"DROP VIEW IF EXISTS {r[0]};")
-    session.execute(f"DROP TABLE {Users.__table__} CASCADE;")
+        op.drop_constraint(f'{r[0]}', f'{r[1]}', schema='sampledb', type_='foreignkey')
+        session.execute(f"DROP VIEW IF EXISTS sampledb.v_{r[1]};")
+    session.execute(f"DROP TABLE sampledb.users ;")
     session.commit()
 
-    session.execute("CREATE OR REPLACE VIEW {} AS " \
-                    "SELECT datasets.created_at, datasets.updated_at, datasets.id, datasets.name, " \
-                    "datasets.title, datasets.start_date, datasets.end_date, datasets.dataset_table_name, " \
-                    "datasets.version, datasets.version_successor, datasets.version_predecessor, " \
-                    "datasets.description, class_systems.name AS classification_system_name, " \
-                    "class_systems.id AS classification_system_id, class_systems.version AS classification_system_version, " \
-                    "datasets.id AS user_id, collect_method.name AS collect_method_name, " \
-                    "collect_method.id AS collect_method_id, " \
-                    "datasets.metadata_json, datasets.is_public "
-                    "FROM {} AS datasets, {} AS class_systems, {} AS collect_method " \
-                    "WHERE class_systems.id = datasets.classification_system_id " \
-                    "AND collect_method.id = datasets.collect_method_id;"
-                    .format(DatasetView.__table__,
-                            Datasets.__table__,
-                            LucClassificationSystem.__table__,
-                            CollectMethod.__table__)
-                    )
     session.commit()
     # ### end Alembic commands ###
 
@@ -94,7 +90,7 @@ def downgrade():
                     .format(DatasetView.__table__,
                             Datasets.__table__,
                             LucClassificationSystem.__table__,
-                            Users.__table__,
+                            'sampledb.users',
                             CollectMethod.__table__)
                     )
     session.commit()

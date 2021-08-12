@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 from sqlalchemy.orm.session import Session
 from lccs_db.models import LucClassificationSystem
-from sample_db.models import Datasets, CollectMethod, Users, DatasetView
+from sample_db.models import Datasets, CollectMethod, DatasetView
 from sample_db.models.dataset_table import DatasetType
 
 # revision identifiers, used by Alembic.
@@ -38,8 +38,8 @@ def upgrade():
     op.create_unique_constraint(op.f('collect_method_name_key'), 'collect_method', ['name'], schema='sampledb')
     op.create_index(op.f('idx_sampledb_collect_method_name'), 'collect_method', ['name'], unique=False, schema='sampledb')
     op.alter_column('datasets', 'observation_table_name', new_column_name='dataset_table_name', schema='sampledb')
-    op.add_column('datasets', sa.Column('is_public', sa.Boolean(), nullable=False), schema='sampledb')
-    op.add_column('datasets', sa.Column('title', sa.String(length=255), nullable=False), schema='sampledb')
+    op.add_column('datasets', sa.Column('is_public', sa.Boolean(), nullable=False,  server_default='t'), schema='sampledb')
+    op.add_column('datasets', sa.Column('title', sa.String(length=255), nullable=False,  server_default='Titulo'), schema='sampledb')
     op.add_column('datasets', sa.Column('version_predecessor', sa.Integer(), nullable=True), schema='sampledb')
     op.add_column('datasets', sa.Column('version_successor', sa.Integer(), nullable=True), schema='sampledb')
     op.alter_column('datasets', 'name',
@@ -92,7 +92,7 @@ def upgrade():
                     .format(DatasetView.__table__,
                             Datasets.__table__,
                             LucClassificationSystem.__table__,
-                            Users.__table__,
+                            'sampledb.users',
                             CollectMethod.__table__)
                     )
 
@@ -167,7 +167,7 @@ def downgrade():
                     .format(DatasetView.__table__,
                             Datasets.__table__,
                             LucClassificationSystem.__table__,
-                            Users.__table__,
+                            'sampledb.users',
                             CollectMethod.__table__)
                     )
     session.commit()

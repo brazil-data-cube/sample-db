@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 from sqlalchemy.orm.session import Session
 from lccs_db.models import LucClassificationSystem
-from sample_db.models import Datasets, CollectMethod, Users, DatasetView
+from sample_db.models import Datasets, CollectMethod, DatasetView
 
 
 
@@ -37,7 +37,7 @@ def upgrade():
                     .format(DatasetView.__table__,
                             Datasets.__table__,
                             LucClassificationSystem.__table__,
-                            Users.__table__,
+                            'sampledb.users',
                             CollectMethod.__table__)
                     )
     session.commit()
