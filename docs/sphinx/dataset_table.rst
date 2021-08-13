@@ -12,7 +12,3 @@ Dataset table
     :members:
     :special-members: __init__
     :member-order: bysource
-
-
-.. autofunction:: sample_db.models.dataset_table::make_dataset_table
-.. autofunction:: sample_db.models.dataset_table::make_view_dataset_table
