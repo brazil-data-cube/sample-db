@@ -6,18 +6,11 @@ Create Date: 2021-09-17 13:58:51.702821
 
 """
 from alembic import op
-import sqlalchemy as sa
-
-from alembic import op
-import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
-from sample_db.models import DatasetView
-
 
 # revision identifiers, used by Alembic.
 revision = 'c36c83a0bf92'
 down_revision = 'bc8aee16d308'
-branch_labels = ('sampledb',)
+branch_labels = ()
 depends_on = None
 
 
