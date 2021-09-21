@@ -84,9 +84,9 @@ def make_dataset_table(table_name: str, create: bool = False) -> Table:
             db.engine.execute(
                 f"ALTER TABLE {Config.SAMPLEDB_SCHEMA}.{klass.name} ALTER COLUMN {klass.c.end_date.name} SET NOT NULL")
             db.engine.execute(
-                f"ALTER TABLE {Config.SAMPLEDB_SCHEMA}.{klass.name} ALTER COLUMN {klass.c.created_at.name} SET DEFAULT now()")
+                f"ALTER TABLE {Config.SAMPLEDB_SCHEMA}.{klass.name} ALTER COLUMN {klass.c.created_at.name} SET DEFAULT CURRENT_TIMESTAMP")
             db.engine.execute(
-                f"ALTER TABLE {Config.SAMPLEDB_SCHEMA}.{klass.name} ALTER COLUMN {klass.c.updated_at.name} SET DEFAULT now()")
+                f"ALTER TABLE {Config.SAMPLEDB_SCHEMA}.{klass.name} ALTER COLUMN {klass.c.updated_at.name} SET DEFAULT CURRENT_TIMESTAMP")
 
             db.engine.execute(
                 f"ALTER TABLE {Config.SAMPLEDB_SCHEMA}.{klass.name} ALTER {klass.c.id.name} SET DEFAULT NEXTVAL('{s_name}');")
