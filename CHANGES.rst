@@ -8,7 +8,7 @@
 Changes
 =======
 
-Version 0.8.1 (2021-09-23)
+Version 0.8.1 (2021-10-06)
 --------------------------
 
 - Bug fix: Adding missing attribute in dataset type (`#75 <https://github.com/brazil-data-cube/sample-db/issues/75>`_).
