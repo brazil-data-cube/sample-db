@@ -8,6 +8,11 @@
 Changes
 =======
 
+Version 0.8.1 (2021-10-06)
+--------------------------
+
+- Bug fix: Adding missing attribute in dataset type (`#75 <https://github.com/brazil-data-cube/sample-db/issues/75>`_).
+
 
 Version 0.8.0 (2021-08-13)
 --------------------------
@@ -17,8 +22,6 @@ Version 0.8.0 (2021-08-13)
 - Bug fix: Add alter sequence owned by table_name (`#70 <https://github.com/brazil-data-cube/sample-db/issues/70>`_).
 
 - Change dataset_table_name to dataset_table_id (`#68 <https://github.com/brazil-data-cube/sample-db/issues/68>`_).
-
-- Remove the sample-db-utils as required (`#65 <https://github.com/brazil-data-cube/sample-db/issues/65>`_).
 
 
 Version 0.6.1 (2021-07-07)
