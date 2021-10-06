@@ -95,10 +95,10 @@ To create a new dataset use the follow command::
     --end_date 2018-06-30 \
     --version 1 \
     --no-public \
-    --description This is a description of the dataset \
+    --description 'This is a description of the dataset' \
     --user_id 1 \
     --collect_method_id 1 \
-    --classification_id 1 \
+    --classification_system_id 1 \
     --metadata_file /path/to/metadata/sample-metadata.json --verbose
 
 

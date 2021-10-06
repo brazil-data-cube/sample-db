@@ -45,7 +45,7 @@ class CreateDatasetType(_CreateDropBase):
 @compiles(CreateDatasetType)
 def _create_composite_type(create, compiler, **kw):
     return f"CREATE TYPE dataset_type AS \
-               ( id INTEGER, user_id INTEGER, class_id INTEGER, start_date DATE, end_date DATE, collection_date DATE, \
+               (created_at TIMESTAMP, updated_at TIMESTAMP, id INTEGER, user_id INTEGER, class_id INTEGER, start_date DATE, end_date DATE, collection_date DATE, \
                location geometry(Geometry,4326))"
 
 
@@ -83,6 +83,10 @@ def make_dataset_table(table_name: str, create: bool = False) -> Table:
                 f"ALTER TABLE {Config.SAMPLEDB_SCHEMA}.{klass.name} ALTER COLUMN {klass.c.start_date.name} SET NOT NULL")
             db.engine.execute(
                 f"ALTER TABLE {Config.SAMPLEDB_SCHEMA}.{klass.name} ALTER COLUMN {klass.c.end_date.name} SET NOT NULL")
+            db.engine.execute(
+                f"ALTER TABLE {Config.SAMPLEDB_SCHEMA}.{klass.name} ALTER COLUMN {klass.c.created_at.name} SET DEFAULT CURRENT_TIMESTAMP")
+            db.engine.execute(
+                f"ALTER TABLE {Config.SAMPLEDB_SCHEMA}.{klass.name} ALTER COLUMN {klass.c.updated_at.name} SET DEFAULT CURRENT_TIMESTAMP")
 
             db.engine.execute(
                 f"ALTER TABLE {Config.SAMPLEDB_SCHEMA}.{klass.name} ALTER {klass.c.id.name} SET DEFAULT NEXTVAL('{s_name}');")
@@ -96,6 +100,8 @@ def make_dataset_table(table_name: str, create: bool = False) -> Table:
             db.engine.execute(CreateIndex(Index(None, klass.c.start_date)))
             db.engine.execute(CreateIndex(Index(None, klass.c.end_date)))
             db.engine.execute(CreateIndex(Index(None, klass.c.collection_date)))
+            db.engine.execute(CreateIndex(Index(None, klass.c.created_at)))
+            db.engine.execute(CreateIndex(Index(None, klass.c.updated_at)))
             Index(f'idx_{klass.name}_start_end_date', klass.c.start_date, klass.c.end_date)
 
             db.engine.execute(AddConstraint(
