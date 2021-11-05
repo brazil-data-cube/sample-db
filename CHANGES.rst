@@ -8,7 +8,7 @@
 Changes
 =======
 
-Version 0.8.2
+Version 0.8.2 (2021-11-05)
 --------------------------
 
 - Bug fix: Migration column "created_at" of relation "dataset_type" already exists (`#78 <https://github.com/brazil-data-cube/sample-db/issues/78>`_).
