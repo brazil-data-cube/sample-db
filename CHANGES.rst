@@ -8,13 +8,15 @@
 Changes
 =======
 
+
 Version 0.8.3
 --------------------------
 
 - Bug fix: Error while get_ds_table when it has a capital letter (`#81 <https://github.com/brazil-data-cube/sample-db/issues/81>`_).
 
 
-Version 0.8.2
+Version 0.8.2 (2021-11-05)
+
 --------------------------
 
 - Bug fix: Migration column "created_at" of relation "dataset_type" already exists (`#78 <https://github.com/brazil-data-cube/sample-db/issues/78>`_).
