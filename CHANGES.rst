@@ -8,6 +8,12 @@
 Changes
 =======
 
+Version 0.8.3
+--------------------------
+
+- Bug fix: Error while get_ds_table when it has a capital letter (`#81 <https://github.com/brazil-data-cube/sample-db/issues/81>`_).
+
+
 Version 0.8.2
 --------------------------
 
