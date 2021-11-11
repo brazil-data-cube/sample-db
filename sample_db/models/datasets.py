@@ -129,8 +129,8 @@ class Datasets(BaseModel):
                'relnamespace::regnamespace::text AS schema ' \
                f'FROM {Config.SAMPLEDB_SCHEMA}.datasets as ds, pg_class ' \
                f'WHERE ds.dataset_table_id = pg_class.oid AND ' \
-               f'LOWER(ds.name) = \'{ds_name}\' AND ' \
-               f'LOWER(ds.version) = \'{ds_version}\''
+               f'LOWER(ds.name) = LOWER(\'{ds_name}\') AND ' \
+               f'LOWER(ds.version) = LOWER(\'{ds_version}\')'
 
         res = _db.session.execute(expr).fetchone()
 
