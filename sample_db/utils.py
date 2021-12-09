@@ -72,7 +72,7 @@ def add_dataset_data_file(dataset_name, dataset_version, user_id,
         except ValueError:
             raise RuntimeError(f'Dataset {dataset_name}-V{dataset_version} not found!')
 
-        _accessor = DBAccessor(system_id=ds.id)
+        _accessor = DBAccessor(system_id=ds.classification_system_id)
 
         driver: Driver = driver_type(entries=dataset_file,
                                      mappings=extra_fields['mappings_json'],
