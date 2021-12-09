@@ -37,7 +37,7 @@ tests_require = [
 ]
 
 sample_requires = [
-    'sample-db-utils @ git+https://github.com/brazil-data-cube/sample-db-utils.git@v0.8.0',
+    'sample-db-utils @ git+https://github.com/fabianazioti/sample-db-utils.git@master',
 ]
 
 extras_require = {
@@ -53,7 +53,7 @@ setup_requires = [
 ]
 
 install_requires = [
-    'lccs-db @ git+https://github.com/brazil-data-cube/lccs-db.git@v0.6.0',
+    # 'lccs-db @ git+https://github.com/brazil-data-cube/lccs-db.git@v0.6.0',
     'GeoAlchemy2>=0.6.3',
     'sqlalchemy-views>=0.2.4',
 ]

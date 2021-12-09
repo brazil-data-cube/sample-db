@@ -64,8 +64,6 @@ def add_dataset_data_file(dataset_name, dataset_version, user_id,
 
     driver_type = factory.get(mimetype)
 
-    _accessor = DBAccessor()
-
     with _db.session.begin_nested():
         try:
             ds = _db.session.query(Datasets)\
@@ -73,6 +71,8 @@ def add_dataset_data_file(dataset_name, dataset_version, user_id,
                 .first()
         except ValueError:
             raise RuntimeError(f'Dataset {dataset_name}-V{dataset_version} not found!')
+
+        _accessor = DBAccessor(system_id=ds.id)
 
         driver: Driver = driver_type(entries=dataset_file,
                                      mappings=extra_fields['mappings_json'],
