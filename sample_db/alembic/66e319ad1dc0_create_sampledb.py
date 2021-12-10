@@ -8,7 +8,6 @@ Create Date: 2020-03-30 17:13:04.289364
 from alembic import op
 import sqlalchemy as sa
 
-from lccs_db.models import LucClass, LucClassificationSystem
 
 
 # revision identifiers, used by Alembic.
