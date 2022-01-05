@@ -2,8 +2,8 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$id": "metadata.json",
     "type": "object",
-    "title": "Dummy JSONSchema",
-    "description": "Define a simple JSONSchema for minimal tests.",
+    "title": "Dataset metadata JSONSchema",
+    "description": "Define a datacite JSONSchema for dataset metadata.",
      "required": [
         "identifiers",
         "creators",
