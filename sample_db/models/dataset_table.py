@@ -6,6 +6,7 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 """SampleDB Observations Model."""
+import sqlalchemy
 from geoalchemy2 import Geometry
 from lccs_db.models import LucClass
 from sqlalchemy import (Column, Date, ForeignKey, ForeignKeyConstraint, Index,
@@ -70,7 +71,7 @@ def make_dataset_table(table_name: str, create: bool = False) -> Table:
     s_name = f"{Config.SAMPLEDB_SCHEMA}.dataset_{table_name}_id_seq"
 
     if create:
-        if not db.engine.dialect.has_table(connection=db.engine, table_name=f'dataset_{table_name}', schema=Config.SAMPLEDB_SCHEMA):
+        if not sqlalchemy.inspect(db.engine).has_table(table_name=f'dataset_{table_name}', schema=Config.SAMPLEDB_SCHEMA):
             db.engine.execute(f"CREATE TABLE {Config.SAMPLEDB_SCHEMA}.dataset_{table_name} OF dataset_type")
             db.engine.execute(f"CREATE SEQUENCE {s_name}")
 

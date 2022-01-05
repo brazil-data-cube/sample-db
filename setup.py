@@ -95,6 +95,9 @@ setup(
         ],
         'bdc_db.namespaces': [
             'sample-db = sample_db.config:Config.SAMPLEDB_SCHEMA'
+        ],
+        'bdc.schemas':[
+            'sample-db = sample_db.jsonschemas'
         ]
     },
     install_requires=install_requires,

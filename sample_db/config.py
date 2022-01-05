@@ -11,6 +11,7 @@ import os
 
 CURRENT_DIR = os.path.dirname(__file__)
 
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
     """Define common config along contexts."""
