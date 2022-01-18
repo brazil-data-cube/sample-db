@@ -1,93 +1,88 @@
 {
-  "id": "lapig_pontos_de_campo_uso_cobertura",
-  "types": {
-    "resourceTypeGeneral": "Dataset",
-    "resourceType": "Dataset",
-    "schemaOrg": "Dataset",
-    "citeproc": "dataset",
-    "bibtex": "misc",
-    "ris": "DATA"
-  },
-  "creators": [
-    {
-      "@type": "Organization",
-      "familyName": "Laboratório de Processamento de Imagens e Geoprocessamento (Lapig)"
-    }
-  ],
-  "titles": {
-    "title": "Pontos coletados em campo de Uso e cobertura da terra",
-    "lang": "pt"
-  },
-  "subjects": [
-    {
-      "subject": "Uso e cobertura da terra",
-      "lang": "pt"
-    },
-    {
-      "subject": "Brasil",
-      "lang": "pt"
-    }
-  ],
-  "contributors": [
-    {
-      "contributorType": "HostingInstitution",
-      "name": "Laboratório de Processamento de Imagens e Geoprocessamento (Lapig)",
-      "nameType": "Organizational"
-    }
-  ],
-  "dates": [
-   {
-      "date": "2019",
-      "dateType": "Available",
-      "dateInformation": "Date of the publishing in symposium."
-   }
-  ],
-  "language": "pt",
-  "sizes": [],
-  "formats": [],
-  "version": "4.",
-  "rightsList": [
-    {
-      "rights": "Termos de Uso para os arquivos providos pelo LAPIG",
-      "rightsUri": "https://pastagem.org/index.php/en-us/"
-    }
-  ],
-  "descriptions": [
-    {
-      "description": "Nos últimos anos o LAPIG realizou vários trabalhos de campo, buscando coletar coordenadas de uso e cobertura do solo, bem com dados sobre forrageiras, condições e manejo de pastagens em vários municípios do Brasil.",
-      "descriptionType": "Abstract",
-      "lang": "pt"
-    }
-  ],
-  "geoLocations": [],
-  "fundingReferences": [
-    {
-      "funderName": "Fundacao Gordon and Betty Moore (GBMF)"
-    },
-    {
-      "funderName": "WWF Brasil"
-    },
-    {
-      "funderName": "Fundacao de Amparo a Pesquisa do Estado de Goias (FAPEG)"
-    },
-    {
-      "funderName": "Conselho Nacional de Desenvolvimento Cientifico e Tecnologico (CNPq)"
-    },
-    {
-      "funderName": "The Nature Conservancy (TNC)"
-    }
-  ],
-  "schemaVersion": "http://datacite.org/schema/kernel-4",
-  "agency": "LAPIG",
-  "state": "unfindable",
-  "relatedIdentifiers": [
-    {
-      "title": "ATLAS DIGITAL DAS PASTAGENS BRASILEIRAS: DADOS E INFORMAÇÕES SOBRE A MAIOR CLASSE DE USO DA TERRA DO BRASIL",
-      "relatedIdentifierType": "URL",
-      "relatedIdentifier": "https://proceedings.science/sbsr-2019/papers/atlas-digital-das-pastagens-brasileiras--dados-e-informacoes-sobre-a-maior-classe-de-uso-da-terra-do-brasil",
-      "relationType": "IsCitedBy",
-      "resourceTypeGeneral": "Text",
-      "relatedMetadataScheme": "application/pdf"
-    }
-  ]
+	"id": "10.1109/LGRS.2017.2789120",
+	"doi": "10.1109/LGRS.2017.2789120",
+	"types": {
+		"resourceTypeGeneral": "Dataset",
+		"resourceType": "Dataset",
+		"schemaOrg": "Dataset",
+		"citeproc": "dataset",
+		"bibtex": "misc",
+		"ris": "DATA"
+	},
+	"creators": [{
+		"@id": "https://orcid.org/0000-0002-3681-487X",
+		"@type": "Person",
+		"familyName": "Sanches",
+		"givenName": "Ieda DelArco",
+		"name": "Ieda DelArco"
+	}],
+	"titles": [{
+		"title": "Amostras Campo Verde, MT (Campo Verde Database)",
+		"lang": "en"
+	}],
+	"publisher": "IEEE GEOSCIENCE AND REMOTE SENSING LETTERS, VOL. 15, NO. 3, MARCH 2018",
+	"subjects": [{
+			"subject": "Agricultura",
+			"lang": "en"
+		},
+		{
+			"subject": "Cerrado",
+			"lang": "en"
+		}
+	],
+	"contributors": [{
+			"@id": "https://orcid.org/0000-0002-3681-487X",
+			"contributorType": "Researcher",
+			"name": "Ieda Del´Arco"
+		},
+		{
+			"@id": "https://orcid.org/0000-0001-9855-2046",
+			"contributorType": "Researcher",
+			"familyName": "Formaggio",
+			"name": "Antonio Roberto",
+			"identifier": "https://orcid.org/0000-0001-9855-2046"
+		},
+		{
+			"@id": "https://orcid.org/0000-0002-1467-6488",
+			"contributorType": "Researcher",
+			"name": "Alfredo José Barreto",
+			"identifier": "https://orcid.org/0000-0002-1467-6488"
+		},
+		{
+			"contributorType": "Researcher",
+			"name": "Bruno Schultz"
+		}
+	],
+	"dates": [{
+		"date": "2018",
+		"dateType": "Issued"
+	}],
+	"publicationYear": "2018",
+	"language": "en",
+	"identifiers": [{
+		"identifierType": "DOI",
+		"identifier": "10.1109/LGRS.2017.2789120"
+	}],
+	"sizes": [],
+	"formats": [],
+	"version": "",
+	"rightsList": [{
+		"rights": "Creative Commons Attribution 4.0 International",
+		"rightsUri": "https://creativecommons.org/licenses/by/4.0/"
+	}],
+	"descriptions": [{
+		"description": "Amostras coletadas no municipio de Campo Verde, MT para um ano agrícola. O objetivo foi coletar amostras de alvos encontrados no ambiente agrícola da região: culturas agrícolas (soja, algodão, milho, feijão, sorgo, ...), solo, cerrado, eucalipto, etc. Essas amostras foram coletadas no âmbito do projeto: Desenvolvimento e implementação de um sistema de monitoramento agrícola para o Brasil, via dados de satélite de observação da terra Projeto 402597/2012-5 (Programa Ciência sem Fronteiras). Os completos desse dataset pode ser obtido em: https://doi.org/10.21227/H2804B",
+		"descriptionType": "Abstract",
+		"lang": "en"
+	}],
+	"geoLocations": [],
+	"fundingReferences": [{
+		"funderName": "Programa Ciência sem Fronteiras",
+		"awardNumber": "402597/2012-5",
+		"awardTitle": "Projeto "
+	}],
+	"relatedIdentifiers": [],
+	"schemaVersion": "http://datacite.org/schema/kernel-4",
+	"agency": "INPE",
+	"state": "findable"
 }

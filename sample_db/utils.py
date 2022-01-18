@@ -6,6 +6,7 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 """Utils Interface for the Sample Database Model ."""
+import json
 import logging
 
 from bdc_db.db import db as _db
@@ -64,8 +65,6 @@ def add_dataset_data_file(dataset_name, dataset_version, user_id,
 
     driver_type = factory.get(mimetype)
 
-    _accessor = DBAccessor()
-
     with _db.session.begin_nested():
         try:
             ds = _db.session.query(Datasets)\
@@ -73,6 +72,8 @@ def add_dataset_data_file(dataset_name, dataset_version, user_id,
                 .first()
         except ValueError:
             raise RuntimeError(f'Dataset {dataset_name}-V{dataset_version} not found!')
+
+        _accessor = DBAccessor(system_id=ds.classification_system_id)
 
         driver: Driver = driver_type(entries=dataset_file,
                                      mappings=extra_fields['mappings_json'],
@@ -126,24 +127,31 @@ def create_dataset(user_id, classification_system_id, collect_method_id,
     extra_fields.setdefault('metadata_json', None)
     extra_fields.setdefault('is_public', True)
 
-    with _db.session.begin_nested():
-        ds = Datasets.create_ds_table(table_name=dataset_name, version=version)
-        ds.name = dataset_name
-        ds.title = title
-        ds.start_date = start_date
-        ds.end_date = end_date
-        ds.description = extra_fields["description"]
-        ds.version_predecessor = extra_fields["version_predecessor"]
-        ds.version_successor = extra_fields["version_successor"]
-        ds.is_public = extra_fields["is_public"]
-        ds.classification_system_id = classification_system_id
-        ds.collect_method_id = collect_method_id
-        ds.metadata_json = extra_fields['metadata_json']
-        ds.user_id = user_id
+    try:
+        with _db.session.begin_nested():
+            ds = Datasets.create_ds_table(table_name=dataset_name, version=version)
+            ds.name = dataset_name
+            ds.title = title
+            ds.start_date = start_date
+            ds.end_date = end_date
+            ds.description = extra_fields["description"]
+            ds.version_predecessor = extra_fields["version_predecessor"]
+            ds.version_successor = extra_fields["version_successor"]
+            ds.is_public = extra_fields["is_public"]
+            ds.classification_system_id = classification_system_id
+            ds.collect_method_id = collect_method_id
+            ds.metadata_json = extra_fields["metadata_json"]
+            ds.user_id = user_id
 
-        _db.session.add(ds)
+            _db.session.add(ds)
 
-    _db.session.commit()
+        _db.session.commit()
+
+    except Exception as e:
+        ds_table_name = f'{dataset_name.replace("-", "_")}_{version}'
+        _db.session.execute(f"DROP TABLE sampledb.dataset_{ds_table_name} CASCADE");
+        _db.session.commit()
+        raise RuntimeError(f'Error while create dataset {e}')
 
     return ds
 

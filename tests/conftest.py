@@ -24,7 +24,7 @@ def app():
 
 def pytest_sessionstart(session):
     """Load SAMPLE-DB and prepare database environment."""
-    for command in ['init', 'create-namespaces', 'create-extension-postgis', 'create-schema', 'load-scripts']:
+    for command in ['init', 'create-namespaces', 'create-extension-postgis',  'create-extension-hstore' , 'create-schema', 'load-scripts']:
         subprocess.call(f'sample-db db {command}', shell=True)
 
 

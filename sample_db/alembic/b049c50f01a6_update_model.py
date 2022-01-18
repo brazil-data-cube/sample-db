@@ -9,7 +9,6 @@ from alembic import op
 import sqlalchemy as sa
 
 from sqlalchemy.orm.session import Session
-from lccs_db.models import LucClassificationSystem
 from sample_db.models import Datasets, CollectMethod, DatasetView
 from sample_db.models.dataset_table import DatasetType
 
@@ -91,7 +90,7 @@ def upgrade():
                     "AND collect_method.id = datasets.collect_method_id;"
                     .format(DatasetView.__table__,
                             Datasets.__table__,
-                            LucClassificationSystem.__table__,
+                            'lccs.class_systems',
                             'sampledb.users',
                             CollectMethod.__table__)
                     )
@@ -166,7 +165,7 @@ def downgrade():
                     "AND collect_method.id = datasets.collect_method_id;"
                     .format(DatasetView.__table__,
                             Datasets.__table__,
-                            LucClassificationSystem.__table__,
+                            'lccs.class_systems',
                             'sampledb.users',
                             CollectMethod.__table__)
                     )

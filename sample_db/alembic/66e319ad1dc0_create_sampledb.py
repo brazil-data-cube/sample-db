@@ -9,11 +9,12 @@ from alembic import op
 import sqlalchemy as sa
 
 
+
 # revision identifiers, used by Alembic.
 revision = '66e319ad1dc0'
 down_revision = None
 branch_labels = ('sample_db',)
-depends_on = None
+depends_on = '237031a776fb' # LCCS-DB reference id
 
 
 def upgrade():

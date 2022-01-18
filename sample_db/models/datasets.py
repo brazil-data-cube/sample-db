@@ -6,8 +6,12 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 """SampleDB Datasets Model."""
+import json
+import pkgutil
 from typing import Dict, Iterable, Union
 
+from bdc_db.sqltypes import JSONB
+from jsonschema import draft7_format_checker
 from lccs_db.models import LucClass, LucClassificationSystem
 from lccs_db.models.base import BaseModel
 from sqlalchemy import (JSON, Boolean, Column, Date, ForeignKey, Index,
@@ -55,7 +59,8 @@ class Datasets(BaseModel):
     version_predecessor = Column(ForeignKey(id, onupdate='CASCADE', ondelete='CASCADE'))
     version_successor = Column(ForeignKey(id, onupdate='CASCADE', ondelete='CASCADE'))
     is_public = Column(Boolean(), nullable=False, default=True)
-    metadata_json = Column(JSON, nullable=True)
+    metadata_json = Column(JSONB(schema='sampledb/metadata.json',
+                                 draft_checker=None), nullable=True)
     classification_system_id = Column(Integer,
                                       ForeignKey(LucClassificationSystem.id, ondelete='CASCADE', onupdate='CASCADE'),
                                       nullable=False)
