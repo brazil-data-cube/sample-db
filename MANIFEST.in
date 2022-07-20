@@ -38,3 +38,4 @@ recursive-include docs Makefile
 recursive-include examples *.json
 recursive-include examples *.zip
 recursive-include sample_db *.sql
+recursive-include sample_db *.json
