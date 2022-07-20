@@ -32,7 +32,6 @@ You can see all namespaces::
     SQLALCHEMY_DATABASE_URI="postgresql://username:password@host:5432/dbname" \
     sample-db db show-namespaces
 
-
 Enable the ``PostGIS`` extension::
 
     SQLALCHEMY_DATABASE_URI="postgresql://username:password@host:5432/dbname" \
