@@ -53,7 +53,7 @@ setup_requires = [
 ]
 
 install_requires = [
-    'lccs-db @ git+https://github.com/brazil-data-cube/lccs-db.git@master',
+    'lccs-db @ git+https://github.com/brazil-data-cube/lccs-db.git@v0.8.1',
     'GeoAlchemy2>=0.6.3',
     'sqlalchemy-views>=0.2.4',
 ]
