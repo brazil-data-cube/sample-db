@@ -8,6 +8,15 @@
 Changes
 =======
 
+Version 0.9.0 (2022-07-21)
+--------------------------
+
+- Add support for new version of LCCS-DB: (`#87 <https://github.com/brazil-data-cube/sample-db/issues/87>`_).
+
+- Adding dataset metadata validation schema :(`#84 <https://github.com/brazil-data-cube/sample-db/issues/84>`_).
+
+- Fixing ArgumentError: dialect.has_table in make_dataset_table.
+
 
 Version 0.8.3 (2022-01-06)
 --------------------------
