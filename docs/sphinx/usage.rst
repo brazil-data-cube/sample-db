@@ -32,12 +32,15 @@ You can see all namespaces::
     SQLALCHEMY_DATABASE_URI="postgresql://username:password@host:5432/dbname" \
     sample-db db show-namespaces
 
-
 Enable the ``PostGIS`` extension::
 
     SQLALCHEMY_DATABASE_URI="postgresql://username:password@host:5432/dbname" \
     sample-db db create-extension-postgis
 
+Enable the extension named "``hstore``" in this database::
+
+    SQLALCHEMY_DATABASE_URI="postgresql://username:password@host:5432/dbname" \
+    sample-db db create-extension-hstore
 
 Creating the Sample Data Model
 ++++++++++++++++++++++++++++++
