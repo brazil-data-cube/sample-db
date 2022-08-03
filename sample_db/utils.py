@@ -140,7 +140,8 @@ def create_dataset(user_id, classification_system_id, collect_method_id,
             ds.is_public = extra_fields["is_public"]
             ds.classification_system_id = classification_system_id
             ds.collect_method_id = collect_method_id
-            ds.metadata_json = extra_fields["metadata_json"]
+            if extra_fields["metadata_json"]:
+                ds.metadata_json = extra_fields["metadata_json"]
             ds.user_id = user_id
 
             _db.session.add(ds)
@@ -149,7 +150,7 @@ def create_dataset(user_id, classification_system_id, collect_method_id,
 
     except Exception as e:
         ds_table_name = f'{dataset_name.replace("-", "_")}_{version}'
-        _db.session.execute(f"DROP TABLE sampledb.dataset_{ds_table_name} CASCADE");
+        _db.session.execute(f"DROP TABLE IF EXISTS sampledb.dataset_{ds_table_name} CASCADE");
         _db.session.commit()
         raise RuntimeError(f'Error while create dataset {e}')
 
