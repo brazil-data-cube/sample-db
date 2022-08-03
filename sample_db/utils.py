@@ -149,7 +149,7 @@ def create_dataset(user_id, classification_system_id, collect_method_id,
 
     except Exception as e:
         ds_table_name = f'{dataset_name.replace("-", "_")}_{version}'
-        _db.session.execute(f"DROP TABLE sampledb.dataset_{ds_table_name} CASCADE");
+        _db.session.execute(f"DROP TABLE IF EXISTS sampledb.dataset_{ds_table_name} CASCADE");
         _db.session.commit()
         raise RuntimeError(f'Error while create dataset {e}')
 
