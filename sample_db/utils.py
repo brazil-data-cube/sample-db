@@ -140,7 +140,8 @@ def create_dataset(user_id, classification_system_id, collect_method_id,
             ds.is_public = extra_fields["is_public"]
             ds.classification_system_id = classification_system_id
             ds.collect_method_id = collect_method_id
-            ds.metadata_json = extra_fields["metadata_json"]
+            if extra_fields["metadata_json"]:
+                ds.metadata_json = extra_fields["metadata_json"]
             ds.user_id = user_id
 
             _db.session.add(ds)
