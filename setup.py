@@ -1,9 +1,19 @@
 #
-# This file is part of Sample Database Model.
-# Copyright (C) 2020-2021 INPE.
+# This file is part of SAMPLE-DB.
+# Copyright (C) 2022 INPE.
 #
-# Sample Database Model is free software; you can redistribute it and/or modify it
-# under the terms of the MIT License; see LICENSE file for more details.
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.html>.
 #
 """Sample-db setup."""
 
@@ -69,7 +79,7 @@ setup(
     version=version,
     description=__doc__,
     keywords=['Land Use Land Cover', 'GIS', 'Database', 'Model', 'Samples'],
-    license='MIT',
+    license='GPLv3',
     author='Brazil Data Cube Team',
     author_email='brazildatacube@inpe.br',
     url='https://github.com/brazil-data-cube/sample-db',
@@ -108,7 +118,7 @@ setup(
         'Environment :: Web Environment',
         'Intended Audience :: Education',
         'Intended Audience :: Science/Research',
-        'License :: OSI Approved :: MIT License',
+        'License :: OSI Approved :: GPL v3 License',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3 :: Only',
         'Topic :: Scientific/Engineering :: GIS',
