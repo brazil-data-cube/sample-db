@@ -14,6 +14,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.html>.
+
 Usage
 =====
 
@@ -72,7 +73,8 @@ You should get a similar output::
     sampledb | collect_method     | table | postgres
     sampledb | datasets           | table | postgres
     sampledb | provenance         | table | postgres
-    (3 rows)
+    sampledb | users              | table | postgres
+    (4 rows)
 
 
 Setting up PL/pgSQL Triggers and Loading default script data
