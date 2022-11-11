@@ -29,6 +29,7 @@ from sqlalchemy_views import CreateView
 
 from ..config import Config
 from .base import db, metadata
+from .users import Users
 
 
 class DatasetType(UserDefinedType):
@@ -118,6 +119,10 @@ def make_dataset_table(table_name: str, create: bool = False) -> Table:
             db.engine.execute(AddConstraint(
                 ForeignKeyConstraint(name=f"dataset_{table_name}_{klass.c.class_id.name}_fkey",
                                      columns=[klass.c.class_id], refcolumns=[LucClass.id], onupdate="CASCADE",
+                                     ondelete="CASCADE")))
+            db.engine.execute(AddConstraint(
+                ForeignKeyConstraint(name=f"dataset_{table_name}_{klass.c.user_id.name}_fkey",
+                                     columns=[klass.c.user_id], refcolumns=[Users.id], onupdate="CASCADE",
                                      ondelete="CASCADE")))
         else:
             raise RuntimeError(f'Table {table_name} already exists')

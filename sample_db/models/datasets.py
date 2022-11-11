@@ -34,9 +34,9 @@ from sqlalchemy_views import CreateView
 from ..config import Config
 from .base import db as _db
 from .dataset_table import make_dataset_table
+from .users import Users
 
 Feature = Dict[str, str]
-
 
 class CollectMethod(BaseModel):
     """Collect Method Model."""
@@ -76,7 +76,7 @@ class Datasets(BaseModel):
                                       nullable=False)
     collect_method_id = Column(Integer, ForeignKey(CollectMethod.id, ondelete='CASCADE', onupdate='CASCADE'),
                                nullable=True)
-    user_id = Column(Integer, nullable=False)
+    user_id = Column(Integer, ForeignKey(Users.id, ondelete='CASCADE'), nullable=False)
 
     __table_args__ = (
         Index(None, user_id),

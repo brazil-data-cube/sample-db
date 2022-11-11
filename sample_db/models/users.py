@@ -15,10 +15,29 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.html>.
 #
-"""SampleDB Provenance Model."""
-from sample_db.models.datasets import CollectMethod, Datasets, DatasetView
-from sample_db.models.provenance import Provenance
-from sample_db.models.users import Users
 
-__all__ = ['Datasets', 'Users', 'Provenance', 'CollectMethod', 'DatasetView']
+from bdc_db.sqltypes import JSONB
+from lccs_db.models.base import BaseModel
+from sqlalchemy import (Column, ForeignKey, Index, Integer,
+                        PrimaryKeyConstraint, String)
 
+from ..config import Config
+
+
+class Users(BaseModel):
+    """User Model."""
+
+    __tablename__ = 'users'
+
+    id = Column(Integer, primary_key=True)
+    email = Column(String(255), nullable=False, unique=True)
+    name = Column(String(255), nullable=False)
+    institution = Column(String(255), nullable=False)
+    user_id = Column(Integer, nullable=False)
+
+    __table_args__ = (
+        Index(None, email),
+        Index(None, name),
+        Index(None, institution),
+        dict(schema=Config.SAMPLEDB_SCHEMA),
+    )
