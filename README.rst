@@ -1,33 +1,34 @@
 ..
-    This file is part of Sample Database.
-    Copyright (C) 2020-2021 INPE.
+    This file is part of SAMPLE-DB.
+    Copyright (C) 2022 INPE.
 
-    Sample Database Module is free software; you can redistribute it and/or modify it
-    under the terms of the MIT License; see LICENSE file for more details.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.html>.
 
 
 ========================================
 Brazil Data Cube - Sample Database Model
 ========================================
 
-.. image:: https://img.shields.io/badge/license-MIT-green
-        :target: https://github.com//brazil-data-cube/sample-db/blob/master/LICENSE
+.. image:: https://img.shields.io/badge/License-GPLv3-blue.svg
+        :target: https://github.com/brazil-data-cube/sample-db/blob/master/LICENSE
         :alt: Software License
-
-.. image:: https://drone.dpi.inpe.br/api/badges/brazil-data-cube/sample-db/status.svg
-        :target: https://drone.dpi.inpe.br/brazil-data-cube/sample-db
-        :alt: Build Status
-
-.. image:: https://codecov.io/gh/brazil-data-cube/sample-db/branch/master/graph/badge.svg?token=WIJ67G1AAO
-        :target: https://codecov.io/gh/brazil-data-cube/sample-db
-        :alt: Code Coverage Test
 
 .. image:: https://readthedocs.org/projects/sample-db/badge/?version=latest
         :target: https://sample-db.readthedocs.io/en/latest/
         :alt: Documentation Status
 
-
-.. image:: https://img.shields.io/badge/lifecycle-experimental-orange.svg
+.. image:: https://img.shields.io/badge/lifecycle-stable-green.svg
         :target: https://www.tidyverse.org/lifecycle/#experimental
         :alt: Software Life Cycle
 
@@ -87,7 +88,9 @@ License
 =======
 
 .. admonition::
-    Copyright (C) 2020-2021 INPE.
+    Copyright (C) 2022 INPE.
 
-    Brazil Data Cube Sample Database Module is free software; you can redistribute it and/or modify it
-    under the terms of the MIT License; see LICENSE file for more details.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
