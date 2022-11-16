@@ -20,17 +20,15 @@
 Brazil Data Cube - Sample Database Model
 ========================================
 
-.. image:: https://img.shields.io/badge/lifecycle-stable-green.svg
+.. image:: https://img.shields.io/badge/License-GPLv3-blue.svg
         :target: https://github.com/brazil-data-cube/sample-db/blob/master/LICENSE
         :alt: Software License
-
 
 .. image:: https://readthedocs.org/projects/sample-db/badge/?version=latest
         :target: https://sample-db.readthedocs.io/en/latest/
         :alt: Documentation Status
 
-
-.. image:: https://img.shields.io/badge/lifecycle-experimental-orange.svg
+.. image:: https://img.shields.io/badge/lifecycle-stable-green.svg
         :target: https://www.tidyverse.org/lifecycle/#experimental
         :alt: Software Life Cycle
 
