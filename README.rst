@@ -21,7 +21,7 @@ Brazil Data Cube - Sample Database Model
 ========================================
 
 .. image:: https://img.shields.io/badge/License-GPLv3-blue.svg
-        :target: https://github.com/brazil-data-cube/bdc-catalog/blob/master/LICENSE
+        :target: https://github.com/brazil-data-cube/sample-db/blob/master/LICENSE
         :alt: Software License
 
 .. image:: https://drone.dpi.inpe.br/api/badges/brazil-data-cube/sample-db/status.svg
