@@ -76,7 +76,7 @@ class Datasets(BaseModel):
                                       nullable=False)
     collect_method_id = Column(Integer, ForeignKey(CollectMethod.id, ondelete='CASCADE', onupdate='CASCADE'),
                                nullable=True)
-    user_id = Column(Integer, ForeignKey(Users.id, ondelete='CASCADE'), nullable=False)
+    user_id = Column(Integer, ForeignKey(Users.user_id, ondelete='CASCADE'), nullable=False)
 
     __table_args__ = (
         Index(None, user_id),

@@ -122,7 +122,7 @@ def make_dataset_table(table_name: str, create: bool = False) -> Table:
                                      ondelete="CASCADE")))
             db.engine.execute(AddConstraint(
                 ForeignKeyConstraint(name=f"dataset_{table_name}_{klass.c.user_id.name}_fkey",
-                                     columns=[klass.c.user_id], refcolumns=[Users.id], onupdate="CASCADE",
+                                     columns=[klass.c.user_id], refcolumns=[Users.user_id], onupdate="CASCADE",
                                      ondelete="CASCADE")))
         else:
             raise RuntimeError(f'Table {table_name} already exists')
