@@ -17,6 +17,13 @@
 Changes
 =======
 
+
+Version 0.9.1 (2022-11-16)
+--------------------------
+
+- Change LICENSE to GPL v3 (`#91 <https://github.com/brazil-data-cube/sample-db/issues/91>`_).
+
+
 Version 0.9.0 (2022-08-03)
 --------------------------
 
