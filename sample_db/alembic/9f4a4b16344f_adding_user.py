@@ -28,11 +28,13 @@ def upgrade():
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.PrimaryKeyConstraint('id', name=op.f('users_pkey')),
     sa.UniqueConstraint('email', name=op.f('users_email_key')),
+    sa.UniqueConstraint('user_id', name=op.f('users_user_id_key')),
     schema='sampledb'
     )
     op.create_index(op.f('idx_sampledb_users_email'), 'users', ['email'], unique=False, schema='sampledb')
     op.create_index(op.f('idx_sampledb_users_institution'), 'users', ['institution'], unique=False, schema='sampledb')
     op.create_index(op.f('idx_sampledb_users_name'), 'users', ['name'], unique=False, schema='sampledb')
+    op.create_index(op.f('idx_sampledb_users_name'), 'users', ['user_id'], unique=False, schema='sampledb')
     op.create_foreign_key(op.f('datasets_user_id_users_fkey'), 'datasets', 'users', ['user_id'], ['user_id'], source_schema='sampledb', referent_schema='sampledb', ondelete='CASCADE')
     # ### end Alembic commands ###
 

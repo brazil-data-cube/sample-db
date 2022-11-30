@@ -33,11 +33,12 @@ class Users(BaseModel):
     email = Column(String(255), nullable=False, unique=True)
     name = Column(String(255), nullable=False)
     institution = Column(String(255), nullable=False)
-    user_id = Column(Integer, nullable=False)
+    user_id = Column(Integer, nullable=False, unique=True)
 
     __table_args__ = (
         Index(None, email),
         Index(None, name),
         Index(None, institution),
+        Index(None, user_id),
         dict(schema=Config.SAMPLEDB_SCHEMA),
     )
