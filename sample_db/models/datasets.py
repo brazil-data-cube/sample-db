@@ -147,13 +147,15 @@ class Datasets(BaseModel):
                f'LOWER(ds.name) = LOWER(\'{ds_name}\') AND ' \
                f'LOWER(ds.version) = LOWER(\'{ds_version}\')'
 
-        res = _db.session.execute(expr).fetchone()
+        try:
+            res =  _db.session.execute(expr).fetchone()
+            if res:
+                return Table(res.table_name, _db.metadata, schema=Config.SAMPLEDB_SCHEMA, autoload=True,
+                             autoload_with=_db.engine)
 
-        if res:
-            return Table(res.table_name, _db.metadata, schema=Config.SAMPLEDB_SCHEMA, autoload=True,
-                         autoload_with=_db.engine)
-
-        return None
+            return None
+        finally:
+            _db.session.close()
 
     @property
     def ds_table(self) -> Union[Table, None]:
