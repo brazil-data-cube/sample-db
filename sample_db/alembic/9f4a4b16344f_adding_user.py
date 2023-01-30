@@ -34,7 +34,7 @@ def upgrade():
     op.create_index(op.f('idx_sampledb_users_email'), 'users', ['email'], unique=False, schema='sampledb')
     op.create_index(op.f('idx_sampledb_users_institution'), 'users', ['institution'], unique=False, schema='sampledb')
     op.create_index(op.f('idx_sampledb_users_name'), 'users', ['name'], unique=False, schema='sampledb')
-    op.create_index(op.f('idx_sampledb_users_name'), 'users', ['user_id'], unique=False, schema='sampledb')
+    op.create_index(op.f('idx_sampledb_users_user_id'), 'users', ['user_id'], unique=False, schema='sampledb')
     op.create_foreign_key(op.f('datasets_user_id_users_fkey'), 'datasets', 'users', ['user_id'], ['user_id'], source_schema='sampledb', referent_schema='sampledb', ondelete='CASCADE')
     # ### end Alembic commands ###
 
@@ -45,5 +45,6 @@ def downgrade():
     op.drop_index(op.f('idx_sampledb_users_name'), table_name='users', schema='sampledb')
     op.drop_index(op.f('idx_sampledb_users_institution'), table_name='users', schema='sampledb')
     op.drop_index(op.f('idx_sampledb_users_email'), table_name='users', schema='sampledb')
+    op.drop_index(op.f('idx_sampledb_users_user_id'), table_name='users', schema='sampledb')
     op.drop_table('users', schema='sampledb')
     # ### end Alembic commands ###
