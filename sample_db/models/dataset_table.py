@@ -29,6 +29,7 @@ from sqlalchemy_views import CreateView
 
 from ..config import Config
 from .base import db, metadata
+from .users import Users
 
 
 class DatasetType(UserDefinedType):
@@ -81,7 +82,7 @@ def make_dataset_table(table_name: str, create: bool = False) -> Table:
     s_name = f"{Config.SAMPLEDB_SCHEMA}.dataset_{table_name}_id_seq"
 
     if create:
-        if not sqlalchemy.inspect(db.engine).has_table(table_name=f'dataset_{table_name}', schema=Config.SAMPLEDB_SCHEMA):
+        if not db.engine.dialect.has_table(table_name=f'dataset_{table_name}', connection=db.session, schema=Config.SAMPLEDB_SCHEMA):
             db.engine.execute(f"CREATE TABLE {Config.SAMPLEDB_SCHEMA}.dataset_{table_name} OF dataset_type")
             db.engine.execute(f"CREATE SEQUENCE {s_name}")
 
@@ -118,6 +119,10 @@ def make_dataset_table(table_name: str, create: bool = False) -> Table:
             db.engine.execute(AddConstraint(
                 ForeignKeyConstraint(name=f"dataset_{table_name}_{klass.c.class_id.name}_fkey",
                                      columns=[klass.c.class_id], refcolumns=[LucClass.id], onupdate="CASCADE",
+                                     ondelete="CASCADE")))
+            db.engine.execute(AddConstraint(
+                ForeignKeyConstraint(name=f"dataset_{table_name}_{klass.c.user_id.name}_fkey",
+                                     columns=[klass.c.user_id], refcolumns=[Users.user_id], onupdate="CASCADE",
                                      ondelete="CASCADE")))
         else:
             raise RuntimeError(f'Table {table_name} already exists')

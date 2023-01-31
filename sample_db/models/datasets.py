@@ -34,9 +34,9 @@ from sqlalchemy_views import CreateView
 from ..config import Config
 from .base import db as _db
 from .dataset_table import make_dataset_table
+from .users import Users
 
 Feature = Dict[str, str]
-
 
 class CollectMethod(BaseModel):
     """Collect Method Model."""
@@ -76,7 +76,7 @@ class Datasets(BaseModel):
                                       nullable=False)
     collect_method_id = Column(Integer, ForeignKey(CollectMethod.id, ondelete='CASCADE', onupdate='CASCADE'),
                                nullable=True)
-    user_id = Column(Integer, nullable=False)
+    user_id = Column(Integer, ForeignKey(Users.user_id, ondelete='CASCADE'), nullable=False)
 
     __table_args__ = (
         Index(None, user_id),
@@ -147,13 +147,15 @@ class Datasets(BaseModel):
                f'LOWER(ds.name) = LOWER(\'{ds_name}\') AND ' \
                f'LOWER(ds.version) = LOWER(\'{ds_version}\')'
 
-        res = _db.session.execute(expr).fetchone()
+        try:
+            res =  _db.session.execute(expr).fetchone()
+            if res:
+                return Table(res.table_name, _db.metadata, schema=Config.SAMPLEDB_SCHEMA, autoload=True,
+                             autoload_with=_db.engine)
 
-        if res:
-            return Table(res.table_name, _db.metadata, schema=Config.SAMPLEDB_SCHEMA, autoload=True,
-                         autoload_with=_db.engine)
-
-        return None
+            return None
+        finally:
+            _db.session.close()
 
     @property
     def ds_table(self) -> Union[Table, None]:

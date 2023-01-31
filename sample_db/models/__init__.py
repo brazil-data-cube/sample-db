@@ -18,6 +18,7 @@
 """SampleDB Provenance Model."""
 from sample_db.models.datasets import CollectMethod, Datasets, DatasetView
 from sample_db.models.provenance import Provenance
+from sample_db.models.users import Users
 
-__all__ = ['Datasets', 'Provenance', 'CollectMethod', 'DatasetView']
+__all__ = ['Datasets', 'Users', 'Provenance', 'CollectMethod', 'DatasetView']
 
