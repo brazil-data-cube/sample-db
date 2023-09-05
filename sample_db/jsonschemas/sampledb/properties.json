@@ -1,0 +1,130 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "properties.json",
+    "type": "object",
+    "title": "Dataset properties JSONSchema",
+    "description": "Define the properties for dataset.",
+     "required": [
+        "identifiers",
+        "creators",
+        "titles",
+        "publisher",
+        "publicationYear",
+        "types",
+        "schemaVersion"
+    ],
+    "definitions": {
+        "plataformType": {
+            "type": "string",
+            "enum": [
+                "TerraCollect",
+                "QGIS",
+                "CollectEarth"
+            ]
+        },
+    	"collections_type": {
+            "type": "string",
+            "title": "The collection identifier.",
+            "description": "The collection identifier used in Brazil Data Cube STAC."
+        },
+        "stac_cloud_cover": {
+            "type": "number",
+            "title": "The stac cloud cover factor.",
+            "description": "The stac cloud cover factor.",
+            "default": 80,
+            "minimum": 0,
+            "maximum": 100,
+            "examples": [
+                "0.9"
+            ]
+        },
+        "external_type": {
+            "type": "object",
+             "required": [
+                "collection",
+                "rgb",
+                "url"
+            ],
+            "properties": {
+                "collection": {
+                    "type": "string",
+                    "title": "The collection map name.",
+                    "description": "The collection map name.",
+                    "examples": [
+                        "Planet Maps"
+                    ]
+                },
+                "url": {
+                    "type": "string",
+                    "title": "The collection map url.",
+                    "description": "The collection map url.",
+                    "examples": [
+                        "https://earth-search.aws.element84.com/v0/"
+                    ]
+                },
+                "rgb": {
+                    "type": "object",
+                     "required": [
+                        "red",
+                        "blue",
+                        "green"
+                    ],
+                    "properties": {
+                        "red": {
+                            "type": "string",
+                            "title": "The red band.",
+                            "description": "The red band.",
+                            "examples": [
+                                "B04"
+                            ]
+                        },
+                        "blue": {
+                            "type": "string",
+                            "title": "The blue band.",
+                            "description": "The blue band.",
+                            "examples": [
+                                "B02"
+                            ]
+                        },
+                        "green": {
+                            "type": "string",
+                            "title": "The green band.",
+                            "description": "The green band.",
+                            "examples": [
+                                "B03"
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+
+    },
+    "additionalProperties": false,
+	"properties": {
+		"name-type": {
+     		"$id": "#/properties/name-type",
+            "type": "string",
+			"$ref": "#/definitions/nameType"
+		},
+        "bdc-stac": {
+            "$id": "#/properties/bdc-stac",
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/collections_type"
+            }
+        },
+        "external-stac": {
+            "$id": "#/properties/external-stac",
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/external_type"
+            }
+        },
+        "stac_cloud_cover": {
+            "$id": "#/properties/stac_cloud_cover",
+            "type": "number",
+            "$ref": "#/definitions/stac_cloud_cover"
+        }
+    }
+}

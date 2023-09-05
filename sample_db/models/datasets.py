@@ -24,7 +24,7 @@ from bdc_db.sqltypes import JSONB
 from jsonschema import draft7_format_checker
 from lccs_db.models import LucClass, LucClassificationSystem
 from lccs_db.models.base import BaseModel
-from sqlalchemy import (JSON, Boolean, Column, Date, ForeignKey, Index,
+from sqlalchemy import (JSON, Boolean, Column, Date, Enum, ForeignKey, Index,
                         Integer, String, Table, Text, UniqueConstraint, select)
 from sqlalchemy.dialects.postgresql import OID
 from sqlalchemy.sql import and_, func
@@ -37,6 +37,8 @@ from .dataset_table import make_dataset_table
 from .users import Users
 
 Feature = Dict[str, str]
+
+enum_status_type = Enum('IN PROGRESS', 'PUBLISHED', 'IN REVISION', name='status_type')
 
 class CollectMethod(BaseModel):
     """Collect Method Model."""
@@ -68,7 +70,11 @@ class Datasets(BaseModel):
     version = Column(String, nullable=False)
     version_predecessor = Column(ForeignKey(id, onupdate='CASCADE', ondelete='CASCADE'))
     version_successor = Column(ForeignKey(id, onupdate='CASCADE', ondelete='CASCADE'))
-    is_public = Column(Boolean(), nullable=False, default=True)
+    is_public = Column(Boolean(), nullable=False, default=False)
+    users = Column(ARRAY(Integer), nullable=False)
+    status = Column(ARRAY(enum_status_type), nullable=False)
+    properties = Column(JSONB(schema='sampledb/properties.json',
+                                 draft_checker=None), nullable=True)
     metadata_json = Column(JSONB(schema='sampledb/metadata.json',
                                  draft_checker=None), nullable=True)
     classification_system_id = Column(Integer,
