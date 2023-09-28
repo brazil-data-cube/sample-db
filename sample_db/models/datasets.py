@@ -24,7 +24,7 @@ from bdc_db.sqltypes import JSONB
 from jsonschema import draft7_format_checker
 from lccs_db.models import LucClass, LucClassificationSystem
 from lccs_db.models.base import BaseModel
-from sqlalchemy import (JSON, Boolean, Column, Date, Enum, ForeignKey, Index,
+from sqlalchemy import (ARRAY, JSON, Boolean, Column, Date, Enum, ForeignKey, Index,
                         Integer, String, Table, Text, UniqueConstraint, select)
 from sqlalchemy.dialects.postgresql import OID
 from sqlalchemy.sql import and_, func
@@ -71,7 +71,7 @@ class Datasets(BaseModel):
     version_predecessor = Column(ForeignKey(id, onupdate='CASCADE', ondelete='CASCADE'))
     version_successor = Column(ForeignKey(id, onupdate='CASCADE', ondelete='CASCADE'))
     is_public = Column(Boolean(), nullable=False, default=False)
-    users = Column(ARRAY(Integer), nullable=False)
+    users = Column(ARRAY(Integer), nullable=True)
     status = Column(ARRAY(enum_status_type), nullable=False)
     properties = Column(JSONB(schema='sampledb/properties.json',
                                  draft_checker=None), nullable=True)
