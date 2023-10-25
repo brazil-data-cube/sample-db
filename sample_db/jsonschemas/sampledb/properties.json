@@ -4,17 +4,8 @@
     "type": "object",
     "title": "Dataset properties JSONSchema",
     "description": "Define the properties for dataset.",
-     "required": [
-        "identifiers",
-        "creators",
-        "titles",
-        "publisher",
-        "publicationYear",
-        "types",
-        "schemaVersion"
-    ],
     "definitions": {
-        "plataformType": {
+        "platformType": {
             "type": "string",
             "enum": [
                 "TerraCollect",
@@ -102,20 +93,20 @@
     },
     "additionalProperties": false,
 	"properties": {
-		"name-type": {
-     		"$id": "#/properties/name-type",
+		"platform_type": {
+     		"$id": "#/properties/platform_type",
             "type": "string",
-			"$ref": "#/definitions/nameType"
+			"$ref": "#/definitions/platformType"
 		},
-        "bdc-stac": {
-            "$id": "#/properties/bdc-stac",
+        "bdc_stac": {
+            "$id": "#/properties/bdc_stac",
             "type": "array",
             "items": {
                 "$ref": "#/definitions/collections_type"
             }
         },
-        "external-stac": {
-            "$id": "#/properties/external-stac",
+        "external_stac": {
+            "$id": "#/properties/external_stac",
             "type": "array",
             "items": {
                 "$ref": "#/definitions/external_type"
@@ -126,5 +117,11 @@
             "type": "number",
             "$ref": "#/definitions/stac_cloud_cover"
         }
-    }
+    },
+    "required": [
+        "platform_type",
+        "bdc_stac",
+        "external_stac",
+        "stac_cloud_cover"
+    ]
 }
