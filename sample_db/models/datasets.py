@@ -38,7 +38,7 @@ from .users import Users
 
 Feature = Dict[str, str]
 
-enum_status_type = Enum('IN PROGRESS', 'PUBLISHED', 'IN REVISION', name='status_type')
+enum_status_type = Enum('IN_PROGRESS', 'PUBLISHED', 'IN_REVISION', name='status_type')
 
 class CollectMethod(BaseModel):
     """Collect Method Model."""
