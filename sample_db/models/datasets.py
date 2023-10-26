@@ -38,7 +38,7 @@ from .users import Users
 
 Feature = Dict[str, str]
 
-enum_status_type = Enum('IN PROGRESS', 'PUBLISHED', 'IN REVISION', name='status_type')
+enum_status_type = Enum('IN_PROGRESS', 'PUBLISHED', 'IN_REVISION', name='status_type')
 
 class CollectMethod(BaseModel):
     """Collect Method Model."""
@@ -72,7 +72,7 @@ class Datasets(BaseModel):
     version_successor = Column(ForeignKey(id, onupdate='CASCADE', ondelete='CASCADE'))
     is_public = Column(Boolean(), nullable=False, default=False)
     users = Column(ARRAY(Integer), nullable=True)
-    status = Column(ARRAY(enum_status_type), nullable=False)
+    status = Column(enum_status_type, nullable=False)
     properties = Column(JSONB(schema='sampledb/properties.json',
                                  draft_checker=None), nullable=True)
     metadata_json = Column(JSONB(schema='sampledb/metadata.json',
