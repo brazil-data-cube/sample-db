@@ -24,7 +24,7 @@ def upgrade():
     status_type.create(bind)
 
     op.add_column('datasets', sa.Column('users', sa.ARRAY(sa.Integer()), nullable=True), schema='sampledb')
-    op.add_column('datasets', sa.Column('status', sa.ARRAY(sa.Enum('IN_PROGRESS', 'PUBLISHED', 'IN_REVISION', name='status_type')), nullable=False, server_default='{IN PROGRESS}'), schema='sampledb')
+    op.add_column('datasets', sa.Column('status', sa.Enum('IN_PROGRESS', 'PUBLISHED', 'IN_REVISION', name='status_type'), nullable=False, server_default='IN_PROGRESS'), schema='sampledb')
     op.add_column('datasets', sa.Column('properties', postgresql.JSONB(astext_type=sa.Text()), nullable=True), schema='sampledb')
     op.alter_column('datasets', 'metadata_json',
                existing_type=postgresql.JSON(astext_type=sa.Text()),
