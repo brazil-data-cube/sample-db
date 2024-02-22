@@ -24,8 +24,9 @@ from bdc_db.sqltypes import JSONB
 from jsonschema import draft7_format_checker
 from lccs_db.models import LucClass, LucClassificationSystem
 from lccs_db.models.base import BaseModel
-from sqlalchemy import (ARRAY, JSON, Boolean, Column, Date, Enum, ForeignKey, Index,
-                        Integer, String, Table, Text, UniqueConstraint, select)
+from sqlalchemy import (ARRAY, JSON, Boolean, Column, Date, Enum, ForeignKey,
+                        Index, Integer, String, Table, Text, UniqueConstraint,
+                        select)
 from sqlalchemy.dialects.postgresql import OID
 from sqlalchemy.sql import and_, func
 from sqlalchemy_utils import create_view
