@@ -17,7 +17,7 @@
 Changes
 =======
 
-Version 1.0.0 (2024-02-22)
+Version 1.0.0 (2024-02-23)
 --------------------------
 
 - Added users table (`#96 <https://github.com/brazil-data-cube/sample-db/issues/96>`_).
