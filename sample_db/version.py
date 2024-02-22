@@ -21,7 +21,4 @@ This file is imported by ``sample_db.__init__``,
 and parsed by ``setup.py``.
 """
 
-
-
 __version__ = '1.0.0'
-

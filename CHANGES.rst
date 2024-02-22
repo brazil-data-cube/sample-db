@@ -23,7 +23,7 @@ Version 1.0.0 (2024-02-22)
 - Added users table (`#96 <https://github.com/brazil-data-cube/sample-db/issues/96>`_).
 - Bug fix: Fixed error in dataset validation sqlalchemy.inspect is not valid (`#97 <https://github.com/brazil-data-cube/sample-db/issues/97>`_).
 - Bug fix: Fixed problem with multiple connections when opening the dataset table retrieval function (`#98 <https://github.com/brazil-data-cube/sample-db/issues/98>`_).
-- Updated the lccs-db version (`#96 <https://github.com/brazil-data-cube/sample-db/issues/96>`_).
+- Updated the lccs-db version (`#102 <https://github.com/brazil-data-cube/sample-db/issues/102>`_).
 
 Version 0.9.1 (2022-11-16)
 --------------------------
