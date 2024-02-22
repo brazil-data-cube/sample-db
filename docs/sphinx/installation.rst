@@ -54,7 +54,7 @@ Install in development mode::
 
     *1.* Create a new virtual environment linked to Python 3.7::
 
-        python3.7 -m venv venv
+        python3.11 -m venv venv
 
 
     **2.** Activate the new environment::
@@ -80,10 +80,9 @@ Run the tests::
 Build the Documentation
 +++++++++++++++++++++++
 
-
 You can generate the documentation based on Sphinx with the following command::
 
-    python setup.py build_sphinx
+    sphinx-build docs/sphinx docs/sphinx/_build/html
 
 
 The above command will generate the documentation in HTML and it will place it under::
@@ -94,13 +93,3 @@ The above command will generate the documentation in HTML and it will place it u
 You can open the above documentation in your favorite browser, as::
 
     firefox docs/sphinx/_build/html/index.html
-
-
-Production Installation - GitHub
---------------------------------
-
-
-Install from GitHub::
-
-    pip3 install git+https://github.com/brazil-data-cube/sample-db
-
