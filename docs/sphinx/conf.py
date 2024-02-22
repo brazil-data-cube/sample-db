@@ -29,7 +29,7 @@ import sphinx_rtd_theme
 # -- Project information -----------------------------------------------------
 
 project = 'SAMPLE-DB'
-copyright = '2022, INPE'
+copyright = '2024, INPE'
 author = 'Brazil Data Cube Team'
 release = sample_db.__version__
 
