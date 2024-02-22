@@ -136,6 +136,7 @@ def create_dataset(user_id, classification_system_id, collect_method_id,
     extra_fields.setdefault('version_successor', None)
     extra_fields.setdefault('metadata_json', None)
     extra_fields.setdefault('is_public', True)
+    extra_fields.setdefault('status', 'IN_PROGRESS')
 
     try:
         with _db.session.begin_nested():
@@ -148,6 +149,7 @@ def create_dataset(user_id, classification_system_id, collect_method_id,
             ds.version_predecessor = extra_fields["version_predecessor"]
             ds.version_successor = extra_fields["version_successor"]
             ds.is_public = extra_fields["is_public"]
+            ds.status = extra_fields["status"]
             ds.classification_system_id = classification_system_id
             ds.collect_method_id = collect_method_id
             if extra_fields["metadata_json"]:

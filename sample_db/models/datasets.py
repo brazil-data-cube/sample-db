@@ -24,8 +24,9 @@ from bdc_db.sqltypes import JSONB
 from jsonschema import draft7_format_checker
 from lccs_db.models import LucClass, LucClassificationSystem
 from lccs_db.models.base import BaseModel
-from sqlalchemy import (JSON, Boolean, Column, Date, ForeignKey, Index,
-                        Integer, String, Table, Text, UniqueConstraint, select)
+from sqlalchemy import (ARRAY, JSON, Boolean, Column, Date, Enum, ForeignKey,
+                        Index, Integer, String, Table, Text, UniqueConstraint,
+                        select)
 from sqlalchemy.dialects.postgresql import OID
 from sqlalchemy.sql import and_, func
 from sqlalchemy_utils import create_view
@@ -34,9 +35,11 @@ from sqlalchemy_views import CreateView
 from ..config import Config
 from .base import db as _db
 from .dataset_table import make_dataset_table
+from .users import Users
 
 Feature = Dict[str, str]
 
+enum_status_type = Enum('IN_PROGRESS', 'PUBLISHED', 'IN_REVISION', name='status_type')
 
 class CollectMethod(BaseModel):
     """Collect Method Model."""
@@ -68,7 +71,11 @@ class Datasets(BaseModel):
     version = Column(String, nullable=False)
     version_predecessor = Column(ForeignKey(id, onupdate='CASCADE', ondelete='CASCADE'))
     version_successor = Column(ForeignKey(id, onupdate='CASCADE', ondelete='CASCADE'))
-    is_public = Column(Boolean(), nullable=False, default=True)
+    is_public = Column(Boolean(), nullable=False, default=False)
+    users = Column(ARRAY(Integer), nullable=True)
+    status = Column(enum_status_type, nullable=False)
+    properties = Column(JSONB(schema='sampledb/properties.json',
+                                 draft_checker=None), nullable=True)
     metadata_json = Column(JSONB(schema='sampledb/metadata.json',
                                  draft_checker=None), nullable=True)
     classification_system_id = Column(Integer,
@@ -76,7 +83,7 @@ class Datasets(BaseModel):
                                       nullable=False)
     collect_method_id = Column(Integer, ForeignKey(CollectMethod.id, ondelete='CASCADE', onupdate='CASCADE'),
                                nullable=True)
-    user_id = Column(Integer, nullable=False)
+    user_id = Column(Integer, ForeignKey(Users.user_id, ondelete='CASCADE'), nullable=False)
 
     __table_args__ = (
         Index(None, user_id),
@@ -147,13 +154,15 @@ class Datasets(BaseModel):
                f'LOWER(ds.name) = LOWER(\'{ds_name}\') AND ' \
                f'LOWER(ds.version) = LOWER(\'{ds_version}\')'
 
-        res = _db.session.execute(expr).fetchone()
+        try:
+            res =  _db.session.execute(expr).fetchone()
+            if res:
+                return Table(res.table_name, _db.metadata, schema=Config.SAMPLEDB_SCHEMA, autoload=True,
+                             autoload_with=_db.engine)
 
-        if res:
-            return Table(res.table_name, _db.metadata, schema=Config.SAMPLEDB_SCHEMA, autoload=True,
-                         autoload_with=_db.engine)
-
-        return None
+            return None
+        finally:
+            _db.session.close()
 
     @property
     def ds_table(self) -> Union[Table, None]:
