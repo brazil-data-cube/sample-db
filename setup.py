@@ -63,7 +63,7 @@ setup_requires = [
 ]
 
 install_requires = [
-    'lccs-db @ git+https://github.com/brazil-data-cube/lccs-db.git@v0.8.1',
+    'lccs-db @ git+https://github.com/brazil-data-cube/lccs-db.git@v0.8.2',
     'GeoAlchemy2>=0.6.3',
     'sqlalchemy-views>=0.2.4',
 ]
@@ -114,13 +114,16 @@ setup(
     extras_require=extras_require,
     tests_require=tests_require,
     classifiers=[
-        'Development Status :: 1 - Planning',
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Web Environment',
         'Intended Audience :: Education',
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: GPL v3 License',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3 :: Only',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
         'Topic :: Scientific/Engineering :: GIS',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
