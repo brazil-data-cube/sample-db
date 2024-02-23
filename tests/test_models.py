@@ -11,13 +11,13 @@ from shapely.geometry import Point
 from geoalchemy2.shape import from_shape
 
 from sample_db import BDCSample
-from sample_db.models import Datasets, CollectMethod
+from sample_db.models import Datasets, CollectMethod, Users
 from sample_db.models.dataset_table import DatasetType
 
 
 def _prepare_samples_fields():
     features = [
-        dict(class_id=1, geometry=from_shape(shape=Point(0, 0),  srid=4326)),
+        dict(class_id=1, geometry=from_shape(shape=Point(0, 0), srid=4326)),
         dict(class_id=1, geometry=from_shape(shape=Point(0, 1), srid=4326)),
         dict(class_id=1, geometry=from_shape(shape=Point(1, 2), srid=4326))
     ]
@@ -59,12 +59,27 @@ def test_create_collect(db):
     assert cl and cl.name == collect_method_infos['name']
 
 
+def test_create_user(db):
+    with db.session.begin_nested():
+        user = Users()
+        user.name = 'Teste'
+        user.email = 'teste@gmail.com'
+        user.user_id = 1
+        user.institution = 'INPE'
+
+        db.session.add(user)
+
+    db.session.commit()
+
+    assert user and user.name == 'Teste'
+
+
 def test_create_ds_table(db):
     with db.session.begin_nested():
         dataset_type = DatasetType()
         dataset_type.create()
 
-        ds = Datasets.create_ds_table(table_name='fake-sample',  version="1")
+        ds = Datasets.create_ds_table(table_name='fake-sample', version="1")
         ds.user_id = 1
         ds.classification_system_id = 1
         ds.start_date = '2007-01-01'
@@ -72,6 +87,7 @@ def test_create_ds_table(db):
         ds.is_public = True
         ds.collect_method_id = 1
         ds.title = 'Fake Sample'
+        ds.status = 'IN_PROGRESS'
         db.session.add(ds)
     db.session.commit()
 
