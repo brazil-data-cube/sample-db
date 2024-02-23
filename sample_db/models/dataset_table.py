@@ -82,7 +82,7 @@ def make_dataset_table(table_name: str, create: bool = False) -> Table:
     s_name = f"{Config.SAMPLEDB_SCHEMA}.dataset_{table_name}_id_seq"
 
     if create:
-        if not db.engine.dialect.has_table(table_name=f'dataset_{table_name}', connection=db.session, schema=Config.SAMPLEDB_SCHEMA):
+        if not db.engine.dialect.has_table(table_name=f'dataset_{table_name}', connection=db.engine.connect(), schema=Config.SAMPLEDB_SCHEMA):
             db.engine.execute(f"CREATE TABLE {Config.SAMPLEDB_SCHEMA}.dataset_{table_name} OF dataset_type")
             db.engine.execute(f"CREATE SEQUENCE {s_name}")
 
