@@ -18,9 +18,10 @@
 Changes
 =======
 
-Version 1.0.0 (2024-02-23)
+Version 1.0.0 (2024-02-29)
 --------------------------
 
+- Review documentation (`#116 <https://github.com/brazil-data-cube/sample-db/issues/116>`_).
 - Added users table (`#96 <https://github.com/brazil-data-cube/sample-db/issues/96>`_).
 - Bug fix: Fixed error in dataset validation sqlalchemy.inspect is not valid (`#97 <https://github.com/brazil-data-cube/sample-db/issues/97>`_).
 - Bug fix: Fixed problem with multiple connections when opening the dataset table retrieval function (`#98 <https://github.com/brazil-data-cube/sample-db/issues/98>`_).
