@@ -29,7 +29,6 @@ docs_require = [
     'Sphinx>=2.2',
     'sphinx_rtd_theme',
     'sphinx-copybutton',
-    'docutils>=0.10,<0.15'
 ]
 
 tests_require = [
